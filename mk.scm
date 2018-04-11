@@ -6,17 +6,20 @@
 
 (define c->T (lambda (c) (cadddr c)))
 
-(define empty-c '(() () () ()))
+(define c->M (lambda (c) (cadddr (cdr c))))
+
+(define empty-c '(() () () () ()))
 
 (define-syntax lambdag@
   (syntax-rules (:)
     ((_ (c) e) (lambda (c) e))
-    ((_ (c : S D A T) e)
+    ((_ (c : S D A T M) e)
      (lambda (c)
        (let ((S (c->S c))
              (D (c->D c))
              (A (c->A c))
-             (T (c->T c)))
+             (T (c->T c))
+             (M (c->M c)))
          e)))))
 
 (define mzero (lambda () #f))
@@ -123,10 +126,10 @@
 (define make-tag-A
   (lambda (tag pred)
     (lambda (u)
-      (lambdag@ (c : S D A T)
+      (lambdag@ (c : S D A T M)
         (case-value (walk u S)
           ((x) (cond
-                 ((make-tag-A+ x tag pred c S D A T) =>
+                 ((make-tag-A+ x tag pred c S D A T M) =>
                   unit)
                  (else (mzero))))
           ((au du) (mzero))
@@ -135,7 +138,7 @@
                  (else (mzero)))))))))
 
 (define make-tag-A+
-  (lambda (u tag pred c S D A T)
+  (lambda (u tag pred c S D A T M)
     (cond
       ((ext-A (walk u S) tag pred S A) => 
        (lambda (A+)  
@@ -143,22 +146,22 @@
            ((null? A+) c)
            (else (let ((D (subsume A+ D))
                        (A (append A+ A)))
-                   (subsume-A S D A T))))))
+                   (subsume-A S D A T M))))))
       (else #f))))
 
 (define subsume-A
-  (lambda (S D A T)
+  (lambda (S D A T M)
     (let ((x* (rem-dups (map lhs A))))
-      (subsume-A+ x* S D A T))))
+      (subsume-A+ x* S D A T M))))
 
 (define subsume-A+
-  (lambda (x* S D A T)
+  (lambda (x* S D A T M)
     (cond
-      ((null? x*) `(,S ,D ,A ,T))
+      ((null? x*) `(,S ,D ,A ,T ,M))
       (else (let ((x (car x*)))
-              (let ((D/T (update-D/T x S D A T)))
+              (let ((D/T (update-D/T x S D A T M)))
                 (let ((D (car D/T)) (T (cdr D/T)))
-                  `(,S ,D ,A ,T))))))))
+                  `(,S ,D ,A ,T ,M))))))))
 
 (define ext-A 
   (lambda (x tag pred S A)
@@ -190,13 +193,13 @@
 
 (define =/= 
   (lambda (u v)
-    (lambdag@ (c : S D A T)
+    (lambdag@ (c : S D A T M)
       (cond
-        ((unify u v S) => (post-unify-=/= S D A T))
+        ((unify u v S) => (post-unify-=/= S D A T M))
         (else (unit c))))))
 
 (define post-unify-=/=
-  (lambda (S D A T)
+  (lambda (S D A T M)
     (lambda (S+)
       (cond
         ((eq? S+ S) (mzero))
@@ -204,7 +207,7 @@
                 (let ((D+ (subsume A D+)))
                   (let ((D+ (subsume T D+)))
                     (let ((D (append D+ D)))
-                      (unit `(,S ,D ,A ,T)))))))))))
+                      (unit `(,S ,D ,A ,T ,M)))))))))))
 
 (define prefix-S
   (lambda (S+ S)
@@ -236,21 +239,21 @@
 
 (define == 
   (lambda (u v)
-    (lambdag@ (c : S D A T)
+    (lambdag@ (c : S D A T M)
       (cond
         ((unify u v S) =>
-         (post-unify-== c S D A T))
+         (post-unify-== c S D A T M))
         (else (mzero))))))
 
 (define post-unify-==
-  (lambda (c S D A T)
+  (lambda (c S D A T M)
     (lambda (S+)
       (cond
         ((eq? S+ S) (unit c))
         ((verify-D D S+) =>
          (lambda (D)
            (cond
-             ((post-verify-D S+ D A T) => unit)
+             ((post-verify-D S+ D A T M) => unit)
              (else (mzero)))))
         (else (mzero))))))
 
@@ -274,10 +277,10 @@
       (else D))))
 
 (define post-verify-D
-  (lambda (S D A T)
+  (lambda (S D A T M)
     (cond
       ((verify-A A S) =>
-       (post-verify-A S D T))
+       (post-verify-A S D T M))
       (else #f))))
 
 (define verify-A
@@ -300,11 +303,11 @@
       (else #f))))
 
 (define post-verify-A
-  (lambda (S D T)
+  (lambda (S D T M)
     (lambda (A)
       (let ((D (subsume A D)))
         (cond
-          ((verify-T T S) => (post-verify-T S D A))
+          ((verify-T T S) => (post-verify-T S D A M))
           (else #f))))))
 
 (define verify-T 
@@ -331,29 +334,29 @@
           ((u) (and (pred u) T0)))))))
 
 (define post-verify-T
-  (lambda (S D A)
+  (lambda (S D A M)
     (lambda (T)
-      (subsume-T T S (subsume T D) A '()))))
+      (subsume-T T S (subsume T D) A '() M))))
 
 (define subsume-T  
-  (lambda (T+ S D A T)
+  (lambda (T+ S D A T M)
     (let ((x* (rem-dups (map lhs A))))
-      (subsume-T+ x* T+ S D A T))))
+      (subsume-T+ x* T+ S D A T M))))
 
 (define subsume-T+ 
-  (lambda (x* T+ S D A T)
+  (lambda (x* T+ S D A T M)
     (cond
       ((null? x*)
        (let ((T (append T+ T)))
-         `(,S ,D ,A ,T)))
+         `(,S ,D ,A ,T ,M)))
       (else
        (let ((x (car x*)) (x* (cdr x*)))
-         (let ((D/T (update-D/T x S D A T+)))
+         (let ((D/T (update-D/T x S D A T+ M)))
            (let ((D (car D/T)) (T+ (cdr D/T)))
-             (subsume-T+ x* T+ S D A T))))))))
+             (subsume-T+ x* T+ S D A T M))))))))
 
 (define update-D/T
-  (lambda (x S D A T)
+  (lambda (x S D A T M)
     (cond
       ((null? A)
        (let ((T (remp (lambda (t)
@@ -366,12 +369,12 @@
            ((and (eq? (lhs a) x)
               (or (tag=? (pr->tag a) 'sym)   
                   (tag=? (pr->tag a) 'num)))
-            (update-D/T+ x '() S D T))
+            (update-D/T+ x '() S D T M))
            (else
-	    (update-D/T x S D (cdr A) T))))))))
+	    (update-D/T x S D (cdr A) T M))))))))
 
 (define update-D/T+
-  (lambda (x T+ S D T)
+  (lambda (x T+ S D T M)
     (cond
       ((null? T)
        `(,D . ,T+))
@@ -381,10 +384,10 @@
          (cond
            ((eq? (lhs t) x)
             (let ((D (ext-D x (pr->tag t) D S)))
-              (update-D/T+ x T+ S D T)))
+              (update-D/T+ x T+ S D T M)))
            (else
             (let ((T+ (cons t T+)))
-              (update-D/T+ x T+ S D T)))))))))
+              (update-D/T+ x T+ S D T M)))))))))
 
 (define ext-D
   (lambda (x tag D S)
@@ -407,13 +410,13 @@
     (cond
       ((not (tag? tag)) fail)
       (else
-       (lambdag@ (c : S D A T)
+       (lambdag@ (c : S D A T M)
          (cond
-           ((absento+ u tag c S D A T) => unit)
+           ((absento+ u tag c S D A T M) => unit)
            (else (mzero))))))))
 
 (define absento+  
-  (lambda (u tag c S D A T)
+  (lambda (u tag c S D A T M)
     (case-value (walk u S)
       ((x)
        (let ((T+ (ext-T x tag S T)))
@@ -421,15 +424,16 @@
            ((null? T+) c)
            (else
             (let ((D (subsume T+ D)))
-              (subsume-T T+ S D A T))))))
+              (subsume-T T+ S D A T M))))))
       ((au du)
-       (let ((c (absento+ au tag c S D A T)))
+       (let ((c (absento+ au tag c S D A T M)))
          (and c
            (let ((S (c->S c))
                  (D (c->D c))
                  (A (c->A c))
-                 (T (c->T c)))
-             (absento+ du tag c S D A T)))))
+                 (T (c->T c))
+                 (M (c->M c)))
+             (absento+ du tag c S D A T M)))))
       ((u)
        (cond
          ((and (tag? u) (tag=? u tag)) #f)
@@ -575,7 +579,8 @@
   (lambda (x)
     (lambda (c)
       (let ((S (c->S c)) (D (c->D c))
-            (A (c->A c)) (T (c->T c)))
+            (A (c->A c)) (T (c->T c))
+            (M (c->M c))) ;; TODO
         (let ((v (walk* x S)))
           (let ((S (reify-S v '())))
             (reify+ v S
@@ -739,7 +744,7 @@
 (define-syntax project
   (syntax-rules ()
     ((_ (x ...) g g* ...)
-     (lambdag@ (c : S D A T)
+     (lambdag@ (c : S D A T M)
        (let ((x (walk* x S)) ...)
          ((fresh () g g* ...) c))))))
 
