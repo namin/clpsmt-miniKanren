@@ -4,7 +4,9 @@ CLP(SMT)-miniKanren
 Canonical miniKanren implementation, augmented with CLP(SMT).
 
 Added SMT hooks:
-TODO
+z/fresh  (declare-fun x () Int)
+z/assert (assert (= x 1)) (assert (>= x 0))
+(check-sat) is called implicitly, if the result is unsat, the procedure fails.
 
 Starts with the language described in the paper:
 
