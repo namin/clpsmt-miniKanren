@@ -1,9 +1,12 @@
-miniKanren
-==========
+CLP(SMT)-miniKanren
+===================
 
-Canonical miniKanren implementation.
+Canonical miniKanren implementation, augmented with CLP(SMT).
 
-Implements the language described in the paper:
+Added SMT hooks:
+TODO
+
+Starts with the language described in the paper:
 
 William E. Byrd, Eric Holk, and Daniel P. Friedman.
 miniKanren, Live and Untagged: Quine Generation via Relational Interpreters (Programming Pearl).
