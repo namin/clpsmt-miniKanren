@@ -788,48 +788,41 @@
 
 (define onceo (lambda (g) (condu (g))))
 
-(define z/var
-  (lambda (x)
-    (lambdag@ (c : S D A T M)
-      (let ((M (cons `(declare-fun ,x () Int) M)))
-        `(,S ,D ,A ,T ,M)))))
+(define z/reify-SM
+  (lambda (M)
+    (lambda (c)
+      (let ((S (c->S c)))
+        (let ((M (walk* (reverse M) S)))
+          (let ((S (reify-S M '())))
+            (cons (map (lambda (x) (cons (cdr x) (car x))) S)
+              (append
+               (map (lambda (s) `(declare-fun ,(cdr s) () Int)) S)
+               (walk* M S)))))))))
 
 (define z/assert
   (lambda (e)
     (lambdag@ (c : S D A T M)
       (let* ((M (cons `(assert ,e) M))
-             (r (check-sat ((reify (reverse M)) c))))
+             (r (check-sat (cdr ((z/reify-SM M) c)))))
         (if r
             `(,S ,D ,A ,T ,M)
             #f)))))
 
-(define find-var
-  (lambda (v rM M)
-    (if (eq? v (cadar rM))
-        (cadar M)
-        (find-var v (cdr rM) (cdr M)))))
-
 (define add-model
-  (lambda (m rM M)
+  (lambda (m s)
     (lambda (c)
       (if (null? m)
           c
           (bind
-           ((== (find-var (caar m) rM M)
-                (cdar m)) c)
-           (add-model (cdr m) rM M))))))
-
-(define only-decl
-  (lambda (M)
-    (filter (lambda (x) (eq? (car x) 'declare-fun)) M)))
+           ((== (cdr (assq (caar m) s)) (cdar m)) c)
+           (add-model (cdr m) s))))))
 
 (define purge-M
   (lambdag@ (c : S D A T M)
-(if (null? M)
-    c
-    (let ([rM ((reify (reverse M)) c)])
-      (let ([model
-             (get-model rM)])
-        (if (not (check-model-unique rM model))
-            c
-            ((add-model model (only-decl rM) (only-decl (reverse M))) c)))))))
+    (if (null? M)
+        c
+        (let* ([SM ((z/reify-SM M) c)])
+          (let ([model (get-model (cdr SM))])
+            (if (not (check-model-unique (cdr SM) model))
+                c
+                ((add-model model (car SM)) c)))))))
