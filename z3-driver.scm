@@ -39,10 +39,12 @@
 
 (define check-model-unique
   (lambda (xs model)
-    (let ([r (check-sat
-              (append xs
-                      (map
-                       (lambda (xv)
-                         `(assert (not (= ,x ,v))))
+    (let ([r
+           (check-sat
+            (append xs
+                    (map
+                     (lambda (xv)
+                       `(assert
+                         (not (= ,(car xv) ,(cdr xv)))))
                        model)))])
       (not r))))

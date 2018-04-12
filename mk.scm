@@ -56,7 +56,7 @@
        (lambdaf@ ()
          ((fresh (x) g0 g ...
             (lambdag@ (final-c)
-              (let ((z ((reify x) final-c)))
+              (let ((z ((reify x) (purge-M final-c))))
                 (choice z empty-f))))
           empty-c))))))
 
@@ -580,7 +580,7 @@
     (lambda (c)
       (let ((S (c->S c)) (D (c->D c))
             (A (c->A c)) (T (c->T c))
-            (M (c->M c))) ;; TODO
+            (M (c->M c)))
         (let ((v (walk* x S)))
           (let ((S (reify-S v '())))
             (reify+ v S
@@ -812,3 +812,34 @@
         (if r
             `(,S ,D ,A ,T ,M)
             #f)))))
+
+(define find-var
+  (lambda (v rM M)
+    (if (eq? v (cadar rM))
+        (cadar M)
+        (find-var v (cdr rM) (cdr M)))))
+
+(define add-model
+  (lambda (m rM M)
+    (lambda (c)
+      (if (null? m)
+          c
+          (bind
+           ((== (find-var (caar m) rM M)
+                (cdar m)) c)
+           (add-model (cdr m) rM M))))))
+
+(define only-decl
+  (lambda (M)
+    (filter (lambda (x) (eq? (car x) 'declare-fun)) M)))
+
+(define purge-M
+  (lambdag@ (c : S D A T M)
+(if (null? M)
+    c
+    (let ([rM ((reify (reverse M)) c)])
+      (let ([model
+             (get-model rM)])
+        (if (not (check-model-unique rM model))
+            c
+            ((add-model model (only-decl rM) (only-decl (reverse M))) c)))))))

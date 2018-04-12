@@ -18,7 +18,6 @@
          (z/assert `(= ,x 1))))))
   '())
 
-;; TODO
 (test "3"
   (run* (q)
     (z/fresh
