@@ -14,3 +14,15 @@
      (assert (= x 1))))
   #f)
 
+(test "3"
+  (get-model
+   '((declare-fun x () Int)
+     (assert (= x 0))))
+  '((x . 0)))
+
+(test "4"
+  (check-model-unique
+   '((declare-fun x () Int)
+     (assert (= x 0)))
+   '((x . 0)))
+  #t)
