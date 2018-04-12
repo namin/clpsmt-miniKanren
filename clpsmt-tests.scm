@@ -48,3 +48,8 @@
   (run* (q)
     (faco q 2))
   '(2))
+
+(test "faco-backwards-720"
+  (run* (q)
+    (faco q 720))
+  '(6))
