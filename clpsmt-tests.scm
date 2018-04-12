@@ -17,3 +17,13 @@
          (z/assert `(= ,x 0))
          (z/assert `(= ,x 1))))))
   '())
+
+;; TODO
+(test "3"
+  (run* (q)
+    (z/fresh
+     (lambda (x)
+       (fresh ()
+         (z/assert `(= ,x 0))
+         (== x q)))))
+  '(0))

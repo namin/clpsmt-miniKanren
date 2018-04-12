@@ -790,7 +790,7 @@
 
 (define z/var
   (lambda (M)
-    (let ((x (string->symbol (string-append "x" (number->string (length M))))))
+    (let ((x (var 'x)))
       (cons
        x
        (cons `(declare-fun ,x () Int) M)))))
@@ -808,7 +808,7 @@
   (lambda (e)
     (lambdag@ (c : S D A T M)
       (let* ((M (cons `(assert ,e) M))
-             (r (check-sat (reverse M))))
+             (r (check-sat ((reify (reverse M)) c))))
         (if r
             `(,S ,D ,A ,T ,M)
             #f)))))
