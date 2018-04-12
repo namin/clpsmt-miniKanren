@@ -787,3 +787,28 @@
          ((c f) (bind* (unit c) g ...)))))))
 
 (define onceo (lambda (g) (condu (g))))
+
+(define z/var
+  (lambda (M)
+    (let ((x (string->symbol (string-append "x" (number->string (length M))))))
+      (cons
+       x
+       (cons `(declare-fun ,x () Int) M)))))
+
+(define z/fresh
+  (lambda (f) ;; TODO: turn into a macro like fresh?
+   (lambdag@ (c : S D A T M)
+     (let* ((xM (z/var M))
+            (x (car xM))
+            (M (cdr xM))
+            (c `(,S ,D ,A ,T ,M)))
+       ((f x) c)))))
+
+(define z/assert
+  (lambda (e)
+    (lambdag@ (c : S D A T M)
+      (let* ((M (cons `(assert ,e) M))
+             (r (check-sat (reverse M))))
+        (if r
+            `(,S ,D ,A ,T ,M)
+            #f)))))
