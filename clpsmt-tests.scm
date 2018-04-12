@@ -43,3 +43,8 @@
       (faco n out)
       (== q `(,n ,out))))
   '((0 1) (1 1) (2 2) (3 6) (4 24) (5 120) (6 720)))
+
+(test "faco-backwards-2"
+  (run* (q)
+    (faco q 2))
+  '(2))
