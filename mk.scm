@@ -789,20 +789,10 @@
 (define onceo (lambda (g) (condu (g))))
 
 (define z/var
-  (lambda (M)
-    (let ((x (var 'x)))
-      (cons
-       x
-       (cons `(declare-fun ,x () Int) M)))))
-
-(define z/fresh
-  (lambda (f) ;; TODO: turn into a macro like fresh?
-   (lambdag@ (c : S D A T M)
-     (let* ((xM (z/var M))
-            (x (car xM))
-            (M (cdr xM))
-            (c `(,S ,D ,A ,T ,M)))
-       ((f x) c)))))
+  (lambda (x)
+    (lambdag@ (c : S D A T M)
+      (let ((M (cons `(declare-fun ,x () Int) M)))
+        `(,S ,D ,A ,T ,M)))))
 
 (define z/assert
   (lambda (e)
