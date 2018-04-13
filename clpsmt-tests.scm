@@ -53,3 +53,15 @@
   (run* (q)
     (faco q 720))
   '(6))
+
+(load "full-interp.scm")
+
+(test "evalo-1"
+  (run* (q)
+    (evalo '(+ 1 2) q))
+  '(3))
+
+(test "evalo-backwards-1"
+  (run* (q)
+    (evalo `(+ 0 ',q) 3))
+  '(3))
