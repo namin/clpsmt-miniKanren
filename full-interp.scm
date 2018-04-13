@@ -178,6 +178,22 @@
        (numbero a1)
        (numbero a2)
        (z/assert `(= ,val (,prim-id ,a1 ,a2))))]
+    [(conde
+       [(== prim-id '=)]
+       [(== prim-id '>)]
+       [(== prim-id '>=)]
+       [(== prim-id '<)]
+       [(== prim-id '=<)])
+     (fresh (a1 a2)
+       (== `(,a1 ,a2) a*)
+       ;; we could use list-of-numbero instead
+       ;; but it causes more divergence with run*
+       ;; (list-of-numbero a*)
+       (numbero a1)
+       (numbero a2)
+       (conde
+         [(z/assert `(,prim-id ,a1 ,a2)) (== #t val)]
+         [(z/assert `(not (,prim-id ,a1 ,a2))) (== #f val)]))]
     ))
 
 (define (prim-expo expr env val)
@@ -257,6 +273,11 @@
                       (- . (val . (prim . -)))
                       (* . (val . (prim . *)))
                       (/ . (val . (prim . /)))
+                      (= . (val . (prim . =)))
+                      (> . (val . (prim . >)))
+                      (>= . (val . (prim . >=)))
+                      (< . (val . (prim . <)))
+                      (=< . (val . (prim . =<)))
                       . ,empty-env))
 
 (define handle-matcho

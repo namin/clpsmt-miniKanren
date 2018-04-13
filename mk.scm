@@ -54,9 +54,9 @@
     ((_ n (x) g0 g ...)
      (take n
        (lambdaf@ ()
-         ((fresh (x) g0 g ...
+         ((fresh (x) g0 g ... purge-M
             (lambdag@ (final-c)
-              (let ((z ((reify x) (purge-M final-c))))
+              (let ((z ((reify x) final-c)))
                 (choice z empty-f))))
           empty-c))))))
 
@@ -821,8 +821,12 @@
   (lambdag@ (c : S D A T M)
     (if (null? M)
         c
-        (let* ([SM ((z/reify-SM M) c)])
-          (let ([model (get-model (cdr SM))])
-            (if (not (check-model-unique (cdr SM) model))
-                c
-                ((add-model model (car SM)) c)))))))
+        (let ([SM ((z/reify-SM M) c)])
+          (if (not (check-sat (cdr SM)))
+              #f
+              (if (null? (car SM))
+                  c
+                  (let ([model (get-model (cdr SM))])
+                    (if (not (check-model-unique (cdr SM) model))
+                        c
+                        ((add-model model (car SM)) c)))))))))

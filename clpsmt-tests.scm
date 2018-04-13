@@ -65,3 +65,31 @@
   (run* (q)
     (evalo `(+ 0 ',q) 3))
   '(3))
+
+(test "evalo-bop-1"
+  (run* (q)
+    (evalo `((lambda (n) (< n 0)) 0) q))
+  '(#f))
+
+(test "evalo-2"
+  (run* (q)
+    (evalo `(((lambda (f)
+                (lambda (n) (if (< n 0) #f
+                           (if (= n 0) 1
+                               (* n (f (- n 1)))))))
+              (lambda (x) 1))
+             2)
+           q))
+  '(2))
+
+
+(test "evalo-fac-6"
+  (run* (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac 6))
+           q))
+  '(720))
