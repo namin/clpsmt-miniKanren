@@ -124,3 +124,18 @@
                (fac 3)))
            '(1 1 2 6)))
   '(1))
+
+(test "evalo-fac-synthesis-hole-1"
+  (run 1 (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (,q (- n 1))))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(fac))
