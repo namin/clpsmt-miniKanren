@@ -581,7 +581,7 @@
       (let ((S (c->S c)) (D (c->D c))
             (A (c->A c)) (T (c->T c))
             (M (c->M c)))
-        (let ((v (walk* x S)))
+        (let ((v (walk* (if (null? M) x (list x ': M)) S)))
           (let ((S (reify-S v '())))
             (reify+ v S
               (let ((D (remp
@@ -825,8 +825,8 @@
           (if (not (check-sat (cdr SM)))
               #f
               (if (null? (car SM))
-                  c
+                  `(,S ,D ,A ,T ())
                   (let ([model (get-model (cdr SM))])
                     (if (not (check-model-unique (cdr SM) model))
                         c
-                        ((add-model model (car SM)) c)))))))))
+                        ((add-model model (car SM)) `(,S ,D ,A ,T ()))))))))))

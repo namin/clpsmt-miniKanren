@@ -281,3 +281,10 @@
   (run* (q)
     (evalo `(* 3 ',q) 18))
   '(6))
+
+(test "evalo-reify-constraint"
+  (run* (q)
+    (fresh (x y)
+      (evalo `(* ',x ',y) 6)
+      (== q (list x y))))
+  '((((_.0 _.1) : ((assert (= 6 (* _.0 _.1))))) (num _.0 _.1))))
