@@ -288,3 +288,19 @@
       (evalo `(* ',x ',y) 6)
       (== q (list x y))))
   '((((_.0 _.1) : ((assert (= 6 (* _.0 _.1))))) (num _.0 _.1))))
+
+;; busted!  Shouldn't (1 3) also be an answer?
+(test "busted-1"
+  (run* (q)
+    (fresh (x y)
+      (evalo `(+ (* ',x ',y) (* ',x ',y)) 6)
+      (== q (list x y))))
+  '((3 1)))
+
+;; busted!  Shouldn't (1 3) also be an answer?
+(test "busted-2"
+  (run* (q)
+    (fresh (x y)
+      (evalo `(* (* ',x ',y) 2) 6)
+      (== q (list x y))))
+  '((3 1)))
