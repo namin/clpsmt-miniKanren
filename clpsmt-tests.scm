@@ -289,18 +289,25 @@
       (== q (list x y))))
   '((((_.0 _.1) : ((assert (= 6 (* _.0 _.1))))) (num _.0 _.1))))
 
-;; busted!  Shouldn't (1 3) also be an answer?
-(test "busted-1"
+(test "many-1"
   (run* (q)
     (fresh (x y)
       (evalo `(+ (* ',x ',y) (* ',x ',y)) 6)
       (== q (list x y))))
-  '((3 1)))
+  '((((_.0 _.1)
+    :
+    ((assert (= _.2 (* _.0 _.1)))
+     (assert (= _.3 (* _.0 _.1)))
+     (assert (= 6 (+ _.3 _.2)))))
+    (num _.0 _.1 _.2 _.3))))
 
-;; busted!  Shouldn't (1 3) also be an answer?
-(test "busted-2"
+(test "many-2"
   (run* (q)
     (fresh (x y)
       (evalo `(* (* ',x ',y) 2) 6)
       (== q (list x y))))
-  '((3 1)))
+  '((((_.0 _.1)
+    :
+    ((assert (= _.2 (* _.0 _.1)))
+     (assert (= 6 (* _.2 2)))))
+    (num _.0 _.1 _.2))))

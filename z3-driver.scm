@@ -42,9 +42,14 @@
     (let ([r
            (check-sat
             (append xs
-                    (map
-                     (lambda (xv)
-                       `(assert
-                         (not (= ,(car xv) ,(cdr xv)))))
-                       model)))])
+                    (list
+                     (cons
+                      'assert
+                      (list
+                       (cons
+                        'or
+                        (map
+                         (lambda (xv)
+                           `(not (= ,(car xv) ,(cdr xv))))
+                         model)))))))])
       (not r))))
