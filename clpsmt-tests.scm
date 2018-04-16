@@ -200,3 +200,68 @@
                (fac 3)))
            '(1 1 2 6)))
   '(fac))
+
+;; takes a while
+(test "evalo-fac-synthesis-hole-1-reversed-examples"
+  (run 1 (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (,q (- n 1))))))))
+              (list
+               (fac 3)
+               (fac 2)
+               (fac 1)
+               (fac 0)))
+           '(6 2 1 1)))
+  '(fac))
+
+(test "evalo-fac-synthesis-hole-2"
+  (run 1 (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- ,q 1))))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(n))
+
+(test "evalo-fac-synthesis-hole-3"
+  (run 1 (q)
+    (fresh (r s)
+      (== (list r s) q)
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- ,r ,s))))))))
+                (list
+                 (fac 0)
+                 (fac 1)
+                 (fac 2)
+                 (fac 3)))
+             '(1 1 2 6))))
+  '((n 1)))
+
+;; slow, even with the 'symbolo' constraint on 'q'
+(test "evalo-fac-synthesis-hole-4"
+  (run 1 (q)
+    (symbolo q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (,q n 1))))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(-))
