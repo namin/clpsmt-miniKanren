@@ -2,6 +2,16 @@
 (load "z3-driver.scm")
 (load "test-check.scm")
 
+(test "inf-smt-ans-1"
+  (run 1 (q)
+    (z/assert `(>= ,q 0)))
+  '(0))
+
+(test "inf-smt-ans-2"
+  (run 2 (q)
+    (z/assert `(>= ,q 0)))
+  '(0 1))
+
 (test "1"
   (run* (q)
     (fresh (x)

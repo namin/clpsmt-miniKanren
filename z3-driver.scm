@@ -62,3 +62,9 @@
       (if (not (check-sat ys))
           (reverse ms)
           (get-all-models xs (cons (get-model ys) ms))))))
+
+(define get-next-model
+  (lambda (xs ms)
+    (let* ([ys (append xs (map neg-model ms))])
+      (and (check-sat ys)
+           (get-model ys)))))

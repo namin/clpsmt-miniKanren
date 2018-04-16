@@ -54,7 +54,7 @@
     ((_ n (x) g0 g ...)
      (take n
        (lambdaf@ ()
-         ((fresh (x) g0 g ... purge-M-all-models
+         ((fresh (x) g0 g ... purge-M-inc-models
             (lambdag@ (final-c)
               (let ((z ((reify x) final-c)))
                 (choice z empty-f))))
@@ -849,3 +849,19 @@
                               (mplus
                                ((add-model (car ms) (car SM)) `(,S ,D ,A ,T ()))
                                (lambda () (loop (cdr ms))))))))))))))
+
+(define purge-M-inc-models
+  (lambdag@ (c : S D A T M)
+    (if (null? M)
+        c
+        (let ([SM ((z/reify-SM M) c)])
+          (if (not (check-sat (cdr SM)))
+              #f
+              (if (null? (car SM))
+                  `(,S ,D ,A ,T ())
+                  (let loop ((ms '()))
+                    (let ((m (get-next-model (cdr SM) ms)))
+                      (and m
+                        (mplus
+                         ((add-model m (car SM)) `(,S ,D ,A ,T ()))
+                         (lambda () (loop (cons m ms)))))))))))))
