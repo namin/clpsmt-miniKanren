@@ -37,19 +37,28 @@
       (system "z3 out.smt >out.txt")
       (read-model "out.txt"))))
 
+(define neg-model
+  (lambda (model)
+    (cons
+     'assert
+     (list
+      (cons
+       'or
+       (map
+        (lambda (xv)
+          `(not (= ,(car xv) ,(cdr xv))))
+        model))))))
+
 (define check-model-unique
   (lambda (xs model)
     (let ([r
            (check-sat
-            (append xs
-                    (list
-                     (cons
-                      'assert
-                      (list
-                       (cons
-                        'or
-                        (map
-                         (lambda (xv)
-                           `(not (= ,(car xv) ,(cdr xv))))
-                         model)))))))])
+            (append xs (list (neg-model model))))])
       (not r))))
+
+(define get-all-models
+  (lambda (xs ms)
+    (let* ([ys (append xs (map neg-model ms))])
+      (if (not (check-sat ys))
+          (reverse ms)
+          (get-all-models xs (cons (get-model ys) ms))))))
