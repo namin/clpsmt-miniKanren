@@ -95,6 +95,67 @@
   '(720))
 
 ;; slowish
+(test "evalo-fac-9"
+  (run* (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac 9))
+           q))
+  '(362880))
+
+(test "evalo-backwards-fac-6"
+  (run 1 (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac ,q))
+           720))
+  '(6))
+
+;; remember the quote!
+(test "evalo-backwards-fac-quoted-6"
+  (run* (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac ',q))
+           720))
+  '(6))
+
+
+;; slowish
+(test "evalo-backwards-fac-9"
+  (run 1 (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac ,q))
+           362880))
+  '(9))
+
+;; remember the quote!
+(test "evalo-backwards-fac-quoted-9"
+  (run* (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac ',q))
+           362880))
+  '(9))
+
+
+;; slowish
 (test "evalo-fac-table"
   (run* (q)
     (evalo `(letrec ((fac
