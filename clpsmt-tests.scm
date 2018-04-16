@@ -265,3 +265,8 @@
                (fac 3)))
            '(1 1 2 6)))
   '(-))
+
+;; This run seems to diverge, although it succeeds if 4 is replaced by 3.
+;; Why does it diverge?  Can we fix the divergence?
+;;
+;; (run 1 (q) (evalo `(* 4 ,q) 6))
