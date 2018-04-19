@@ -152,6 +152,87 @@
                           (if (!= (+ x (+ y z)) 3)
                               'good
                               (list 'bad x y z))))))))
+             `(bad . ,vals))))
+  '())
+
+;;;
+
+(test "evalo-symbolic-execution-f"
+  (run 8 (q)
+    (fresh (alpha beta gamma vals)
+      (== (list alpha beta gamma vals) q)
+      (evalo `((lambda (a b c)
+                 (let ((x (if (!= a 0)
+                              -2
+                              0)))
+                   (let ((y (if (and (< b 5) (= a 0) (!= c 0))
+                                1
+                                0)))
+                     (let ((z (if (< b 5)
+                                  2
+                                  0)))
+                       (if (!= (+ x (+ y z)) 3)
+                           'good
+                           (list 'bad x y z))))))
+               ',alpha ',beta ',gamma)
+             `(bad . ,vals))))  
+  '((0 4 1 (0 1 2))
+    (0 0 -1 (0 1 2))
+    (0 -1 -2 (0 1 2))
+    (0 -2 -3 (0 1 2))
+    (0 -3 -4 (0 1 2))
+    (0 -4 -5 (0 1 2))
+    (0 -5 -6 (0 1 2))
+    (0 -6 -7 (0 1 2))))
+
+(test "evalo-symbolic-execution-g"
+  (run 8 (q)
+    (fresh (alpha beta gamma vals)
+      (z/assert `(not (= 0 ,beta)))
+      (== (list alpha beta gamma vals) q)
+      (evalo `((lambda (a b c)
+                 (let ((x (if (!= a 0)
+                              -2
+                              0)))
+                   (let ((y (if (and (< b 5) (= a 0) (!= c 0))
+                                1
+                                0)))
+                     (let ((z (if (< b 5)
+                                  2
+                                  0)))
+                       (if (!= (+ x (+ y z)) 3)
+                           'good
+                           (list 'bad x y z))))))
+               ',alpha ',beta ',gamma)
+             `(bad . ,vals))))  
+  '((0 1 1 (0 1 2))
+    (0 -1 -1 (0 1 2))
+    (0 -2 -2 (0 1 2))
+    (0 -3 -3 (0 1 2))
+    (0 -4 -4 (0 1 2))
+    (0 -5 -5 (0 1 2))
+    (0 -6 -6 (0 1 2))
+    (0 2 -7 (0 1 2))))
+
+(test "evalo-symbolic-execution-h"
+  (run* (q)
+    (fresh (alpha beta gamma vals)
+      (z/assert `(not (= 0 ,alpha)))
+      (== (list alpha beta gamma vals) q)
+      (evalo `((lambda (a b c)
+                 (let ((x (if (!= a 0)
+                              -2
+                              0)))
+                   (let ((y (if (and (< b 5) (= a 0) (!= c 0))
+                                1
+                                0)))
+                     (let ((z (if (< b 5)
+                                  2
+                                  0)))
+                       (if (!= (+ x (+ y z)) 3)
+                           'good
+                           (list 'bad x y z))))))
+               ',alpha ',beta ',gamma)
              `(bad . ,vals))))  
   '())
 
