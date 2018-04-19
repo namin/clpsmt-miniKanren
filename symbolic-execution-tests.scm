@@ -69,3 +69,35 @@
       'bar))
   '(138 139 140 141 142 143 144 145 146 147))
 
+(test "symbolic-execution-3a"
+  (run* (q)
+    (evalo
+      `((lambda (n)
+          (if (= (+ (* n 3) 5) 14359371734)
+              'foo
+              'bar))
+        ',q)
+      'foo))
+  '(4786457243))
+
+(test "symbolic-execution-4a"
+  (run* (q)
+    (evalo
+      `((lambda (n)
+          (if (= (+ (* n 17) 5) 81369773136)
+              'foo
+              'bar))
+        ',q)
+      'foo))
+  '(4786457243))
+
+(test "symbolic-execution-5a"
+  (run* (q)
+    (evalo
+      `((lambda (n)
+          (if (= (+ (* n 17) 5) 127142397731434)
+              'foo
+              'bar))
+        ',q)
+      'foo))
+  '(7478964572437))
