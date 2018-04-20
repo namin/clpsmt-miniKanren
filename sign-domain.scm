@@ -84,6 +84,10 @@
         ((z/assert `(> ,n 0))
          (s/is-poso  s))))))
 
+(define s/z3-alphao
+  (lambda (n s)
+    (z/assert `(= ,s (ite (> ,n 0) ,vec-pos (ite (= ,n 0) ,vec-zero ,vec-neg))))))
+
 ;; For example,
 ;; {−,0}⊕{−}={−} and {−}⊕{+}={−,0,+}.
 ;; {−}⊗{+,0}={−,0} and  {−,+}⊗{0}={0}

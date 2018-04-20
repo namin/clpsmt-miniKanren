@@ -44,6 +44,13 @@
       (s/alphao 5 s)))
   '(bitvec-100))
 
+(test "4z3"
+  (run* (s)
+    (fresh (n)
+      (s/declareo s)
+      (s/z3-alphao 5 s)))
+  '(bitvec-100))
+
 (test "5"
   (run* (s)
     (fresh (s1 s2)
