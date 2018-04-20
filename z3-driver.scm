@@ -73,8 +73,9 @@
 
 (define get-next-model
   (lambda (xs ms)
-    (if (filter (lambda (m) (number? (cdr m))) ms)
-        (let* ([ys (append xs (map neg-model ms))])
-          (and (check-sat ys)
-               (get-model ys)))
-        #f)))
+    (let* ([ms (map (lambda (m) ;; hmm: ignoring e.g. functions...
+                      (filter (lambda (x) (number? (cdr x))) m))
+                    ms)]
+           [ys (append xs (map neg-model ms))])
+      (and (check-sat ys)
+           (get-model ys)))))
