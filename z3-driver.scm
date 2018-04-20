@@ -14,7 +14,8 @@
       (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
       (system "sed -i '' 's/bitvec-/#b/g' out.smt")
-      (system "z3 out.smt >out.txt"))))
+      (system "z3 out.smt >out.txt")
+      (system "sed -i '' 's/#b/bitvec-/g' out.txt"))))
 
 (define check-sat
   (lambda (xs)
@@ -36,6 +37,7 @@
                                  (cond
                                    ((eq? r 'false) #f)
                                    ((eq? r 'true) #t)
+                                   ((and (pair? (cadddr x)) (eq? (cadr (cadddr x)) 'BitVec)) r)
                                    (else (eval r))))
                                `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
                    (cdr m)))
@@ -77,8 +79,11 @@
 
 (define get-next-model
   (lambda (xs ms)
-    (let* ([ms (map (lambda (m) ;; hmm: ignoring e.g. functions...
-                      (filter (lambda (x) (number? (cdr x))) m))
+    (let* ([ms (map (lambda (m)
+                      (filter (lambda (x) ; ignoring functions
+                                (or (number? (cdr x))
+                                    (symbol? (cdr x)) ; for bitvectors
+                                    )) m))
                     ms)]
            [ys (append xs (map neg-model ms))])
       (and (check-sat ys)
