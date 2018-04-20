@@ -70,7 +70,8 @@
     (conde
       
       [(symbolo expr) (store-lookupo expr s num)]
-      
+
+      ;; Perhaps should use (z/assert `(= ,expr ,num)) instead of (== expr num)
       [(numbero expr) (== expr num)]
 
       [(fresh (a1 a2 n1 n2)
