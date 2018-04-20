@@ -8,15 +8,18 @@
         (close-input-port p)
         (eq? r 'sat)))))
 
-(define check-sat
+(define call-z3
   (lambda (xs)
     (let ([p (open-output-file "out.smt" 'replace)])
-      (for-each (lambda (x) (fprintf p "~a\n" x))
-                (append xs '((check-sat) (exit))))
+      (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
-      (system "z3 out.smt >out.txt")
-      (set! z3-counter-check-sat (+ z3-counter-check-sat 1))
-      (read-sat "out.txt"))))
+      (system "z3 out.smt >out.txt"))))
+
+(define check-sat
+  (lambda (xs)
+    (call-z3 (append xs '((check-sat) (exit))))
+    (set! z3-counter-check-sat (+ z3-counter-check-sat 1))
+    (read-sat "out.txt")))
 
 (define read-model
   (lambda (fn)
@@ -37,13 +40,9 @@
 
 (define get-model
   (lambda (xs)
-    (let ([p (open-output-file "out.smt" 'replace)])
-      (for-each (lambda (x) (fprintf p "~a\n" x))
-                (append xs '((check-sat) (get-model) (exit))))
-      (close-output-port p)
-      (system "z3 out.smt >out.txt")
-      (set! z3-counter-get-model (+ z3-counter-get-model 1))
-      (read-model "out.txt"))))
+    (call-z3 (append xs '((check-sat) (get-model) (exit))))
+    (set! z3-counter-get-model (+ z3-counter-get-model 1))
+    (read-model "out.txt")))
 
 (define neg-model
   (lambda (model)
