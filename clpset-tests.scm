@@ -15,13 +15,12 @@
     (z/assert `(not (,s ,x)))))
 
 (test "1"
-  (run 2 (q)
+  (run 1 (q)
     (fresh (s a b)
       (z/set s)
       (z/in a s)
       (z/not-in b s)
       (== q `(,s ,a ,b))))
-  ;; TODO: hmmm
   '(((lambda (x!0)
     (ite (= x!0 0) true (ite (= x!0 1) false true)))
    0
