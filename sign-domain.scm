@@ -239,3 +239,20 @@
 
 (define s/plus-tableo  (s/op-tableo (op-table plus-abstract)))
 (define s/times-tableo (s/op-tableo (op-table times-abstract)))
+
+(define s/z3-op-tableo
+  (lambda (table)
+    (lambda (s1 s2 so)
+      (define iter
+        (lambda (es)
+          (let ((e (car es)))
+            (if (null? (cdr es))
+                (caddr e)
+                `(ite (and (= ,(car e)  ,s1)
+                           (= ,(cadr e) ,s2))
+                      ,(caddr e)
+                      ,(iter (cdr es)))))))
+      (z/assert `(= ,so ,(iter table))))))
+
+(define s/z3-plus-tableo  (s/z3-op-tableo (op-table plus-abstract)))
+(define s/z3-times-tableo (s/z3-op-tableo (op-table times-abstract)))
