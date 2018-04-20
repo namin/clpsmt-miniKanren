@@ -13,6 +13,7 @@
     (let ([p (open-output-file "out.smt" 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
+      (system "sed -i '' 's/bitvec-/#b/g' out.smt")
       (system "z3 out.smt >out.txt"))))
 
 (define check-sat
@@ -31,7 +32,11 @@
               (map (lambda (x)
                      (cons (cadr x)
                            (if (null? (caddr x))
-                               (eval (cadddr (cdr x)))
+                               (let ([r (cadddr (cdr x))])
+                                 (cond
+                                   ((eq? r 'false) #f)
+                                   ((eq? r 'true) #t)
+                                   (else (eval r))))
                                `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
                    (cdr m)))
             (begin
