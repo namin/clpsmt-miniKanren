@@ -796,8 +796,19 @@
           (let ((S (reify-S M '())))
             (cons (map (lambda (x) (cons (cdr x) (car x))) S)
               (append
-               (map (lambda (s) `(declare-fun ,(cdr s) () Int)) S)
+               (map (lambda (x) `(declare-fun ,x () Int))
+                    (filter (undeclared? M) (map cdr S)))
                (walk* M S)))))))))
+
+(define undeclared?
+  (lambda (M)
+    (let ((ds
+           (map
+            cadr
+            (filter (lambda (s) (eq? 'declare-fun (car s)))
+                    M))))
+      (lambda (x)
+        (not (memq x ds))))))
 
 (define z/assert
   (lambda (e)
@@ -807,6 +818,12 @@
         (if r
             `(,S ,D ,A ,T ,M)
             #f)))))
+
+(define z/
+  (lambda (line)
+    (lambdag@ (c : S D A T M)
+      (let ((M (cons line M)))
+        `(,S ,D ,A ,T ,M)))))
 
 (define add-model
   (lambda (m s)
