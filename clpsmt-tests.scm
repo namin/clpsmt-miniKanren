@@ -56,6 +56,14 @@
   ;; what do we really want here? syntax lambda or actual lambda?
   '((lambda (x!0) (ite (= x!0 1) 1 (ite (= x!0 0) 0 1)))))
 
+(test "6"
+  (run 1 (q)
+    (fresh (f x)
+      (z/ `(declare-fun ,f (Int) Int))
+      (z/assert `(= ,x (,f ,x)))
+      (== q x)))
+  '(0))
+
 (define faco
   (lambda (n out)
     (conde ((z/assert `(= ,n 0))

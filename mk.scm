@@ -791,14 +791,16 @@
 (define z/reify-SM
   (lambda (M)
     (lambda (c)
-      (let ((S (c->S c)))
-        (let ((M (walk* (reverse M) S)))
-          (let ((S (reify-S M '())))
-            (cons (map (lambda (x) (cons (cdr x) (car x))) S)
-              (append
-               (map (lambda (x) `(declare-fun ,x () Int))
-                    (filter (undeclared? M) (map cdr S)))
-               (walk* M S)))))))))
+      (let* ((S (c->S c))
+             (M (walk* (reverse M) S))
+             (S (reify-S M '()))
+             (M (walk* M S)))
+        (cons
+         (map (lambda (x) (cons (cdr x) (car x))) S)
+         (append
+          (map (lambda (x) `(declare-fun ,x () Int))
+               (filter (undeclared? M) (map cdr S)))
+          M))))))
 
 (define undeclared?
   (lambda (M)
