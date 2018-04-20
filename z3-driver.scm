@@ -1,3 +1,6 @@
+(define z3-counter-check-sat 0)
+(define z3-counter-get-model 0)
+
 (define read-sat
   (lambda (fn)
     (let ([p (open-input-file fn)])
@@ -12,6 +15,7 @@
                 (append xs '((check-sat) (exit))))
       (close-output-port p)
       (system "z3 out.smt >out.txt")
+      (set! z3-counter-check-sat (+ z3-counter-check-sat 1))
       (read-sat "out.txt"))))
 
 (define read-model
@@ -38,6 +42,7 @@
                 (append xs '((check-sat) (get-model) (exit))))
       (close-output-port p)
       (system "z3 out.smt >out.txt")
+      (set! z3-counter-get-model (+ z3-counter-get-model 1))
       (read-model "out.txt"))))
 
 (define neg-model

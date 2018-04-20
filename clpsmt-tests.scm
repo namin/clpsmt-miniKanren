@@ -2,6 +2,16 @@
 (load "z3-driver.scm")
 (load "test-check.scm")
 
+(test "counters"
+  (let ((c1 z3-counter-check-sat)
+        (c2 z3-counter-get-model))
+    (run* (q)
+      (z/assert `(= ,q 0)))
+    (list
+     (- z3-counter-check-sat c1)
+     (- z3-counter-get-model c2)))
+  '(4 1))
+
 (test "inf-smt-ans-1"
   (run 1 (q)
     (z/assert `(>= ,q 0)))
