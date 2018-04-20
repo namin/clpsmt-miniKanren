@@ -22,7 +22,10 @@
             (let ([m (read p)])
               (close-input-port p)
               (map (lambda (x)
-                     (cons (cadr x) (eval (cadddr (cdr x)))))
+                     (cons (cadr x)
+                           (if (null? (caddr x))
+                               (eval (cadddr (cdr x)))
+                               `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
                    (cdr m)))
             (begin
               (close-input-port p)
