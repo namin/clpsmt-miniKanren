@@ -18,6 +18,11 @@
 ;;;
 ;;; do *not* work!
 
+#|
+;;; Original defn of remove-one-elemento, using (== x a) rather than (z/assert `(= ,x ,a)).
+;;; Which version is preferable?
+;;; What are the tradeoffs?
+
 (define remove-one-elemento
   (lambda (x ls out)
     (fresh (a d)
@@ -28,12 +33,34 @@
          (fresh (res)
            (== `(,a . ,res) out)
            (remove-one-elemento x d res)))))))
+|#
+
+;;; optimized version, more in the spirit of 24:
+;;; assumes that 'ls' is a list of integers in
+;;; *non-decreasing* order.
+(define remove-one-elemento
+  (lambda (x ls out)
+    (fresh (a d)
+      (== `(,a . ,d) ls)
+      (numbero a)
+      (conde
+        ((z/assert `(= ,a ,x))
+         (== d out))
+        ((z/assert `(< ,a ,x))
+         (fresh (res)
+           (== `(,a . ,res) out)
+           (remove-one-elemento x d res)))))))
 
 (define puzzleo
   (lambda (expr num* val num*^)
-    (conde    
+    (conde
       
-      [(numbero expr) (== expr val) (remove-one-elemento expr num* num*^)]
+      [(numbero expr)
+       ;; Originally used (== expr val).
+       ;; Which version is preferable?
+       ;; What are the tradeoffs?
+       (z/assert `(= ,expr ,val))
+       (remove-one-elemento expr num* num*^)]
 
       [(fresh (a1 a2 n1 n2 num*^^)
          (== `(+ ,a1 ,a2) expr)
@@ -62,10 +89,58 @@
       
       )))
 
-;;; 35 seconds on Will's lappy
+(test "remove-one-elemento-a"
+  (run* (q)
+    (fresh (x out)
+      (== (list x out) q)
+      (remove-one-elemento x '(2 2 10 10) out)))
+  '((2 (2 10 10))
+    (10 (2 2 10))))
+
+
+;; On Will's lappy--timings, according to Chez Scheme:
+;; vast majority of the time spent in Z3.
+;;
+;; run 1: 2.6s CPU time, 85s real time
+;; ((* 8 (+ 1 (+ 1 1))))
+;;
+;; run 2: 3.5s CPU time, 118s real time
+;; ((* 8 (+ 1 (+ 1 1)))
+;;  (* 8 (+ (+ 1 1) 1)))
+;;
+;; run 3: 9.4s CPU, 312s real time
+;; ((* 8 (+ 1 (+ 1 1)))
+;;  (* 8 (+ (+ 1 1) 1))
+;;  (* (+ 1 (+ 1 1)) 8))
 (test "24-puzzle-a"
   (run 1 (e) (puzzleo e '(1 1 1 8) 24 '()))
   '((* 8 (+ 1 (+ 1 1)))))
+
+(test "24-puzzle-g"
+  (run 1 (e) (puzzleo e '(2 2 10 10) 24 '()))
+  '((+ 2 (+ 2 (+ 10 10)))))
+
+;; On Will's lappy--timings, according to Chez Scheme:
+;; vast majority of the time spent in Z3.
+;;
+;; run 1: 2.3s CPU time, 75s real time
+;; ((/ (* 2 12) (/ 2 2)))
+;;
+;; run 2: 2.5s CPU time, 85s real time
+;; ((/ (* 2 12) (/ 2 2))
+;;  (+ (- 2 2) (* 2 12)))
+;;
+;; run 3: 4.6s CPU time, 156s real time
+;; ((/ (* 2 12) (/ 2 2))
+;;  (+ (- 2 2) (* 2 12))
+;;  (- 2 (- 2 (* 2 12))))
+(test "24-puzzle-h"
+  (run 1 (e) (puzzleo e '(2 2 2 12) 24 '()))
+  '((/ (* 2 12) (/ 2 2))))
+
+(test "24-puzzle-i"
+  (run 1 (e) (puzzleo e '(4 6 7 7) 24 '()))
+  '((+ 4 (+ 6 (+ 7 7)))))
 
 ;;; boring!!
 (test "24-puzzle-b"
@@ -89,22 +164,22 @@
     (+ 15 (+ 3 (+ 3 3)))
     (+ 12 (+ 4 (+ 4 4)))
     (+ 9 (+ 5 (+ 5 5)))
-    (+ 13 (+ 4 (+ 3 4)))
-    (+ 11 (+ 6 (+ 3 4)))
-    (+ 10 (+ 7 (+ 3 4)))
-    (+ 9 (+ 8 (+ 3 4)))
-    (+ 12 (+ 5 (+ 3 4)))
-    (+ 8 (+ 9 (+ 3 4)))
-    (+ 7 (+ 10 (+ 3 4)))
+    (+ 13 (+ 4 (+ 4 3)))
+    (+ 11 (+ 6 (+ 4 3)))
+    (+ 10 (+ 7 (+ 4 3)))
+    (+ 12 (+ 4 (+ 5 3)))
+    (+ 11 (+ 4 (+ 6 3)))
+    (+ 10 (+ 6 (+ 5 3)))
+    (+ 9 (+ 8 (+ 4 3)))
+    (+ 8 (+ 9 (+ 4 3)))
     (+ 14 (+ 4 (+ 3 3)))
+    (+ 10 (+ 5 (+ 6 3)))
     (+ 13 (+ 5 (+ 3 3)))
-    (+ 12 (+ 6 (+ 3 3)))
-    (+ 6 (+ 11 (+ 3 4)))
-    (+ 11 (+ 7 (+ 3 3)))
+    (+ 12 (+ 5 (+ 4 3)))
+    (+ 10 (+ 4 (+ 7 3)))
     (+ 10 (+ 8 (+ 3 3)))
     (+ 9 (+ 9 (+ 3 3)))
-    (+ 8 (+ 10 (+ 3 3)))
-    (+ 7 (+ 11 (+ 3 3)))))
+    (+ 7 (+ 10 (+ 4 3)))))
 
 (test "24-puzzle-d"
   (run 10 (e)
@@ -118,14 +193,14 @@
       (puzzleo e num* 24 '())))
   '((+ (+ 21 1) (+ 1 1))
     (+ (+ 18 2) (+ 2 2))
-    (+ (+ 15 3) (+ 3 3))  
+    (+ (+ 15 3) (+ 3 3))
     (+ (+ 12 4) (+ 4 4))
-    (+ (+ 16 3) (+ 2 3))
-    (+ (+ 14 5) (+ 2 3))
-    (+ (+ 13 6) (+ 2 3))
-    (+ (+ 12 7) (+ 2 3))
-    (+ (+ 15 4) (+ 2 3))
-    (+ (+ 11 8) (+ 2 3))))
+    (+ (+ 16 3) (+ 3 2))
+    (+ (+ 14 5) (+ 3 2))
+    (+ (+ 13 6) (+ 3 2))
+    (+ (+ 15 3) (+ 4 2))
+    (+ (+ 14 3) (+ 5 2))
+    (+ (+ 13 5) (+ 4 2))))
 
 (test "24-puzzle-e"
   (run 10 (e)
@@ -142,12 +217,12 @@
     (- 30 (+ 2 (+ 2 2)))
     (- 33 (+ 3 (+ 3 3)))
     (- 36 (+ 4 (+ 4 4)))
-    (- 32 (+ 3 (+ 2 3)))
-    (- 34 (+ 5 (+ 2 3)))
-    (- 35 (+ 6 (+ 2 3)))
-    (- 36 (+ 7 (+ 2 3)))
-    (- 33 (+ 4 (+ 2 3)))
-    (- 37 (+ 8 (+ 2 3)))))
+    (- 32 (+ 3 (+ 3 2)))
+    (- 34 (+ 5 (+ 3 2)))
+    (- 35 (+ 6 (+ 3 2)))
+    (- 33 (+ 3 (+ 4 2)))
+    (- 34 (+ 3 (+ 5 2)))
+    (- 35 (+ 5 (+ 4 2)))))
 
 (test "24-puzzle-f"
   (run 10 (e)
@@ -170,15 +245,3 @@
     (* 6 (+ 1 (+ 1 2)))
     (* 4 (+ 3 (+ 1 2)))
     (* 3 (+ 5 (+ 1 2)))))
-
-(test "24-puzzle-g"
-  (run 1 (e) (puzzleo e '(2 2 10 10) 24 '()))
-  '((+ 2 (+ 2 (+ 10 10)))))
-
-(test "24-puzzle-h"
-  (run 1 (e) (puzzleo e '(2 2 2 12) 24 '()))
-  '((+ (- 2 2) (* 2 12))))
-
-(test "24-puzzle-i"
-  (run 1 (e) (puzzleo e '(4 6 7 7) 24 '()))
-  '((+ 4 (+ 6 (+ 7 7)))))
