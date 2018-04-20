@@ -36,3 +36,21 @@
     (s/declareo q)
     (s/membero 'bitvec-110 q))
   '(bitvec-010 bitvec-100))
+
+(test "4"
+  (run* (s)
+    (fresh (n)
+      (s/declareo s)
+      (s/alphao 5 s)))
+  '(bitvec-100))
+
+(test "5"
+  (run* (s)
+    (fresh (s1 s2)
+      (s/declareo s)
+      (s/declareo s1)
+      (s/declareo s2)
+      (s/alphao -5 s1)
+      (s/alphao 5 s2)
+      (s/plus-alphao s1 s2 s)))
+  '(bitvec-111))
