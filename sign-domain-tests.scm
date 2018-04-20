@@ -65,3 +65,14 @@
       (s/alphao 5 s2)
       (s/pluso s1 s2 s)))
   '(bitvec-111 bitvec-111)) ;; TODO: why twice?
+
+(test "7"
+  (run* (s)
+    (fresh (s1 s2)
+      (s/declareo s)
+      (s/declareo s1)
+      (s/declareo s2)
+      (s/alphao -5 s1)
+      (s/alphao 5 s2)
+      (s/plus-tableo s1 s2 s)))
+  '(bitvec-111))

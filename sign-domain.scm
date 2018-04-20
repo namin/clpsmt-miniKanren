@@ -156,11 +156,11 @@
     [(from '+  0)  (set '+)]
     [(from '+ '+)  (set '+)]))
 
-(define to-bitvector
+(define to-bitvec
   (lambda (s)
     (string->symbol
      (string-append
-      "bitvector-"
+      "bitvec-"
       (if (memq '+ s) "1" "0")
       (if (memq '0 s) "1" "0")
       (if (memq '- s) "1" "0")))))
@@ -173,7 +173,7 @@
                         (flatten (cdr xs)))))))
 
 (define (plus-abstract s1 s2)
-  (to-bitvector
+  (to-bitvec
    (flatten
     (map
      (lambda (b1)
@@ -196,9 +196,27 @@
       (lambda (s1)
         (map
          (lambda (s2)
-           (list (to-bitvector s1) (to-bitvector s2)
+           (list (to-bitvec s1) (to-bitvec s2)
                  (plus-abstract s1 s2)))
          r))
       r))))
 
 ;(plus-table)
+
+
+(define s/plus-tableo
+  (let ((table (plus-table)))
+    (lambda (s1 s2 so)
+      (define itero
+        (lambda (es)
+          (if (null? es)
+              fail
+              (let ((e (car es)))
+                (conde
+                  ((z/assert `(= ,(car e)   ,s1))
+                   (z/assert `(= ,(cadr e)  ,s2))
+                   (z/assert `(= ,(caddr e) ,so)))
+                  ((z/assert `(or (not (= ,(car e)  ,s1))
+                                  (not (= ,(cadr e) ,s2))))
+                   (itero (cdr es))))))))
+      (itero table))))
