@@ -156,6 +156,20 @@
     [(from '+  0)  (set '+)]
     [(from '+ '+)  (set '+)]))
 
+(define (times-alpha s1 s2)
+  (define (from a b)
+    (and (eq? a s1) (eq? b s2)))
+  (define (set . xs)
+    xs)
+  (cond
+    [(from '- '-)  (set '+)]
+    [(from '- '0)  (set  0)]
+    [(from '- '+)  (set '-)]
+    [(from '0 s2)  (set  0)]
+    [(from '+ '-)  (set '-)]
+    [(from '+  0)  (set  0)]
+    [(from '+ '+)  (set '+)]))
+
 (define to-bitvec
   (lambda (s)
     (string->symbol
@@ -172,23 +186,28 @@
           (else (append (flatten (car xs))
                         (flatten (cdr xs)))))))
 
-(define (plus-abstract s1 s2)
-  (to-bitvec
-   (flatten
-    (map
-     (lambda (b1)
-       (map
-        (lambda (b2)
-          (plus-alpha b1 b2))
-        s2))
-     s1))))
+(define op-abstract
+  (lambda (op)
+    (lambda (s1 s2)
+      (to-bitvec
+       (flatten
+        (map
+         (lambda (b1)
+           (map
+            (lambda (b2)
+              (op b1 b2))
+            s2))
+         s1))))))
+
+(define plus-abstract  (op-abstract plus-alpha))
+(define times-abstract (op-abstract times-alpha))
 
 (define (comb xs)
   (if (null? xs) '(())
       (let ((r (comb (cdr xs))))
         (append r (map (lambda (s) (cons (car xs) s)) r)))))
 
-(define (plus-table)
+(define (op-table op)
   (let ((r (comb '(- 0 +))))
     (apply
      append
@@ -197,15 +216,12 @@
         (map
          (lambda (s2)
            (list (to-bitvec s1) (to-bitvec s2)
-                 (plus-abstract s1 s2)))
+                 (op s1 s2)))
          r))
       r))))
 
-;(plus-table)
-
-
-(define s/plus-tableo
-  (let ((table (plus-table)))
+(define s/op-tableo
+  (lambda (table)
     (lambda (s1 s2 so)
       (define itero
         (lambda (es)
@@ -220,3 +236,6 @@
                                   (not (= ,(cadr e) ,s2))))
                    (itero (cdr es))))))))
       (itero table))))
+
+(define s/plus-tableo  (s/op-tableo (op-table plus-abstract)))
+(define s/times-tableo (s/op-tableo (op-table times-abstract)))
