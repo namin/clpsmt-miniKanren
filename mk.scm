@@ -807,10 +807,14 @@
     (let ((ds
            (map
             cadr
-            (filter (lambda (s) (eq? 'declare-fun (car s)))
+            (filter (lambda (s)
+                      (or (eq? 'declare-fun (car s))
+                          (eq? 'declare-const (car s))))
                     M))))
-      (lambda (x)
-        (not (memq x ds))))))
+      (if (null? ds)
+          (lambda (x) #t)
+          (lambda (x)
+            (not (memq x ds)))))))
 
 (define z/assert
   (lambda (e)
