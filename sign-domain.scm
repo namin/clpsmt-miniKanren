@@ -43,6 +43,8 @@
 (define s/chas-poso (s/chaso vec-pos))
 (define s/chasnt-poso (s/chasnto vec-pos))
 
+(define vecs (list vec-neg vec-zero vec-pos))
+
 (define s/iso
   (lambda (p)
     (lambda (s)
@@ -139,3 +141,64 @@
               (z/assert `(= ,so bitvec-111)))
              ((s/chasnt-poso s1))
              ((s/chasnt-nego s2))))))
+
+(define (plus-alpha s1 s2)
+  (define (from a b)
+    (and (eq? a s1) (eq? b s2)))
+  (define (set . xs)
+    xs)
+  (cond
+    [(from '- '-)  (set '-)]
+    [(from '-  0)  (set '-)]
+    [(from '- '+)  (set '- '0 '+)]
+    [(from '0  s2) (set s2)]
+    [(from '+ '-)  (set '- '0 '+)]
+    [(from '+  0)  (set '+)]
+    [(from '+ '+)  (set '+)]))
+
+(define to-bitvector
+  (lambda (s)
+    (string->symbol
+     (string-append
+      "bitvector-"
+      (if (memq '+ s) "1" "0")
+      (if (memq '0 s) "1" "0")
+      (if (memq '- s) "1" "0")))))
+
+(define flatten
+  (lambda (xs)
+    (cond ((null? xs) xs)
+          ((atom? xs) (list xs))
+          (else (append (flatten (car xs))
+                        (flatten (cdr xs)))))))
+
+(define (plus-abstract s1 s2)
+  (to-bitvector
+   (flatten
+    (map
+     (lambda (b1)
+       (map
+        (lambda (b2)
+          (plus-alpha b1 b2))
+        s2))
+     s1))))
+
+(define (comb xs)
+  (if (null? xs) '(())
+      (let ((r (comb (cdr xs))))
+        (append r (map (lambda (s) (cons (car xs) s)) r)))))
+
+(define (plus-table)
+  (let ((r (comb '(- 0 +))))
+    (apply
+     append
+     (map
+      (lambda (s1)
+        (map
+         (lambda (s2)
+           (list (to-bitvector s1) (to-bitvector s2)
+                 (plus-abstract s1 s2)))
+         r))
+      r))))
+
+;(plus-table)
