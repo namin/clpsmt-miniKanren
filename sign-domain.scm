@@ -11,17 +11,37 @@
     (lambda (s b)
       (z/assert `(= ,s (ite ,b (bvor ,s ,p) (bvand ,s (bvnot ,p))))))))
 
+(define s/hasnto
+  (lambda (p)
+    (lambda (s b)
+      (z/assert `(= ,s (ite ,b (bvand ,s (bvnot ,p)) (bvor ,s ,p)))))))
+
+(define s/chaso
+  (lambda (p)
+    (lambda (s)
+      (z/assert `(= ,s (bvor ,s ,p))))))
+(define s/chasnto
+  (lambda (p)
+    (lambda (s)
+      (z/assert `(= ,s (bvand ,s (bvnot ,p)))))))
+
 (define vec-neg 'bitvec-001)
-(define s/has-nego
-  (s/haso vec-neg))
+(define s/has-nego (s/haso vec-neg))
+(define s/hasnt-nego (s/hasnto vec-neg))
+(define s/chas-nego (s/chaso vec-neg))
+(define s/chasnt-nego (s/chasnto vec-neg))
 
 (define vec-zero 'bitvec-010)
-(define s/has-zeroo
-  (s/haso vec-zero))
+(define s/has-zeroo (s/haso vec-zero))
+(define s/hasnt-zeroo (s/hasnto vec-zero))
+(define s/chas-zeroo (s/chaso vec-zero))
+(define s/chasnt-zeroo (s/chasnto vec-zero))
 
 (define vec-pos 'bitvec-100)
-(define s/has-poso
-  (s/haso vec-pos))
+(define s/has-poso (s/haso vec-pos))
+(define s/hasnt-poso (s/hasnto vec-pos))
+(define s/chas-poso (s/chaso vec-pos))
+(define s/chasnt-poso (s/chasnto vec-pos))
 
 (define s/iso
   (lambda (p)
@@ -85,3 +105,37 @@
       ((s/is-poso s1)
        (s/is-nego s2)
        (z/assert `(= ,so bitvec-111))))))
+
+(define s/containso
+  (lambda (s1 s2)
+    (z/assert `(= (bvor ,s1 ,s2) ,s1))))
+
+(define s/pluso
+  (lambda (s1 s2 so)
+    (fresh ()
+      (conde ((s/chas-zeroo s1)
+              (s/containso so s2))
+             ((s/chasnt-zeroo s1)))
+      (conde ((s/chas-zeroo s2)
+              (s/containso so s1))
+             ((s/chasnt-zeroo s2)))
+      (conde ((s/chas-nego s1)
+              (s/chas-nego s2)
+              (s/chas-nego so))
+             ((s/chasnt-nego s1))
+             ((s/chasnt-nego s2)))
+      (conde ((s/chas-poso s1)
+              (s/chas-poso s2)
+              (s/chas-poso so))
+             ((s/chasnt-poso s1))
+             ((s/chasnt-poso s2)))
+      (conde ((s/chas-nego s1)
+              (s/chas-poso s2)
+              (z/assert `(= ,so bitvec-111)))
+             ((s/chasnt-nego s1))
+             ((s/chasnt-poso s2)))
+      (conde ((s/chas-poso s1)
+              (s/chas-nego s2)
+              (z/assert `(= ,so bitvec-111)))
+             ((s/chasnt-poso s1))
+             ((s/chasnt-nego s2))))))
