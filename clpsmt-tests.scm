@@ -38,14 +38,12 @@
   '(0))
 
 (test "5"
-  (run 1 (f)
+  (run 2 (f)
     (z/ `(declare-fun ,f (Int) Int))
     (z/assert `(= 1 (,f 1)))
     (z/assert `(= 0 (,f 0))))
   ;; TODO:
   ;; what do we really want here? syntax lambda or actual lambda?
-  ;; besides, asking for more answers always return the same.
-  ;; BUG
   '((lambda (x!0) (ite (= x!0 1) 1 (ite (= x!0 0) 0 1)))))
 
 (define faco
