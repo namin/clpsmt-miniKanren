@@ -116,3 +116,19 @@
       (s/z3-alphao 5 s2)
       (s/z3-times-tableo s1 s2 s)))
   '(bitvec-001))
+
+(test "9"
+  (run* (s)
+    (s/declareo s)
+    (s/chas-nego  s)
+    (s/chas-zeroo s)
+    (s/chasnt-poso  s))
+  '(bitvec-011))
+
+(test "10"
+  (run* (s)
+    (s/declareo s)
+    (s/has-nego  s 'true)
+    (s/has-zeroo s 'true)
+    (s/has-poso  s 'false))
+  '(bitvec-011))
