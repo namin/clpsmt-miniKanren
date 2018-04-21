@@ -915,25 +915,33 @@
                          ((add-model m (car SM)) `(,S ,D ,A ,T ()))
                          (lambda () (loop (cons m ms)))))))))))))
 
-(define tabling-record!
-  (lambda (id args c-in)
-    (let* ((r (assq id tabling))
-           (xs (cdr r))
-           (old? (member args xs)))
-      (if old?
-          #f
-          (begin
-            (set-cdr! r (cons args (cdr r)))
-            (let ((k (lambda (c-out) c-out)))
-              k))))))
-
+(define resume-each
+  (lambda (cs)
+    (if (null? cs)
+        #f
+        (mplus (car cs)
+               (lambda () (resume-each (cdr cs)))))))
 (define tabled
   (lambda (f)
     (let ((id (length tabling)))
       (set! tabling (cons (cons id '()) tabling))
       (lambda args
         (lambdag@ (c : S D A T M)
-          (let* ((k (tabling-record! id args c)))
-            (and
-             k
-             (bind* ((apply f args) c) k))))))))
+          (let* ((r (assq id tabling))
+                 (rhs (cdr r))
+                 (old (assoc args rhs)))
+            (if (not old)
+                (let ((e (cons args (cons '() '()))))
+                  (set-cdr! r (cons e rhs))
+                  (bind* ((apply f args) c)
+                         (lambda (c-out)
+                           (let* ((ans (walk* args (c->S c-out)))
+                                  (answers (car (cdr e)))
+                                  (conts (cdr (cdr e))))
+                             (if (member ans answers)
+                                 #f
+                                 (begin
+                                   (set-car! (cdr e) (cons ans answers))
+                                   (set-cdr! (cdr e) (cons c-out conts))
+                                   (resume-each (cdr (cdr e)))))))))
+                (resume-each (cdr (cdr (cdr old)))))))))))
