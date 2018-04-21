@@ -7,6 +7,16 @@
 ;;;
 ;;; http://matt.might.net/articles/intro-static-analysis/
 
+
+;;; Initial thoughts:
+
+;;; 1. Having to declare a bitvector once and only once using 's/declareo' seems very error prone in complex queries/code.  At a minimum, have an error signalled, rather than failing silently, would be extremely friendly.  (See tests declaro-1 and declaro-2.)
+
+;;; 2. s/declareo is non-relational, since declaraing the variable after use results in failure (once again, should really signal an error if possible, if not make fully relational).
+
+;;; 3. Not sure how to best mix sets/bitvectors with booleans, closures, etc., in the interpreter.  If we want an abstract evaluator that only handles sets, no problem.  If we want to also handle closures as values, for example, seems tricky, given the need to use 's/declareo' on sets.
+
+
 ;;; assumption: aval is a bit vector
 (define alookupo
   (lambda (x aenv aval)
