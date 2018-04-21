@@ -90,18 +90,23 @@
 
 #|
 ;;; Hmmm--no bit pattern?
+;;; Currently produces an error
 (test "declaro-1"
   (run* (q)
     (s/declareo q))
-  '(_.0))
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
 
 ;;; Hmmm--this seems tricky!
-;;; An error would be better
+;;; Idempotent would be better
 (test "declaro-2"
   (run* (q)
     (s/declareo q)
     (s/declareo q))
-  '())
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
 
 ;;; Compare with declareo-1 -- now can see that we have bit patterns.
 (test "declaro-3"
@@ -120,7 +125,78 @@
   (run* (q)
     (s/chas-poso q)
     (s/declareo q))
-  '())
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
+
+(test "declareo-5"
+  (run* (q)
+    (fresh (x y)
+      (s/declareo x)
+      (s/declareo y)
+      (== x y)
+      (s/chas-poso x)))
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
+
+(test "declareo-6"
+  (run* (q)
+    (fresh (x y)
+      (s/declareo x)
+      (s/declareo y)
+      (== x y)
+      (s/chas-poso x)))
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
+
+;; shouldn't this be an error, since y isn't associated with a bit pattern?
+(test "declareo-7"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso x)))
+  '((bitvec-100 _.0)
+    (bitvec-111 _.0)
+    (bitvec-110 _.0)
+    (bitvec-101 _.0)))
+
+(test "declareo-8"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (s/declareo x)
+      (s/declareo y)))
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
+
+(test "declareo-9"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso y)))
+  '((_.0 bitvec-100)
+    (_.0 bitvec-111)
+    (_.0 bitvec-110)
+    (_.0 bitvec-101)))
+
+(test "declareo-10"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (== x y)
+      (s/declareo x)
+      (s/declareo y)))
+  '?)
+Exception in call-z3: error in z3 out.smt > out.txt
+Type (debug) to enter the debugger.
+
 |#
 
 (test "lookupo-1"
