@@ -12,6 +12,15 @@
      (- z3-counter-get-model c2)))
   '(4 1))
 
+(test "declare-idempotent"
+  (run* (q) ;; TODO: * instead of 1
+    (fresh (v1 v2)
+      (z/ `(declare-const ,v1 Bool))
+      (z/ `(declare-const ,v2 Bool))
+      (== v1 v2)
+      (== q v1)))
+  '(_.0))
+
 (test "inf-smt-ans-1"
   (run 1 (q)
     (z/assert `(>= ,q 0)))
@@ -48,7 +57,7 @@
   '(0))
 
 (test "5"
-  (run 2 (f)
+  (run* (f)
     (z/ `(declare-fun ,f (Int) Int))
     (z/assert `(= 1 (,f 1)))
     (z/assert `(= 0 (,f 0))))

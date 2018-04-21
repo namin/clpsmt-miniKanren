@@ -88,7 +88,8 @@
                                 (or (number? (cdr x))
                                     (symbol? (cdr x)) ; for bitvectors
                                     )) m))
-                    ms)]
-           [ys (append xs (map neg-model ms))])
-      (and (check-sat ys)
-           (get-model ys)))))
+                    ms)])
+      (if (member '() ms) #f  ; if we're skipping a model, let us stop
+          (let ([ys (append xs (map neg-model ms))])
+            (and (check-sat ys)
+                 (get-model ys)))))))

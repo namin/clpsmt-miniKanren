@@ -794,27 +794,50 @@
       (let* ((S (c->S c))
              (M (walk* (reverse M) S))
              (S (reify-S M '()))
-             (M (walk* M S)))
+             (M (walk* M S))
+             (ds-R (partition declares? M))
+             (ds (car ds-R))
+             (R (cdr ds-R))
+             (ds (filter-redundant-declares ds ds))
+             (M (append ds R)))
         (cons
          (map (lambda (x) (cons (cdr x) (car x))) S)
          (append
           (map (lambda (x) `(declare-fun ,x () Int))
-               (filter (undeclared? M) (map cdr S)))
+               (filter (undeclared? (map cadr ds)) (map cdr S)))
           M))))))
 
+(define partition
+  (lambda (p xs)
+    (cons (filter p xs)
+          (filter (lambda (x) (not (p x))) xs))))
+
+(define declares?
+  (lambda (s)
+    (and (pair? s)
+         (or (eq? 'declare-fun (car s))
+             (eq? 'declare-const (car s)))
+         (cadr s))))
+
+(define filter-redundant-declare
+  (lambda (d es)
+    (filter
+     (lambda (e)
+       (or (not (eq? (cadr e) (cadr d)))
+           (if (equal? e d) #f
+               (error 'filter-redundant-declare "inconsistent" d e))))
+     es)))
+
+(define filter-redundant-declares
+  (lambda (ds es)
+    (if (null? ds)
+        es
+        (filter-redundant-declares
+         (cdr ds)
+         (cons (car ds) (filter-redundant-declare (car ds) es))))))
+
 (define undeclared?
-  (lambda (M)
-    (let ((ds
-           (map
-            cadr
-            (filter (lambda (s)
-                      (or (eq? 'declare-fun (car s))
-                          (eq? 'declare-const (car s))))
-                    M))))
-      (if (null? ds)
-          (lambda (x) #t)
-          (lambda (x)
-            (not (memq x ds)))))))
+  (lambda (ds) (if (null? ds) (lambda (x) #t) (lambda (x) (not (memq x ds))))))
 
 (define z/assert
   (lambda (e)
