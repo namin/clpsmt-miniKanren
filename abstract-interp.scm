@@ -73,12 +73,14 @@
       
       )))
 
+;;; Hmmm--no bit pattern?
 (test "declaro-1"
   (run* (q)
     (s/declareo q))
   '(_.0))
 
 ;;; Hmmm--this seems tricky!
+;;; An error would be better
 (test "declaro-2"
   (run* (q)
     (s/declareo q)
