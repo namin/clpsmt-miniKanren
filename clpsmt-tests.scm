@@ -57,7 +57,7 @@
   '(0))
 
 (test "5"
-  (run* (f)
+  (run 2 (f)
     (z/ `(declare-fun ,f (Int) Int))
     (z/assert `(= 1 (,f 1)))
     (z/assert `(= 0 (,f 0))))
