@@ -35,31 +35,25 @@
 
       [(fresh (e1 e2 v1 v2 v)
          (== `(+ ,e1 ,e2) expr)
-         ;(s/declareo v1)
-         ;(s/declareo v2)
+         (s/declareo v1)
+         (s/declareo v2)
          (s/declareo v)
          ;; is this the ideal ordering?
          (== `(num ,v) val)
-         (evalo e1 env `(num ,v1))
-         (evalo e2 env `(num ,v2))
-         ;; ugh--the call to s/z3-plus-tableo should come before the
-         ;; recursive evalo calls.  But s/declareo is causing issues!
          (s/z3-plus-tableo v1 v2 v)
-         )]
+         (evalo e1 env `(num ,v1))
+         (evalo e2 env `(num ,v2)))]
 
       [(fresh (e1 e2 v1 v2 v)
          (== `(* ,e1 ,e2) expr)
-         ;(s/declareo v1)
-         ;(s/declareo v2)
+         (s/declareo v1)
+         (s/declareo v2)
          (s/declareo v)
          ;; is this the ideal ordering?
          (== `(num ,v) val)
-         (evalo e1 env `(num ,v1))
-         (evalo e2 env `(num ,v2))
-         ;; ugh--the call to s/z3-plus-tableo should come before the
-         ;; recursive evalo calls.  But s/declareo is causing issues!
          (s/z3-times-tableo v1 v2 v)
-         )]
+         (evalo e1 env `(num ,v1))
+         (evalo e2 env `(num ,v2)))]
 
       ;;; hmmm---seems like there is a problem here:
       ;;; if we want to make zero? and if work separately,
@@ -67,7 +61,7 @@
       ;;; How would this work, given the need for s/declareo?
       [(fresh (e1 e2 e3 v1)
          (== `(ifzero ,e1 ,e2 ,e3) expr)
-         ;; (s/declareo v1)
+         (s/declareo v1)
          ;; is this the ideal ordering?
          (evalo e1 env `(num ,v1))
          (conde
@@ -81,34 +75,24 @@
       [(fresh (x e body v env^)
          (== `(let ((,x ,e)) ,body) expr)
          (symbolo x)
-         ;; (s/declareo v)
          (== `((,x . ,v) . ,env) env^)
          (evalo e env v)
          (evalo body env^ val))]
       
       )))
 
-#|
-;;; Hmmm--no bit pattern?
-;;; Currently produces an error
+
 (test "declaro-1"
   (run* (q)
     (s/declareo q))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
+  '(_.0))
 
-;;; Hmmm--this seems tricky!
-;;; Idempotent would be better
 (test "declaro-2"
   (run* (q)
     (s/declareo q)
     (s/declareo q))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
+  '(_.0))
 
-;;; Compare with declareo-1 -- now can see that we have bit patterns.
 (test "declaro-3"
   (run* (q)
     (s/declareo q)
@@ -118,9 +102,9 @@ Type (debug) to enter the debugger.
     bitvec-110
     bitvec-101))
 
+#|
 ;;; Non-declarative behavior
 ;;; compare with declareo-3 -- just swapped order of goals
-;;; An error would be friendlier
 (test "declareo-4"
   (run* (q)
     (s/chas-poso q)
@@ -128,30 +112,21 @@ Type (debug) to enter the debugger.
   '?)
 Exception in call-z3: error in z3 out.smt > out.txt
 Type (debug) to enter the debugger.
+|#
 
 (test "declareo-5"
   (run* (q)
     (fresh (x y)
+      (== (list x y) q)
       (s/declareo x)
       (s/declareo y)
       (== x y)
       (s/chas-poso x)))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
+  '((bitvec-100 bitvec-100)
+    (bitvec-111 bitvec-111)
+    (bitvec-110 bitvec-110)
+    (bitvec-101 bitvec-101)))
 
-(test "declareo-6"
-  (run* (q)
-    (fresh (x y)
-      (s/declareo x)
-      (s/declareo y)
-      (== x y)
-      (s/chas-poso x)))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
-
-;; shouldn't this be an error, since y isn't associated with a bit pattern?
 (test "declareo-7"
   (run* (q)
     (fresh (x y)
@@ -170,9 +145,7 @@ Type (debug) to enter the debugger.
       (== (list x y) q)
       (s/declareo x)
       (s/declareo y)))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
+  '((_.0 _.1)))
 
 (test "declareo-9"
   (run* (q)
@@ -193,11 +166,72 @@ Type (debug) to enter the debugger.
       (== x y)
       (s/declareo x)
       (s/declareo y)))
-  '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
+  '((_.0 _.0)))
 
-|#
+(test "declareo-11"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (== x y)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso x)
+      (s/chas-poso y)))
+  '((bitvec-100 bitvec-100)
+    (bitvec-111 bitvec-111)
+    (bitvec-110 bitvec-110)
+    (bitvec-101 bitvec-101)))
+
+(test "declareo-12"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (== x y)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso x)))
+  '((bitvec-100 bitvec-100)
+    (bitvec-111 bitvec-111)
+    (bitvec-110 bitvec-110)
+    (bitvec-101 bitvec-101)))
+
+(test "declareo-13"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso x)))
+  '((bitvec-100 _.0)
+    (bitvec-111 _.0)
+    (bitvec-110 _.0)
+    (bitvec-101 _.0)))
+
+(test "declareo-14"
+  (run* (q)
+    (fresh (x y)
+      (== (list x y) q)
+      (s/declareo x)
+      (s/declareo y)
+      (s/chas-poso x)
+      (s/chas-poso y)))
+  '((bitvec-100 bitvec-100)
+    (bitvec-111 bitvec-111)
+    (bitvec-111 bitvec-110)
+    (bitvec-111 bitvec-100)
+    (bitvec-111 bitvec-101)
+    (bitvec-110 bitvec-110)
+    (bitvec-110 bitvec-111)
+    (bitvec-110 bitvec-100)
+    (bitvec-110 bitvec-101)
+    (bitvec-101 bitvec-111)
+    (bitvec-101 bitvec-101)
+    (bitvec-100 bitvec-101)
+    (bitvec-100 bitvec-111)
+    (bitvec-101 bitvec-110)
+    (bitvec-100 bitvec-110)
+    (bitvec-101 bitvec-100)))
+
 
 (test "lookupo-1"
   (run 3 (q)
@@ -243,8 +277,8 @@ Type (debug) to enter the debugger.
   (run* (q)
     (fresh (x env val v1 v2)
       (s/declareo v1)
-      (s/chas-poso v1)
       (s/declareo v2)
+      (s/chas-poso v1)
       (s/chas-nego v2)      
       (== `((x . (num ,v1)) (y . (num ,v2))) env)
       (== (list env val) q)
@@ -308,14 +342,6 @@ Type (debug) to enter the debugger.
     (6 (num bitvec-100))))
 
 (test "evalo-2a"
-  (run 1 (q)
-    (fresh (expr val)
-      (== `(+ 3 4) expr)
-      (== (list expr val) q)
-      (evalo expr '() val)))
-  '(((+ 3 4) (num bitvec-100))))
-
-(test "evalo-2b"
   (run* (q)
     (fresh (expr val)
       (== `(+ 3 4) expr)
@@ -323,66 +349,88 @@ Type (debug) to enter the debugger.
       (evalo expr '() val)))
   '(((+ 3 4) (num bitvec-100))))
 
-(test "evalo-2c"
-  (run 1 (q)
+(test "evalo-2b"
+  (run 20 (q)
     (fresh (expr val e1 e2)
       (== `(+ ,e1 ,e2) expr)
       (== (list expr val) q)
       (evalo expr '() val)))
-  '(((+ -1 1) (num bitvec-111))))
-
-(test "evalo-2d"
-  (run 10 (q)
-    (fresh (expr val e1 e2)
-      (== `(+ ,e1 ,e2) expr)
-      (== (list expr val) q)
-      (evalo expr '() val)))
-  '(((+ -1 1) (num bitvec-111))
+  '(((+ 0 -1) (num bitvec-001))
     ((+ 1 -1) (num bitvec-111))
+    ((+ 1 -2) (num bitvec-111))
+    ((+ 1 -3) (num bitvec-111))
+    ((+ 0 1) (num bitvec-100))
+    ((+ 2 -4) (num bitvec-111))
     ((+ 1 1) (num bitvec-100))
-    ((+ 0 2) (num bitvec-100))
-    ((+ -2 0) (num bitvec-001))
-    ((+ 2 2) (num bitvec-100))
-    ((+ -2 -2) (num bitvec-001))
-    ((+ -3 -3) (num bitvec-001))
-    ((+ 0 3) (num bitvec-100))
-    ((+ -4 -4) (num bitvec-001))))
+    ((+ 1 2) (num bitvec-100))
+    ((+ 1 -4) (num bitvec-111))
+    ((+ 1 -5) (num bitvec-111))
+    ((+ 1 -6) (num bitvec-111))
+    ((+ -1 -6) (num bitvec-001))
+    ((+ 2 -7) (num bitvec-111))
+    ((+ -2 3) (num bitvec-111))
+    ((+ -3 -6) (num bitvec-001))
+    ((+ -2 -7) (num bitvec-001))
+    ((+ -2 -8) (num bitvec-001))
+    ((+ 3 -8) (num bitvec-111))
+    ((+ -4 -6) (num bitvec-001))
+    ((+ -5 4) (num bitvec-111))))
 
 (test "evalo-2"
-  (run 30 (q)
+  (run 50 (q)
     (fresh (expr val op e1 e2)
       (== `(,op ,e1 ,e2) expr)
       (== (list expr val) q)
       (evalo expr '() val)))
-  '(((+ -1 1) (num bitvec-111))
+  '(((+ 0 -1) (num bitvec-001))
     ((+ 1 -1) (num bitvec-111))
+    ((+ 1 -2) (num bitvec-111))
+    ((+ 1 -3) (num bitvec-111))
+    ((+ 0 1) (num bitvec-100))
+    ((+ 2 -4) (num bitvec-111))
     ((+ 1 1) (num bitvec-100))
-    ((+ 0 2) (num bitvec-100))
-    ((+ -2 0) (num bitvec-001))
-    ((+ 2 2) (num bitvec-100))
-    ((+ -2 -2) (num bitvec-001))
-    ((+ -3 -3) (num bitvec-001))
-    ((+ 0 3) (num bitvec-100))
-    ((+ -4 -4) (num bitvec-001))
-    ((+ -5 -5) (num bitvec-001))
-    ((+ -6 -6) (num bitvec-001))
-    ((+ -7 -7) (num bitvec-001))
-    ((+ 0 4) (num bitvec-100))
-    ((+ -8 -8) (num bitvec-001))
-    ((+ 2 1) (num bitvec-100))
-    ((+ 1 3) (num bitvec-100))
-    ((+ 1 4) (num bitvec-100))
-    ((+ 1 5) (num bitvec-100))
-    ((+ -9 -9) (num bitvec-001))
-    ((+ 1 0) (num bitvec-100))
+    ((+ 1 2) (num bitvec-100))
+    ((+ 1 -4) (num bitvec-111))
+    ((+ 1 -5) (num bitvec-111))
+    ((+ 1 -6) (num bitvec-111))
+    ((+ -1 -6) (num bitvec-001))
+    ((+ 2 -7) (num bitvec-111))
+    ((+ -2 3) (num bitvec-111))
+    ((+ -3 -6) (num bitvec-001))
+    ((+ -2 -7) (num bitvec-001))
+    ((+ -2 -8) (num bitvec-001))
+    ((+ 3 -8) (num bitvec-111))
+    ((+ -4 -6) (num bitvec-001))
+    ((+ -5 4) (num bitvec-111))
+    ((+ -6 -7) (num bitvec-001))
     ((+ 0 0) (num bitvec-010))
-    ((+ -10 -6) (num bitvec-001))
-    ((+ 0 5) (num bitvec-100))
-    ((+ 0 6) (num bitvec-100))
+    ((+ -7 -9) (num bitvec-001))
+    ((+ 4 -9) (num bitvec-111))
+    ((+ -8 5) (num bitvec-111))
+    ((+ -8 -8) (num bitvec-001))
+    ((+ -3 -9) (num bitvec-001))
+    ((+ -9 -9) (num bitvec-001))
+    ((+ 5 -10) (num bitvec-111))
+    ((+ 6 -11) (num bitvec-111))
+    ((+ 1 -12) (num bitvec-111))
+    ((+ 1 -13) (num bitvec-111))
+    ((+ 6 0) (num bitvec-100))
+    ((+ 7 0) (num bitvec-100))
     ((+ -10 -10) (num bitvec-001))
-    ((+ 0 -11) (num bitvec-001))
-    ((+ -11 -11) (num bitvec-001))
-    ((+ -12 0) (num bitvec-001))
+    ((+ 1 -14) (num bitvec-111))
+    ((+ 1 -15) (num bitvec-111))
+    ((+ -11 -14) (num bitvec-001))
+    ((+ -12 6) (num bitvec-111))
+    ((* 0 0) (num bitvec-010))
+    ((+ 2 -16) (num bitvec-111))
+    ((+ 0 -15) (num bitvec-001))
+    ((* -1 -1) (num bitvec-100))
+    ((+ 2 -17) (num bitvec-111))
+    ((+ 0 -16) (num bitvec-001))
+    ((* 1 1) (num bitvec-100))
+    ((+ 0 -17) (num bitvec-001))
+    ((+ 0 -18) (num bitvec-001))
+    ((* 2 -2) (num bitvec-001))
     ((+ -12 -12) (num bitvec-001))))
 
 (test "evalo-3"
