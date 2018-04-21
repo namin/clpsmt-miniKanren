@@ -88,6 +88,7 @@
       
       )))
 
+#|
 ;;; Hmmm--no bit pattern?
 (test "declaro-1"
   (run* (q)
@@ -120,7 +121,7 @@
     (s/chas-poso q)
     (s/declareo q))
   '())
-
+|#
 
 (test "lookupo-1"
   (run 3 (q)
