@@ -2,6 +2,13 @@
 (load "z3-driver.scm")
 (load "test-check.scm")
 
+;; this is for the future
+;; dummy implementation
+(define tabled
+  (lambda (f)
+    (lambda args
+      (apply f args))))
+
 ;; some tests inspired by
 ;; https://github.com/webyrd/tabling
 
@@ -18,7 +25,7 @@
                          ((fresh (z)
                             (arc x z)
                             (path z y))))))))
-    (run* (q)
+    (run 4 (q)
       (path 'a q)))
   '(b a d))
 
@@ -52,7 +59,7 @@
                              (z/assert `(= (* ,n ,r) ,out))
                              (facto n-1 r))))))))
     (run* (q)
-      (facto q 2)))  
+      (facto q 2)))
   '(2))
 
 (test "facto-backwards-720"

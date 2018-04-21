@@ -1,5 +1,3 @@
-(define tabling '())
-
 (define c->S (lambda (c) (car c)))
 
 (define c->D (lambda (c) (cadr c)))
@@ -54,7 +52,6 @@
 (define-syntax run
   (syntax-rules ()
     ((_ n (x) g0 g ...)
-     (set! tabling '())
      (take n
        (lambdaf@ ()
          ((fresh (x) g0 g ... purge-M-inc-models
@@ -921,27 +918,3 @@
         #f
         (mplus (car cs)
                (lambda () (resume-each (cdr cs)))))))
-(define tabled
-  (lambda (f)
-    (let ((id (length tabling)))
-      (set! tabling (cons (cons id '()) tabling))
-      (lambda args
-        (lambdag@ (c : S D A T M)
-          (let* ((r (assq id tabling))
-                 (rhs (cdr r))
-                 (old (assoc args rhs)))
-            (if (not old)
-                (let ((e (cons args (cons '() '()))))
-                  (set-cdr! r (cons e rhs))
-                  (bind* ((apply f args) c)
-                         (lambda (c-out)
-                           (let* ((ans (walk* args (c->S c-out)))
-                                  (answers (car (cdr e)))
-                                  (conts (cdr (cdr e))))
-                             (if (member ans answers)
-                                 #f
-                                 (begin
-                                   (set-car! (cdr e) (cons ans answers))
-                                   (set-cdr! (cdr e) (cons c-out conts))
-                                   (resume-each (cdr (cdr e)))))))))
-                (resume-each (cdr (cdr (cdr old)))))))))))
