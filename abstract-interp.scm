@@ -10,7 +10,7 @@
 
 ;;; Initial thoughts:
 
-;;; 1. Having to declare a bitvector once and only once using 's/declareo' seems very error prone in complex queries/code.  At a minimum, have an error signalled, rather than failing silently, would be extremely friendly.  (See tests declaro-1 and declaro-2.)
+;;; 1. Having to declare a bitvector once and only once using 's/declareo' seems very error prone in complex queries/code.  At a minimum, having an error signalled, rather than failing silently, would be extremely friendly.  (See tests declaro-1 and declaro-2 to see the problem.)
 
 ;;; 2. s/declareo is non-relational, since declaraing the variable after use results in failure (once again, should really signal an error if possible, if not make fully relational).
 
