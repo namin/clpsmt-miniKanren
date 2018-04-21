@@ -212,7 +212,7 @@
         (append r (map (lambda (s) (cons (car xs) s)) r)))))
 
 (define (op-table op)
-  (let ((r (comb '(- 0 +))))
+  (let ((r (filter null? (comb '(- 0 +)))))
     (apply
      append
      (map
