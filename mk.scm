@@ -1,3 +1,5 @@
+(define tabling '())
+
 (define c->S (lambda (c) (car c)))
 
 (define c->D (lambda (c) (cadr c)))
@@ -52,6 +54,7 @@
 (define-syntax run
   (syntax-rules ()
     ((_ n (x) g0 g ...)
+     (set! tabling '())
      (take n
        (lambdaf@ ()
          ((fresh (x) g0 g ... purge-M-inc-models
@@ -911,3 +914,26 @@
                         (mplus
                          ((add-model m (car SM)) `(,S ,D ,A ,T ()))
                          (lambda () (loop (cons m ms)))))))))))))
+
+(define tabling-record!
+  (lambda (id args c-in)
+    (let* ((r (assq id tabling))
+           (xs (cdr r))
+           (old? (member args xs)))
+      (if old?
+          #f
+          (begin
+            (set-cdr! r (cons args (cdr r)))
+            (let ((k (lambda (c-out) c-out)))
+              k))))))
+
+(define tabled
+  (lambda (f)
+    (let ((id (length tabling)))
+      (set! tabling (cons (cons id '()) tabling))
+      (lambda args
+        (lambdag@ (c : S D A T M)
+          (let* ((k (tabling-record! id args c)))
+            (and
+             k
+             (bind* ((apply f args) c) k))))))))
