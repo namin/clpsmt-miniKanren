@@ -1,5 +1,5 @@
 (load "mk.scm")
-;(load "z3-driver.scm")
+(load "z3-driver.scm")
 (load "test-check.scm")
 
 ;; some tests inspired by
@@ -21,3 +21,51 @@
     (run* (q)
       (path 'a q)))
   '(b a d))
+
+
+(test "facto-7"
+  (letrec ((facto (tabled
+                      (lambda (n out)
+                        (conde
+                          ((z/assert `(= ,n 0))
+                           (z/assert `(= ,out 1)))
+                          ((z/assert `(not (= ,n 0)))
+                           (fresh (n-1 r)
+                             (z/assert `(= (- ,n 1) ,n-1))
+                             (z/assert `(= (* ,n ,r) ,out))
+                             (facto n-1 r))))))))
+    (run 7 (q)
+      (fresh (n out)
+        (facto n out)
+        (== q `(,n ,out)))))
+  '((0 1) (1 1) (2 2) (3 6) (4 24) (5 120) (6 720)))
+
+(test "facto-backwards-2"
+  (letrec ((facto (tabled
+                      (lambda (n out)
+                        (conde
+                          ((z/assert `(= ,n 0))
+                           (z/assert `(= ,out 1)))
+                          ((z/assert `(not (= ,n 0)))
+                           (fresh (n-1 r)
+                             (z/assert `(= (- ,n 1) ,n-1))
+                             (z/assert `(= (* ,n ,r) ,out))
+                             (facto n-1 r))))))))
+    (run* (q)
+      (facto q 2)))  
+  '(2))
+
+(test "facto-backwards-720"
+  (letrec ((facto (tabled
+                      (lambda (n out)
+                        (conde
+                          ((z/assert `(= ,n 0))
+                           (z/assert `(= ,out 1)))
+                          ((z/assert `(not (= ,n 0)))
+                           (fresh (n-1 r)
+                             (z/assert `(= (- ,n 1) ,n-1))
+                             (z/assert `(= (* ,n ,r) ,out))
+                             (facto n-1 r))))))))
+    (run* (q)
+      (facto q 720)))
+  '(6))
