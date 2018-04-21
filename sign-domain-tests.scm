@@ -316,6 +316,8 @@
 
 ;;; Non-declarative behavior: ideally should still work, even if
 ;;; s/declareo comes after s/z3-alphao
+;;
+;; Should at least give an error instead of failing, if possible.
 (test "14-non-declarative-b"
   (run 1 (q)
     (fresh (n s)
