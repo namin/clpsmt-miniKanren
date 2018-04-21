@@ -305,3 +305,22 @@
     (13 bitvec-100)
     (14 bitvec-100)
     (15 bitvec-100)))
+
+(test "14-non-declarative-a"
+  (run 1 (q)
+    (fresh (n s)
+      (== (list n s) q)
+      (s/declareo s)
+      (s/z3-alphao n s)))
+  '((0 bitvec-010)))
+
+;;; Non-declarative behavior: ideally should still work, even if
+;;; s/declareo comes after s/z3-alphao
+(test "14-non-declarative-b"
+  (run 1 (q)
+    (fresh (n s)
+      (== (list n s) q)
+      (s/z3-alphao n s)
+      (s/declareo s)))
+  '())
+
