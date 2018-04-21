@@ -788,25 +788,6 @@
 
 (define onceo (lambda (g) (condu (g))))
 
-(define z/reify-SM
-  (lambda (M)
-    (lambda (c)
-      (let* ((S (c->S c))
-             (M (walk* (reverse M) S))
-             (S (reify-S M '()))
-             (M (walk* M S))
-             (ds-R (partition declares? M))
-             (ds (car ds-R))
-             (R (cdr ds-R))
-             (ds (filter-redundant-declares ds ds))
-             (M (append ds R)))
-        (cons
-         (map (lambda (x) (cons (cdr x) (car x))) S)
-         (append
-          (map (lambda (x) `(declare-fun ,x () Int))
-               (filter (undeclared? (map cadr ds)) (map cdr S)))
-          M))))))
-
 (define partition
   (lambda (p xs)
     (cons (filter p xs)
@@ -838,6 +819,25 @@
 
 (define undeclared?
   (lambda (ds) (if (null? ds) (lambda (x) #t) (lambda (x) (not (memq x ds))))))
+
+(define z/reify-SM
+  (lambda (M)
+    (lambda (c)
+      (let* ((S (c->S c))
+             (M (walk* (reverse M) S))
+             (S (reify-S M '()))
+             (M (walk* M S))
+             (ds-R (partition declares? M))
+             (ds (car ds-R))
+             (R (cdr ds-R))
+             (ds (filter-redundant-declares ds ds))
+             (M (append ds R)))
+        (cons
+         (map (lambda (x) (cons (cdr x) (car x))) S)
+         (append
+          (map (lambda (x) `(declare-fun ,x () Int))
+               (filter (undeclared? (map cadr ds)) (map cdr S)))
+          M))))))
 
 (define z/assert
   (lambda (e)
