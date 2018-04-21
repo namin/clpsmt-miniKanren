@@ -13,7 +13,7 @@
   '(4 1))
 
 (test "declare-idempotent"
-  (run* (q) ;; TODO: * instead of 1
+  (run* (q)
     (fresh (v1 v2)
       (z/ `(declare-const ,v1 Bool))
       (z/ `(declare-const ,v2 Bool))
