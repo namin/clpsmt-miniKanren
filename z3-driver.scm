@@ -13,6 +13,8 @@
     (let ([p (open-output-file "out.smt" 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
+      (system "sed -i '' 's/#t/true/g' out.smt")
+      (system "sed -i '' 's/#f/false/g' out.smt")
       (system "sed -i '' 's/bitvec-/#b/g' out.smt")
       (system "z3 out.smt >out.txt")
       (system "sed -i '' 's/#b/bitvec-/g' out.txt"))))

@@ -128,7 +128,7 @@
 (test "10"
   (run* (s)
     (s/declareo s)
-    (s/has-nego  s 'true)
-    (s/has-zeroo s 'true)
-    (s/has-poso  s 'false))
+    (s/has-nego  s #t)
+    (s/has-zeroo s #t)
+    (s/has-poso  s #f))
   '(bitvec-011))
