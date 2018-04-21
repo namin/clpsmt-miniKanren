@@ -17,7 +17,7 @@
 ;;; 3. Not sure how to best mix sets/bitvectors with booleans, closures, etc., in the interpreter.  If we want an abstract evaluator that only handles sets, no problem.  If we want to also handle closures as values, for example, seems tricky, given the need to use 's/declareo' on sets.
 
 
-;;; assumption: aval is a bit vector
+
 (define alookupo
   (lambda (x aenv aval)
     (conde
