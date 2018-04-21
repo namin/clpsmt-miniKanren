@@ -19,6 +19,7 @@
 ;;; 4. The reified answer for (run* (q) (s/declareo q)) is just (_.0) -- no bit pattern in presented, no side-condition saying this is a set is included.  (See declaro-1 and declaro-3.)
 
 
+;; should this code have any 's/declareo's?
 (define alookupo
   (lambda (x aenv aval)
     (conde
