@@ -177,6 +177,7 @@
        ;; (list-of-numbero a*)
        (numbero a1)
        (numbero a2)
+       (numbero val)
        (z/assert `(= ,val (,prim-id ,a1 ,a2))))]
     [(conde
        [(== prim-id '=)]

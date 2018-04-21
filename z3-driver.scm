@@ -18,7 +18,7 @@
       (system "sed -i '' 's/bitvec-/#b/g' out.smt")
       (let ((r (system "z3 out.smt >out.txt")))
         (system "sed -i '' 's/#b/bitvec-/g' out.txt")
-        (if (> r 0)
+        (if (not (= r 0))
             (error 'call-z3 "error in z3 out.smt > out.txt"))))))
 
 (define check-sat
