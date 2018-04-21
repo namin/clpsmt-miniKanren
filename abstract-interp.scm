@@ -12,10 +12,11 @@
 
 ;;; 1. Having to declare a bitvector once and only once using 's/declareo' seems very error prone in complex queries/code.  At a minimum, having an error signalled, rather than failing silently, would be extremely friendly.  (See tests declaro-1 and declaro-2 to see the problem.)
 
-;;; 2. s/declareo is non-relational, since declaraing the variable after use results in failure (once again, should really signal an error if possible, if not make fully relational).
+;;; 2. s/declareo is non-relational, since declaraing the variable after use results in failure (once again, should really signal an error if possible, if not make fully relational).  (See declaro-3 and declaro-4.)
 
 ;;; 3. Not sure how to best mix sets/bitvectors with booleans, closures, etc., in the interpreter.  If we want an abstract evaluator that only handles sets, no problem.  If we want to also handle closures as values, for example, seems tricky, given the need to use 's/declareo' on sets.
 
+;;; 4. The reified answer for (run* (q) (s/declareo q)) is just (_.0) -- no bit pattern in presented, no side-condition saying this is a set is included.  (See declaro-1 and declaro-3.)
 
 
 (define alookupo
@@ -96,6 +97,26 @@
     (s/declareo q)
     (s/declareo q))
   '())
+
+;;; Compare with declareo-1 -- now can see that we have bit patterns.
+(test "declaro-3"
+  (run* (q)
+    (s/declareo q)
+    (s/chas-poso q))
+  '(bitvec-100
+    bitvec-111
+    bitvec-110
+    bitvec-101))
+
+;;; Non-declarative behavior
+;;; compare with declareo-3 -- just swapped order of goals
+;;; An error would be friendlier
+(test "declareo-4"
+  (run* (q)
+    (s/chas-poso q)
+    (s/declareo q))
+  '())
+
 
 (test "alookupo-1"
   (run 3 (q)
