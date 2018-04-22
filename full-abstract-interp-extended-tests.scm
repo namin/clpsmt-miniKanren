@@ -8,6 +8,8 @@
 ;;;
 ;;; Not sure the arithmetic is working correctly in the abstract evaluator.
 ;;;
+;;; Fix broken tests, including after #!eof
+;;;
 ;;; Need to add tabling
 ;;;
 ;;; Want to get more precise answers from factorial
