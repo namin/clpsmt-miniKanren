@@ -10,6 +10,16 @@
 ;;;
 ;;; Fix broken tests, including after #!eof
 ;;;
+;;;
+;;; Fix quine-generating query: (run 3 (q) (evalo q q))
+;;;
+;;; Exception in call-z3: error in z3 out.smt > out.txt
+;;; Type (debug) to enter the debugger.
+;;;
+;;; (error "line 4 column 28: Sort mismatch at argument #1 for function (declare-fun > (Int Int) Bool) supplied sort is (_ BitVec 3)")
+;;; sat
+;;;
+;;;
 ;;; Need to add tabling
 ;;;
 ;;; Want to get more precise answers from factorial
