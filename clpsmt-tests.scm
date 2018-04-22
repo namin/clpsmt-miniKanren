@@ -1,4 +1,5 @@
 (load "mk.scm")
+(load "tabling.scm")
 (load "z3-driver.scm")
 (load "test-check.scm")
 

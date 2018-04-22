@@ -1,6 +1,14 @@
 ;; starting point is miniKanren tabling code by Ramana Kumar
 ;; taken from webyrd/tabling
 
+(define ext-s-no-check
+  (lambda (x v s)
+    (cons `(,x . ,v) s)))
+
+(define new-s
+  (lambda (c s)
+    (cons s (cdr c))))
+
 (define make-cache (lambda (ansv*) (vector 'cache ansv*)))
 (define cache-ansv* (lambda (v) (vector-ref v 1)))
 (define cache-ansv*-set! (lambda (v val) (vector-set! v 1 val)))
@@ -27,26 +35,26 @@
         (else #f)))))
 
 (define reuse
-  (lambda (argv cache s)
+  (lambda (argv cache s c)
     (let fix ((start (cache-ansv* cache)) (end '()))
       (let loop ((ansv* start))
         (if (eq? ansv* end)
             (list (make-ss cache start (lambdaf@ () (fix (cache-ansv* cache) start))))
-            (choice (subunify argv (reify-var (car ansv*) s) s)
+            (choice (new-s c (subunify argv (reify-var (car ansv*) s) s))
                     (lambdaf@ () (loop (cdr ansv*)))))))))
 
 (define master
   (lambda (argv cache)
-    (lambdag@ (s)
+    (lambdag@ (c : S D A T M)
       (and
         (for-all
-         (lambda (ansv) (not (subsumed argv ansv s)))
+         (lambda (ansv) (not (subsumed argv ansv S)))
          (cache-ansv* cache))
         (begin
           (cache-ansv*-set! cache
-                            (cons (reify-var argv s)
+                            (cons (reify-var argv S)
                                   (cache-ansv* cache)))
-          s)))))
+          c)))))
 
 (define-syntax tabled
   (syntax-rules ()
@@ -54,14 +62,14 @@
      (let ((table '()))
        (lambda (x ...)
          (let ((argv (list x ...)))
-           (lambdag@ (s)
-             (let ((key (reify argv s)))
+           (lambdag@ (c : S D A T M)
+             (let ((key ((reify argv) c)))
                (cond
                  ((assoc key table)
-                  => (lambda (key.cache) (reuse argv (cdr key.cache) s)))
+                  => (lambda (key.cache) (reuse argv (cdr key.cache) S c)))
                  (else (let ((cache (make-cache '())))
                          (set! table (cons `(,key . ,cache) table))                         
-                         ((fresh () g g* ... (master argv cache)) s))))))))))))
+                         ((fresh () g g* ... (master argv cache)) c))))))))))))
 
 
 (define ss-ready? (lambda (ss) (not (eq? (cache-ansv* (ss-cache ss)) (ss-ansv* ss)))))
@@ -82,62 +90,66 @@
 
 (define-syntax case-inf
   (syntax-rules ()
-    ((_ e (() e0) ((f^) e1) ((w) ew) ((a^) e2) ((a f) e3))
-     (let ((a-inf e))
+    ((_ e (() e0) ((f^) e1) ((w) ew) ((c^) e2) ((c f) e3))
+     (let ((c-inf e))
        (cond
-         ((not a-inf) e0)
-         ((procedure? a-inf) (let ((f^ a-inf)) e1))
-         ((and (pair? a-inf) (procedure? (cdr a-inf)))
-          (let ((a (car a-inf)) (f (cdr a-inf))) e3))
-         ((w? a-inf) (w-check a-inf
+         ((not c-inf) e0)
+         ((procedure? c-inf)  (let ((f^ c-inf)) e1))
+         ((w? c-inf) (w-check c-inf
                               (lambda (f^) e1)
-                              (lambda () (let ((w a-inf)) ew))))           
-         (else (let ((a^ a-inf)) e2)))))))
+                              (lambda () (let ((w c-inf)) ew))))
+         ((not (and (pair? c-inf)
+                 (procedure? (cdr c-inf))))
+          (let ((c^ c-inf)) e2))
+         (else (let ((c (car c-inf)) (f (cdr c-inf))) 
+                 e3)))))))
 
 (define take
   (lambda (n f)
-    (if (and n (zero? n)) 
-      '()
-      (case-inf (f)
-        (() '())
-        ((f) (take n f))
-        ((w) '())
-        ((a) a)
-        ((a f) (cons (car a) (take (and n (- n 1)) f)))))))
+    (cond
+      ((and n (zero? n)) '())
+      (else
+       (case-inf (f) 
+         (() '())
+         ((f) (take n f))
+         ((w) '())
+         ((c) (cons c '()))
+         ((c f) (cons c (take (and n (- n 1)) f))))))))
 
 (define bind
-  (lambda (a-inf g)
-    (case-inf a-inf
+  (lambda (c-inf g)
+    (case-inf c-inf
       (() (mzero))
       ((f) (inc (bind (f) g)))
       ((w) (map (lambda (ss)
                   (make-ss (ss-cache ss) (ss-ansv* ss)
                            (lambdaf@ () (bind ((ss-f ss)) g))))
                 w))
-      ((a) (g a))
-      ((a f) (mplus (g a) (lambdaf@ () (bind (f) g)))))))
+      ((c) (g c))
+      ((c f) (mplus (g c) (lambdaf@ () (bind (f) g)))))))
 
 (define mplus
-  (lambda (a-inf f)
-    (case-inf a-inf
+  (lambda (c-inf f)
+    (case-inf c-inf
       (() (f))
       ((f^) (inc (mplus (f) f^)))
-      ((w) (lambdaf@ () (let ((a-inf (f)))
-                          (if (w? a-inf)
-                              (append a-inf w)
-                              (mplus a-inf (lambdaf@ () w))))))
-      ((a) (choice a f))
-      ((a f^) (choice a (lambdaf@ () (mplus (f) f^)))))))
+      ((w) (lambdaf@ () (let ((c-inf (f)))
+                          (if (w? c-inf)
+                              (append c-inf w)
+                              (mplus c-inf (lambdaf@ () w))))))      ((c) (choice c f))
+      ((c f^) (choice c (lambdaf@ () (mplus (f) f^)))))))
 
 (define reify-v
   (lambda (n)
     (var n)))
-
+
+(define empty-S '())
+
 (define make-reify
   (lambda (rep)
     (lambda (v s)
       (let ((v (walk* v s)))
-        (walk* v (reify-s rep v empty-s))))))
+        (walk* v (reify-s rep v empty-S))))))
 
 (define reify-s
   (lambda (rep v s)
@@ -147,25 +159,5 @@
         ((pair? v) (reify-s rep (cdr v) (reify-s rep (car v) s)))
         (else s)))))
 
-(define reify (make-reify reify-name))
+(define reify-from-s (make-reify reify-name))
 (define reify-var (make-reify reify-v))
-
-;;; Do not include in diss
-(define-syntax run+
-  (syntax-rules ()
-    ((_ (x) g0 g* ...)
-     (take+
-      (lambdaf@ ()
-        ((fresh (x) g0 g* ... 
-                (lambdag@ (a)
-                  (cons (reify x a) '())))
-         empty-s))))))
-
-(define take+
-  (lambda (f)
-    (case-inf (f)
-      (() '())
-      ((f) (take+ f))
-      ((w) '())
-      ((a) (cons (car a) (lambda () '())))
-      ((a f) (cons (car a) (lambda () (take+ f)))))))
