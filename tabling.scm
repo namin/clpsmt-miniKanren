@@ -68,7 +68,7 @@
                  ((assoc key table)
                   => (lambda (key.cache) (reuse argv (cdr key.cache) S c)))
                  (else (let ((cache (make-cache '())))
-                         (set! table (cons `(,key . ,cache) table))                         
+                         (set! table (cons `(,key . ,cache) table))
                          ((fresh () g g* ... (master argv cache)) c))))))))))))
 
 
@@ -101,7 +101,7 @@
          ((not (and (pair? c-inf)
                  (procedure? (cdr c-inf))))
           (let ((c^ c-inf)) e2))
-         (else (let ((c (car c-inf)) (f (cdr c-inf))) 
+         (else (let ((c (car c-inf)) (f (cdr c-inf)))
                  e3)))))))
 
 (define take
@@ -109,7 +109,7 @@
     (cond
       ((and n (zero? n)) '())
       (else
-       (case-inf (f) 
+       (case-inf (f)
          (() '())
          ((f) (take n f))
          ((w) '())
