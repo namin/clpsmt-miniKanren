@@ -59,6 +59,11 @@
            q))
   '((num bitvec-110)))
 
+;;; possible error
+;;;
+;;; expected ((num bitvec-111))
+;;;
+;;; but am getting ((num bitvec-111) (num bitvec-111))
 (test "evalo-if-zero?-sub1-b"
   (run* (q)
     (evalo '(let ((x (+ 1 -1)))
