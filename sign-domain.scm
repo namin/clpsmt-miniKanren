@@ -167,12 +167,22 @@
     xs)
   (cond
     [(from '- '-)  (set '+)]
-    [(from '- '0)  (set  0)]
+    [(from '- '0)  (set '0)]
     [(from '- '+)  (set '-)]
-    [(from '0 s2)  (set  0)]
+    [(from '0 s2)  (set '0)]
     [(from '+ '-)  (set '-)]
-    [(from '+  0)  (set  0)]
+    [(from '+  0)  (set '0)]
     [(from '+ '+)  (set '+)]))
+
+(define (sub1-alpha s1)
+  (define (from a)
+    (eq? a s1))
+  (define (set . xs)
+    xs)
+  (cond
+    [(from '-) (set '-)]
+    [(from '0) (set '0)]
+    [(from '+) (set '0 '+)]))
 
 (define to-bitvec
   (lambda (s)
@@ -206,6 +216,15 @@
 (define plus-abstract  (op-abstract plus-alpha))
 (define times-abstract (op-abstract times-alpha))
 
+(define op1-abstract
+  (lambda (op)
+    (lambda (s1)
+      (to-bitvec
+       (flatten
+        (map (lambda (b1) (op b1)) s1))))))
+
+(define sub1-abstract (op1-abstract sub1-alpha))
+
 (define (comb xs)
   (if (null? xs) '(())
       (let ((r (comb (cdr xs))))
@@ -223,6 +242,14 @@
                  (op s1 s2)))
          r))
       r))))
+
+(define (op1-table op)
+  (let ((r (comb '(- 0 +))))
+    (map
+     (lambda (s1)
+       (list (to-bitvec s1)
+             (op s1)))
+     r)))
 
 (define s/op-tableo
   (lambda (table)
@@ -260,3 +287,18 @@
 
 (define s/z3-plus-tableo  (s/z3-op-tableo (op-table plus-abstract)))
 (define s/z3-times-tableo (s/z3-op-tableo (op-table times-abstract)))
+
+(define s/z3-op1-tableo
+  (lambda (table)
+    (lambda (s1 so)
+      (define iter
+        (lambda (es)
+          (let ((e (car es)))
+            (if (null? (cdr es))
+                (cadr e)
+                `(ite (= ,(car e) ,s1)
+                      ,(cadr e)
+                      ,(iter (cdr es)))))))
+      (z/assert `(= ,so ,(iter table))))))
+
+(define s/z3-sub1-tableo (s/z3-op1-tableo (op1-table sub1-abstract)))

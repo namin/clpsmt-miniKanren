@@ -279,6 +279,22 @@
     (bitvec-100 bitvec-001 bitvec-001)
     (bitvec-100 bitvec-011 bitvec-011)))
 
+(test "sub1-table"
+  (run* (s)
+    (fresh (s1 s2)
+      (== (list s1 s2) s)
+      (s/declareo s1)
+      (s/declareo s2)
+      (s/z3-sub1-tableo s1 s2)))
+  '((bitvec-000 bitvec-000)
+    (bitvec-011 bitvec-011)
+    (bitvec-001 bitvec-001)
+    (bitvec-100 bitvec-110)
+    (bitvec-110 bitvec-110)
+    (bitvec-111 bitvec-111)
+    (bitvec-101 bitvec-111)
+    (bitvec-010 bitvec-010)))
+
 (test "13"
   (run 20 (q)
     (fresh (n s)
