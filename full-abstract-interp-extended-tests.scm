@@ -4,6 +4,15 @@
 (load "test-check.scm")
 (load "full-abstract-interp-extended.scm")
 
+;;; WEB stopping point:  21 April 02018
+;;;
+;;; Not sure the arithmetic is working correctly in the abstract evaluator.
+;;;
+;;; Need to add tabling
+;;;
+;;; Want to get more precise answers from factorial
+;;;
+;;; Does this mixture of abstract value/powerset for integers, and concrete values for all other values, make sense?  Or should we use power sets for everything?  Currently the code feels a bit like concolic execution.
 
 (test "evalo-simple-let-a"
   (run* (q)
