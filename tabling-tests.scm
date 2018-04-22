@@ -33,13 +33,13 @@
                          (z/assert `(= (- ,n 1) ,n-1))
                          (z/assert `(= (* ,n ,r) ,out))
                          (facto n-1 r)))))))
-    (run 7 (q)
+    (run 7 (q) ;; TODO: run 2 diverges, only run 1 works
       (fresh (n out)
         (facto n out)
         (== q `(,n ,out)))))
   '((0 1) (1 1) (2 2) (3 6) (4 24) (5 120) (6 720)))
 
-(todo "facto-backwards-2"
+(test "facto-backwards-2"
   (letrec ((facto (tabled (n out)
                     (conde
                       ((z/assert `(= ,n 0))
@@ -53,17 +53,16 @@
       (facto q 2)))
   '(2))
 
-(todo "facto-backwards-720"
-  (letrec ((facto (tabled
-                      (lambda (n out)
-                        (conde
-                          ((z/assert `(= ,n 0))
-                           (z/assert `(= ,out 1)))
-                          ((z/assert `(not (= ,n 0)))
-                           (fresh (n-1 r)
-                             (z/assert `(= (- ,n 1) ,n-1))
-                             (z/assert `(= (* ,n ,r) ,out))
-                             (facto n-1 r))))))))
+(test "facto-backwards-720"
+  (letrec ((facto (tabled (n out)
+                    (conde
+                      ((z/assert `(= ,n 0))
+                       (z/assert `(= ,out 1)))
+                      ((z/assert `(not (= ,n 0)))
+                       (fresh (n-1 r)
+                         (z/assert `(= (- ,n 1) ,n-1))
+                         (z/assert `(= (* ,n ,r) ,out))
+                         (facto n-1 r)))))))
     (run* (q)
       (facto q 720)))
   '(6))
