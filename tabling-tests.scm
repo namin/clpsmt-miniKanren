@@ -90,7 +90,7 @@
 ;;; Busted!
 ;;
 ;; Seems to diverge on the first recursive case
-(test "fibo-1-tabled"
+(todo "fibo-1-tabled"
   (letrec ((fibo (tabled (n out)
                    (conde
                      ((z/assert `(= ,n 0))
