@@ -46,15 +46,18 @@
 (define master
   (lambda (argv cache)
     (lambdag@ (c : S D A T M)
-      (and
-        (for-all
-         (lambda (ansv) (not (subsumed argv ansv S)))
-         (cache-ansv* cache))
-        (begin
-          (cache-ansv*-set! cache
-                            (cons (reify-var argv S)
-                                  (cache-ansv* cache)))
-          c)))))
+      (bind*
+       (purge-M-inc-models c)
+       (lambdag@ (c : S D A T M)
+         (and
+          (for-all
+           (lambda (ansv) (not (subsumed argv ansv S)))
+           (cache-ansv* cache))
+          (begin
+            (cache-ansv*-set! cache
+                              (cons (reify-var argv S)
+                                    (cache-ansv* cache)))
+            c)))))))
 
 (define-syntax tabled
   (syntax-rules ()

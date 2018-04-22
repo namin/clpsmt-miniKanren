@@ -23,7 +23,7 @@
   '(b a d))
 
 
-(todo "facto-7"
+(test "facto-7"
   (letrec ((facto (tabled (n out)
                     (conde
                       ((z/assert `(= ,n 0))
@@ -33,7 +33,7 @@
                          (z/assert `(= (- ,n 1) ,n-1))
                          (z/assert `(= (* ,n ,r) ,out))
                          (facto n-1 r)))))))
-    (run 7 (q) ;; TODO: run 2 diverges, only run 1 works
+    (run 7 (q)
       (fresh (n out)
         (facto n out)
         (== q `(,n ,out)))))
