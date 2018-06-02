@@ -1,16 +1,62 @@
 (load "mk.scm")
 (load "z3-driver.scm")
 (load "test-check.scm")
-(load "full-interp-extended-memo-lambda.scm")
+(load "full-interp-mutation-apply.scm")
 
 
-(test "evalo-simple-let-a"
-  (run* (q)
-    (evalo '(let ((foo (+ 1 2))) (* foo foo)) q))
-  '(9))
+;; Not implemented yet!
+;; needs begin, set!, apply
+;;
+;; should work for memoization, but not full tabling (can't cut off infinite recursions, for example)
+;;
+;; would need to intercept recursive calls -- I think this means we need a 'memo-lambda' special form
+(test "evalo-memo-1-a"
+  (time
+    (run 1 (q)
+      (evalo `(letrec ((assoc (lambda (x ls)
+                                (match ls
+                                  [`() #f]
+                                  [`((,y . ,v) . ,rest)
+                                   (if (equal? x y)
+                                       (cons y v)
+                                       (assoc x rest))]))))
+                (let ((table-function (lambda (f)
+                                        (let ((table '()))
+                                          (lambda args
+                                            (let ((v (assoc args table)))
+                                              (if v
+                                                  (cdr v)
+                                                  (let ((v (apply f args)))
+                                                    (begin
+                                                      (set! table (cons (cons args v) tab))
+                                                      v)))))))))
+                  (letrec ((fib (lambda (n)
+                                  (if (= n 0)
+                                      0
+                                      (if (= n 1)
+                                          1
+                                          (+ (fib (- n 1)) (fib (- n 2))))))))
+                    (let ((memo-fib (table-function fib)))
+                      (memo-fib 8)))))
+             q)))
+  '???)
 
 
-#|
+
+;;; takes about a minute on Will's laptop
+(test "evalo-fib-1-a"
+  (time
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 6))
+             q)))
+  '(8))
+
 (test "evalo-assoc-1-a"
   (time
     (run* (q)
@@ -26,7 +72,6 @@
                       (assoc 'a '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))))
              q)))
   '(((z . 6) #f (a . 3))))
-|#
 
 (test "evalo-assoc-2-a"
   (time
@@ -43,202 +88,28 @@
              q)))
   '(((z . 6) #f (a . 3))))
 
-(test "evalo-memo-lambda-1-a"
-  (run* (q)
-    (evalo `(list
-             (lambda (x y z) (+ x y z))
-             (memo-lambda foo (x y z) (+ x y z)))
-           q))
-  '(((closure
-      (lambda (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=)))
-     (closure
-      (memo-lambda foo (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-2-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(lambda (x) x) initial-env initial-tables tables-out val)))
-  '((()
-     (closure
-      (lambda (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-3-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(memo-lambda foo (x) x) initial-env initial-tables tables-out val)))
-  '((((foo))
-     (closure
-      (memo-lambda foo (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-3-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(list (lambda (x) x)
-                        (memo-lambda foo (x) x)
-                        (lambda (x) x)
-                        (memo-lambda bar (x) x)
-                        (lambda (x) x))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((bar) (foo))
-     ((closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda foo (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda bar (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))))))
-
-(test "evalo-memo-lambda-4-a"
-  (run* (q)
-    (evalo `((memo-lambda foo (b) 5) 'there)
-           q))
-  '(5))
-
-(test "evalo-memo-lambda-5-a"
-  (run* (q)
-    (evalo `((memo-lambda foo (b) b) 'there)
-           q))
-  '(there))
-
-(test "evalo-memo-lambda-6-a"
-  (run* (q)
-    (evalo `(list
-             ((lambda (a) a) 'hi)
-             ((memo-lambda foo (b) b) 'there))
-           q))
-  '((hi there)))
-
-(test "evalo-memo-lambda-6-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(list
-                   ((lambda (a) a) 'hi)
-                   ((memo-lambda foo (b) b) 'there))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((foo ((there) (memo-value there)) ((there) in-progress))
-      (foo ((there) in-progress))
-      (foo))
-     (hi there))))
-
 #|
-;; need to add letrec version!  and need to add test-diverge
-
-(test-diverge "evalo-memo-lambda-7-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(letrec ((f (lambda (x)
-                                (f x))))
-                    (f 'catte))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val))))
-
-(test "evalo-memo-lambda-7-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(letrec ((f (memo-lambda foo (x)
-                                (f x))))
-                    (f 'catte))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '())
-|#
-
-(test "evalo-memo-lambda-8-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(let ((square-mem (memo-lambda square (x)
-                                      (* x x))))
-                    (square-mem 3))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((square ((3) (memo-value 9)) ((3) in-progress))
-      (square ((3) in-progress))
-      (square))
-     9)))
-
-(test "evalo-memo-lambda-8-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(let ((square-mem (memo-lambda square (x)
-                                      (* x x))))
-                    (list (square-mem 3)
-                          (square-mem 4)
-                          (square-mem 3)))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '?)
-
-
-
-#!eof
-
-;;; takes about a minute on Will's laptop
-(test "evalo-fib-1-a"
+;; need to add 'cond'
+(test "evalo-assoc-3-a"
   (time
     (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 6))
+      (evalo `(letrec ((assoc (lambda (x ls)
+                                (cond
+                                  [(null? ls) #f]
+                                  [(equal? (car (car ls)) x) (car ls)]
+                                  [else (assoc x (cdr ls))]))))
+                (list (assoc 'z '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
+                      (assoc 'w '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
+                      (assoc 'a '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))))
              q)))
-  '(8))
+  '(((z . 6) #f (a . 3))))
+|#
 
+
+(test "evalo-simple-let-a"
+  (run* (q)
+    (evalo `(let ((foo (+ 1 2))) (* foo foo)) q))
+  '(9))
 
 
 ;;; symbolic execution example from slide 7 of Stephen Chong's slides

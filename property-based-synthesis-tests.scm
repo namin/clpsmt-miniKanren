@@ -1,244 +1,197 @@
 (load "mk.scm")
 (load "z3-driver.scm")
 (load "test-check.scm")
-(load "full-interp-extended-memo-lambda.scm")
+(load "full-interp-extended.scm")
 
+
+;; can we prove that fact of any number greater than 1 must be odd?
+
+;; standard concrete execution
+(test "evalo-fac-6"
+  (run* (q)
+    (evalo `(letrec ((fac
+                      (lambda (n)
+                        (if (< n 0) #f
+                            (if (= n 0) 1
+                                (* n (fac (- n 1))))))))
+              (fac 6))
+           q))
+  '(720))
+
+
+(test "evalo-fac-odd-n-1"
+  (run 1 (q)
+    (fresh (x y z)
+      (== (list x y z) q)
+      (numbero x)
+      (numbero y)
+      (numbero z)
+      (z/assert `(<= 0 ,y))
+      (z/assert `(<= 0 ,x))
+      (z/assert `(<= 0 ,z))
+      ;; assert z is odd
+      (z/assert `(= ,z (+ (* 2 ,y) 1)))
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac ,x))
+             z)))
+  '((0 0 1)))
+
+(test "evalo-fac-odd-n-2"
+  (run 2 (q)
+    (fresh (x y z)
+      (== (list x y z) q)
+      (numbero x)
+      (numbero y)
+      (numbero z)
+      (z/assert `(<= 0 ,y))
+      (z/assert `(<= 0 ,x))
+      (z/assert `(<= 0 ,z))
+      ;; assert z is odd
+      (z/assert `(= ,z (+ (* 2 ,y) 1)))
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac ,x))
+             z)))
+  '((0 0 1) (1 0 1)))
+
+;; terminates!!
+;;
+;; proof that for any non-negative integer input, the only odd output
+;; factorial can produce is '1'
+(test "evalo-fac-odd-n-3"
+  (run* (q)
+    (fresh (x y z)
+      (== (list x y z) q)
+      (numbero x)
+      (numbero y)
+      (numbero z)
+      (z/assert `(<= 0 ,y))
+      (z/assert `(<= 0 ,x))
+      (z/assert `(<= 0 ,z))
+      ;; assert z is odd
+      (z/assert `(= ,z (+ (* 2 ,y) 1)))
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac ,x))
+             z)))
+  '((0 0 1) (1 0 1)))
+
+;; even version of the above factorial code
+(test "evalo-fac-even-n-3"
+  (run 3 (q)
+    (fresh (x y z)
+      (== (list x y z) q)
+      (numbero x)
+      (numbero y)
+      (numbero z)
+      (z/assert `(<= 0 ,y))
+      (z/assert `(<= 0 ,x))
+      (z/assert `(<= 0 ,z))
+      ;; assert z is even
+      (z/assert `(= ,z (* 2 ,y)))
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac ,x))
+             z)))
+  '((2 1 2) (3 3 6) (4 12 24)))
+
+
+(test "synthesize-triple-by-property-1a"
+  (run 1 (f)
+    (fresh (e x x-tripled)
+      (== `(lambda (x) ,e) f)
+      (evalo `(,f ,x) x-tripled)))
+  '(((lambda (x) _.0) (num _.0))))
+
+;; too bad!  we get existential, not universal, quantification
+(test "synthesize-triple-by-property-1b"
+  (run 1 (q)
+    (fresh (f x x-tripled e)
+      (== (list f x x-tripled) q)
+      (== `(lambda (x) ,e) f)
+      (numbero x)
+      (numbero x-tripled)
+      (z/assert `(= ,x (* 3 ,x-tripled)))
+      (evalo `(,f ,x) x-tripled)))
+  '(((lambda (x) 0) 0 0)))
+
+
+
+(test "synthesize-triple-by-example-1a"
+  (run 1 (e)
+    (evalo `(,e 0) 0))
+  '(quote))
+
+; hmm
+;
+; (error "line 6 column 35: unknown function/constant lambda")
+; sat
+#|
+(test "synthesize-triple-by-example-1b"
+  (run 1 (e)
+    (evalo `(,e 0) 0)
+    (evalo `(,e 1) 3))
+  '?)
+|#
+
+(test "synthesize-triple-by-example-2a"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 0) 0))
+  '((lambda (x) 0)))
+
+(test "synthesize-triple-by-example-2b"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 1) 3))
+  '((lambda (x) 3)))
+
+;; ugh
+;;
+;; (error "line 6 column 35: unknown function/constant lambda")
+;; sat
+#|
+(test "synthesize-triple-by-example-2c"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '?)
+|#
+
+;; ugh
+;;
+;; (error "line 6 column 35: unknown function/constant lambda")
+;; sat
+#|
+(test "synthesize-triple-by-example-2d"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 0) 0)
+    (evalo `(,f 1) 3))
+  '?)
+|#
 
 (test "evalo-simple-let-a"
   (run* (q)
     (evalo '(let ((foo (+ 1 2))) (* foo foo)) q))
   '(9))
-
-
-#|
-(test "evalo-assoc-1-a"
-  (time
-    (run* (q)
-      (evalo `(letrec ((assoc (lambda (x ls)
-                                (match ls
-                                  [`() #f]
-                                  [`((,y . ,v) . ,rest)
-                                   (if (equal? x y)
-                                       (cons y v)
-                                       (assoc x rest))]))))
-                (list (assoc 'z '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
-                      (assoc 'w '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
-                      (assoc 'a '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))))
-             q)))
-  '(((z . 6) #f (a . 3))))
-|#
-
-(test "evalo-assoc-2-a"
-  (time
-    (run* (q)
-      (evalo `(letrec ((assoc (lambda (x ls)
-                                (if (null? ls)
-                                    #f
-                                    (if (equal? (car (car ls)) x)
-                                        (car ls)
-                                        (assoc x (cdr ls)))))))
-                (list (assoc 'z '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
-                      (assoc 'w '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))
-                      (assoc 'a '((a . 3) (b . 4) (c . 5) (z . 6) (d . 7) (a . 8)))))
-             q)))
-  '(((z . 6) #f (a . 3))))
-
-(test "evalo-memo-lambda-1-a"
-  (run* (q)
-    (evalo `(list
-             (lambda (x y z) (+ x y z))
-             (memo-lambda foo (x y z) (+ x y z)))
-           q))
-  '(((closure
-      (lambda (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=)))
-     (closure
-      (memo-lambda foo (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-2-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(lambda (x) x) initial-env initial-tables tables-out val)))
-  '((()
-     (closure
-      (lambda (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-3-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(memo-lambda foo (x) x) initial-env initial-tables tables-out val)))
-  '((((foo))
-     (closure
-      (memo-lambda foo (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
-
-(test "evalo-memo-lambda-3-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(list (lambda (x) x)
-                        (memo-lambda foo (x) x)
-                        (lambda (x) x)
-                        (memo-lambda bar (x) x)
-                        (lambda (x) x))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((bar) (foo))
-     ((closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda foo (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda bar (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))))))
-
-(test "evalo-memo-lambda-4-a"
-  (run* (q)
-    (evalo `((memo-lambda foo (b) 5) 'there)
-           q))
-  '(5))
-
-(test "evalo-memo-lambda-5-a"
-  (run* (q)
-    (evalo `((memo-lambda foo (b) b) 'there)
-           q))
-  '(there))
-
-(test "evalo-memo-lambda-6-a"
-  (run* (q)
-    (evalo `(list
-             ((lambda (a) a) 'hi)
-             ((memo-lambda foo (b) b) 'there))
-           q))
-  '((hi there)))
-
-(test "evalo-memo-lambda-6-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(list
-                   ((lambda (a) a) 'hi)
-                   ((memo-lambda foo (b) b) 'there))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((foo ((there) (memo-value there)) ((there) in-progress))
-      (foo ((there) in-progress))
-      (foo))
-     (hi there))))
-
-#|
-;; need to add letrec version!  and need to add test-diverge
-
-(test-diverge "evalo-memo-lambda-7-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(letrec ((f (lambda (x)
-                                (f x))))
-                    (f 'catte))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val))))
-
-(test "evalo-memo-lambda-7-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(letrec ((f (memo-lambda foo (x)
-                                (f x))))
-                    (f 'catte))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '())
-|#
-
-(test "evalo-memo-lambda-8-a"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(let ((square-mem (memo-lambda square (x)
-                                      (* x x))))
-                    (square-mem 3))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '((((square ((3) (memo-value 9)) ((3) in-progress))
-      (square ((3) in-progress))
-      (square))
-     9)))
-
-(test "evalo-memo-lambda-8-b"
-  (run* (q)
-    (fresh (tables-out val)
-      (== (list tables-out val) q)
-      (eval-expo `(let ((square-mem (memo-lambda square (x)
-                                      (* x x))))
-                    (list (square-mem 3)
-                          (square-mem 4)
-                          (square-mem 3)))
-                 initial-env
-                 initial-tables
-                 tables-out
-                 val)))
-  '?)
-
-
-
-#!eof
-
-;;; takes about a minute on Will's laptop
-(test "evalo-fib-1-a"
-  (time
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 6))
-             q)))
-  '(8))
-
 
 
 ;;; symbolic execution example from slide 7 of Stephen Chong's slides
@@ -444,6 +397,81 @@
     (0 -5 -5 (0 1 2))
     (0 -6 -6 (0 1 2))
     (0 2 -7 (0 1 2))))
+
+;; run* terminates with these restrictions on alpha, beta gamma
+(test "evalo-symbolic-execution-g2"
+  (run* (q)
+    (fresh (alpha beta gamma vals)
+      (z/assert `(<= 0 ,alpha))
+      (z/assert `(<= 0 ,beta))
+      (z/assert `(<= 0 ,gamma))
+      (z/assert `(<= ,gamma 10))
+      (== (list alpha beta gamma vals) q)
+      (evalo `((lambda (a b c)
+                 (let ((x (if (!= a 0)
+                              -2
+                              0)))
+                   (let ((y (if (and (< b 5) (= a 0) (!= c 0))
+                                1
+                                0)))
+                     (let ((z (if (< b 5)
+                                  2
+                                  0)))
+                       (if (!= (+ x (+ y z)) 3)
+                           'good
+                           (list 'bad x y z))))))
+               ',alpha ',beta ',gamma)
+             `(bad . ,vals))))
+  '((0 0 1 (0 1 2))
+    (0 1 1 (0 1 2))
+    (0 2 2 (0 1 2))
+    (0 3 3 (0 1 2))
+    (0 4 4 (0 1 2))
+    (0 4 5 (0 1 2))
+    (0 4 6 (0 1 2))
+    (0 4 7 (0 1 2))
+    (0 4 8 (0 1 2))
+    (0 4 9 (0 1 2))
+    (0 4 10 (0 1 2))
+    (0 4 3 (0 1 2))
+    (0 3 6 (0 1 2))
+    (0 3 10 (0 1 2))
+    (0 3 7 (0 1 2))
+    (0 3 8 (0 1 2))
+    (0 3 9 (0 1 2))
+    (0 3 4 (0 1 2))
+    (0 3 5 (0 1 2))
+    (0 4 2 (0 1 2))
+    (0 3 2 (0 1 2))
+    (0 2 4 (0 1 2))
+    (0 4 1 (0 1 2))
+    (0 2 1 (0 1 2))
+    (0 3 1 (0 1 2))
+    (0 2 3 (0 1 2))
+    (0 2 6 (0 1 2))
+    (0 2 5 (0 1 2))
+    (0 2 7 (0 1 2))
+    (0 2 8 (0 1 2))
+    (0 2 10 (0 1 2))
+    (0 2 9 (0 1 2))
+    (0 1 10 (0 1 2))
+    (0 1 2 (0 1 2))
+    (0 1 3 (0 1 2))
+    (0 1 5 (0 1 2))
+    (0 1 6 (0 1 2))
+    (0 1 4 (0 1 2))
+    (0 1 7 (0 1 2))
+    (0 1 8 (0 1 2))
+    (0 1 9 (0 1 2))
+    (0 0 10 (0 1 2))
+    (0 0 4 (0 1 2))
+    (0 0 2 (0 1 2))
+    (0 0 6 (0 1 2))
+    (0 0 5 (0 1 2))
+    (0 0 3 (0 1 2))
+    (0 0 7 (0 1 2))
+    (0 0 8 (0 1 2))
+    (0 0 9 (0 1 2))))
 
 (test "evalo-symbolic-execution-h"
   (run* (q)

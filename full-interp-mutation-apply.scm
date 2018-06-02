@@ -1,3 +1,7 @@
+;; supports let, begin, apply, set!
+;;
+;; expressing-passing, environment-passing, store-passing interpreter
+
 ;; The definition of 'letrec' is based based on Dan Friedman's code,
 ;; using the "half-closure" approach from Reynold's definitional
 ;; interpreters.

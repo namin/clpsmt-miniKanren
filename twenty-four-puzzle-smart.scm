@@ -90,6 +90,9 @@
       
       )))
 
+(define puzzle-drivero
+  (lambda (expr num*)
+    (puzzleo expr num* 3 24 '() 0)))
 
 (test "remove-one-elemento-a"
   (run* (q)
@@ -116,19 +119,29 @@
 
 
 (test "24-puzzle-a-check-answer-a"
-  (run* (e) (== '(* 8 (+ 1 (+ 1 1))) e) (puzzleo e '(1 1 1 8) 3 24 '() 0))
+  (run* (e) (== '(* 8 (+ 1 (+ 1 1))) e) (puzzle-drivero e '(1 1 1 8)))
   '((* 8 (+ 1 (+ 1 1)))))
 
 (test "24-puzzle-a-check-answer-b"
-  (run* (e) (== '(+ 8 (+ 1 (+ 1 1))) e) (puzzleo e '(1 1 1 8) 3 24 '() 0))
+  (run* (e) (== '(+ 8 (+ 1 (+ 1 1))) e) (puzzle-drivero e '(1 1 1 8)))
   '())
 
 
-
-
+;; *** z3-counter-check-sat count: 28203
+;; *** z3-counter-get-model count: 41
+;; (time (test "24-puzzle-i" ...))
+;;     214 collections
+;;     20.592048386s elapsed cpu time, including 0.275569252s collecting
+;;     718.830567000s elapsed real time, including 0.277166000s collecting
+;;     1743521856 bytes allocated, including 1708956160 bytes reclaimed
 (time
   (test "24-puzzle-i"
-    (streaming-run* (e) (puzzleo e '(4 6 7 7) 3 24 '() 0))
+    (let ((c1 z3-counter-check-sat)
+          (c2 z3-counter-get-model))
+      (let ((ans (streaming-run* (e) (puzzle-drivero e '(4 6 7 7)))))
+        (printf "*** z3-counter-check-sat count: ~s\n" (- z3-counter-check-sat c1))
+        (printf "*** z3-counter-get-model count: ~s\n" (- z3-counter-get-model c2))
+        ans))    
     '((- 7 (- 7 (* 4 6)))
       (+ 4 (+ 6 (+ 7 7)))
       (* 4 (- 6 (- 7 7)))
@@ -173,7 +186,7 @@
 
 (time
   (test "24-puzzle-j"
-    (streaming-run* (e) (puzzleo e '(1 2 5 10) 3 24 '() 0))
+    (streaming-run* (e) (puzzle-drivero e '(1 2 5 10)))
     '((- 5 (- 1 (* 2 10)))
       (+ 5 (- (* 2 10) 1))
       (+ (- 5 1) (* 2 10))
@@ -186,7 +199,7 @@
 
 (time
   (test "24-puzzle-k"
-    (streaming-run* (e) (puzzleo e '(3 7 8 9) 3 24 '() 0))
+    (streaming-run* (e) (puzzle-drivero e '(3 7 8 9)))
     '((* 3 (- 7 (- 8 9)))
       (* 3 (- 8 (/ 7 9)))
       (* 3 (- 9 (- 8 7)))
@@ -212,12 +225,12 @@
 
 (time
   (test "24-puzzle-a-all-streaming"
-    (streaming-run* (e) (puzzleo e '(1 1 1 8) 3 24 '() 0))
+    (streaming-run* (e) (puzzle-drivero e '(1 1 1 8)))
     '((* 8 (+ 1 (+ 1 1))))))
 
 (time
   (test "24-puzzle-g-all-streaming"
-    (streaming-run* (e) (puzzleo e '(2 2 10 10) 3 24 '() 0))
+    (streaming-run* (e) (puzzle-drivero e '(2 2 10 10)))
     '((+ 2 (+ 2 (+ 10 10)))
       (+ 2 (+ 10 (+ 2 10)))
       (+ 10 (+ 2 (+ 2 10)))
@@ -231,7 +244,7 @@
 
 (time
   (test "24-puzzle-h-all-streaming"
-    (streaming-run* (e) (puzzleo e '(2 2 2 12) 3 24 '() 0))
+    (streaming-run* (e) (puzzle-drivero e '(2 2 2 12)))
     '((- 2 (- 2 (* 2 12)))
       (* 2 (- 2 (- 2 12)))
       (* 2 (- 12 (- 2 2)))

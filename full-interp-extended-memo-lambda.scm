@@ -302,7 +302,7 @@
        [(== prim-id '>)]
        [(== prim-id '>=)]
        [(== prim-id '<)]
-       [(== prim-id '=<)])
+       [(== prim-id '<=)])
      (fresh (a1 a2)
        (== `(,a1 ,a2) a*)
        ;; we could use list-of-numbero instead
@@ -401,7 +401,7 @@
                       (> . (val . (prim . >)))
                       (>= . (val . (prim . >=)))
                       (< . (val . (prim . <)))
-                      (=< . (val . (prim . =<)))
+                      (<= . (val . (prim . <=)))
                       . ,empty-env))
 
 (define initial-tables '())
