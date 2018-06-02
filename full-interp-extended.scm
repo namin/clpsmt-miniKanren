@@ -189,6 +189,7 @@
        ;; (list-of-numbero a*)
        (numbero a1)
        (numbero a2)
+       (numbero val)
        (z/assert `(= ,val (,prim-id ,a1 ,a2))))]
     [(== prim-id '!=)
      (fresh (a1 a2)
@@ -196,8 +197,8 @@
        (numbero a1)
        (numbero a2)
        (conde
-         [(z/assert `(not (= ,a1 ,a2))) (== #t val)]
-         [(z/assert `(= ,a1 ,a2)) (== #f val)]))]
+         [(== #t val) (z/assert `(not (= ,a1 ,a2)))]
+         [(== #f val) (z/assert `(= ,a1 ,a2))]))]
     [(conde
        [(== prim-id '=)]
        [(== prim-id '>)]
@@ -212,8 +213,8 @@
        (numbero a1)
        (numbero a2)
        (conde
-         [(z/assert `(,prim-id ,a1 ,a2)) (== #t val)]
-         [(z/assert `(not (,prim-id ,a1 ,a2))) (== #f val)]))]
+         [(== #t val) (z/assert `(,prim-id ,a1 ,a2))]
+         [(== #f val) (z/assert `(not (,prim-id ,a1 ,a2)))]))]
     ))
 
 (define (prim-expo expr env val)

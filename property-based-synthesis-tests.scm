@@ -4,6 +4,225 @@
 (load "full-interp-extended.scm")
 
 
+
+(test "synthesize-triple-by-property-1a"
+  (run 1 (f)
+    (fresh (e x x-tripled)
+      (== `(lambda (x) ,e) f)
+      (evalo `(,f ,x) x-tripled)))
+  '(((lambda (x) _.0) (num _.0))))
+
+;; too bad!  we get existential, not universal, quantification
+;;
+;; diverges??
+#|
+(test "synthesize-triple-by-property-1b"
+  (run 1 (q)
+    (fresh (f x x-tripled e)
+      (== (list f x x-tripled) q)
+      (== `(lambda (x) ,e) f)
+      (numbero x)
+      (numbero x-tripled)
+      (z/assert `(= ,x (* 3 ,x-tripled)))
+      (evalo `(,f ,x) x-tripled)))
+  '(((lambda (x) 0) 0 0)))
+|#
+
+
+(test "synthesize-triple-by-example-1a"
+  (run 1 (e)
+    (evalo `(,e 0) 0))
+  '(quote))
+
+; hmm
+;
+; (error "line 6 column 35: unknown function/constant lambda")
+; sat
+;;
+;; diverges
+#|
+(test "synthesize-triple-by-example-1b"
+  (run 1 (e)
+    (evalo `(,e 0) 0)
+    (evalo `(,e 1) 3))
+  '?)
+|#
+
+(test "synthesize-triple-by-example-2a"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 0) 0))
+  '((lambda (x) 0)))
+
+(test "synthesize-triple-by-example-2b"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 1) 3))
+  '((lambda (x) 3)))
+
+;; ugh
+;;
+;; (error "line 6 column 35: unknown function/constant lambda")
+;; sat
+;; diverges
+#|
+(test "synthesize-triple-by-example-2c"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '?)
+|#
+
+(test "synthesize-triple-by-example-2c1"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f)
+      (== `(lambda (x) (* x 3)) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* x 3))))
+
+(test "synthesize-triple-by-example-2c2"
+  (run 1 (f)
+    (fresh (e expr)
+      (== `(lambda (x) ,e) f)
+      (== `(lambda (x) (* . ,expr)) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+
+(test "synthesize-triple-by-example-2c3"
+  (run 1 (f)
+    (fresh (expr)
+      (== `(lambda (x) (* . ,expr)) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+
+(test "synthesize-triple-by-example-2c4"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (== '* op))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+
+(test "synthesize-triple-by-example-2c5"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (conde
+        [(== '+ op)]
+        [(== '- op)]
+        [(== '/ op)]
+        [(== '* op)]))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+
+(test "synthesize-triple-by-example-2c6"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (conde
+        [(== '= op)]
+        [(== '> op)]
+        [(== '>= op)]
+        [(== '< op)]
+        [(== '<= op)]
+        [(== '!= op)]
+        [(== '+ op)]
+        [(== '- op)]
+        [(== '/ op)]
+        [(== '* op)]))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+
+(test "synthesize-triple-by-example-2c7"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (match x (0 0) (1 3) . _.0))))
+
+(test "synthesize-triple-by-example-2c8"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op))
+    (evalo `(list (,f 1) (,f 2) (,f 3) (,f 4)) '(3 6 9 12)))
+  '((lambda (x) (match x (1 3) (2 6) (3 9) (4 12) . _.0))))
+
+(test "synthesize-triple-by-example-2c9"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op)
+      (=/= 'match op))
+    (evalo `(,f 2) 6))
+  '(((lambda (x) (let ((_.0 _.1)) 6)) (num _.1) (sym _.0))))
+
+(test "synthesize-triple-by-example-2c10"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op)
+      (=/= 'match op))
+    (evalo `(list (,f 2)) '(6)))
+  '(((lambda (x) (let ((_.0 _.1)) 6)) (num _.1) (sym _.0))))
+
+;; Seems to diverge
+#|
+(test "synthesize-triple-by-example-2c11"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op)
+      (=/= 'match op))
+    (evalo `(list (,f 1) (,f 2)) '(3 6)))
+  '?)
+|#
+
+;; Seems to diverge
+#|
+(test "synthesize-triple-by-example-2c12"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f)
+      (symbolo op)
+      (=/= 'match op))
+    (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
+  '?)
+|#
+
+;; seems to diverge
+#|
+(test "synthesize-triple-by-example-2c5"
+  (run 1 (f)
+    (fresh (op args)
+      (== `(lambda (x) (,op . ,args)) f))
+    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
+  '((lambda (x) (* 3 x))))
+|#
+
+;; ugh
+;;
+;; (error "line 6 column 35: unknown function/constant lambda")
+;; sat
+;; diverges
+#|
+(test "synthesize-triple-by-example-2d"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f))
+    (evalo `(,f 0) 0)
+    (evalo `(,f 1) 3))
+  '?)
+|#
+
+
+
+
 ;; can we prove that fact of any number greater than 1 must be odd?
 
 ;; standard concrete execution
@@ -108,85 +327,6 @@
              z)))
   '((2 1 2) (3 3 6) (4 12 24)))
 
-
-(test "synthesize-triple-by-property-1a"
-  (run 1 (f)
-    (fresh (e x x-tripled)
-      (== `(lambda (x) ,e) f)
-      (evalo `(,f ,x) x-tripled)))
-  '(((lambda (x) _.0) (num _.0))))
-
-;; too bad!  we get existential, not universal, quantification
-(test "synthesize-triple-by-property-1b"
-  (run 1 (q)
-    (fresh (f x x-tripled e)
-      (== (list f x x-tripled) q)
-      (== `(lambda (x) ,e) f)
-      (numbero x)
-      (numbero x-tripled)
-      (z/assert `(= ,x (* 3 ,x-tripled)))
-      (evalo `(,f ,x) x-tripled)))
-  '(((lambda (x) 0) 0 0)))
-
-
-
-(test "synthesize-triple-by-example-1a"
-  (run 1 (e)
-    (evalo `(,e 0) 0))
-  '(quote))
-
-; hmm
-;
-; (error "line 6 column 35: unknown function/constant lambda")
-; sat
-#|
-(test "synthesize-triple-by-example-1b"
-  (run 1 (e)
-    (evalo `(,e 0) 0)
-    (evalo `(,e 1) 3))
-  '?)
-|#
-
-(test "synthesize-triple-by-example-2a"
-  (run 1 (f)
-    (fresh (e)
-      (== `(lambda (x) ,e) f))
-    (evalo `(,f 0) 0))
-  '((lambda (x) 0)))
-
-(test "synthesize-triple-by-example-2b"
-  (run 1 (f)
-    (fresh (e)
-      (== `(lambda (x) ,e) f))
-    (evalo `(,f 1) 3))
-  '((lambda (x) 3)))
-
-;; ugh
-;;
-;; (error "line 6 column 35: unknown function/constant lambda")
-;; sat
-#|
-(test "synthesize-triple-by-example-2c"
-  (run 1 (f)
-    (fresh (e)
-      (== `(lambda (x) ,e) f))
-    (evalo `(cons (,f 0) (,f 1)) '(0 . 3)))
-  '?)
-|#
-
-;; ugh
-;;
-;; (error "line 6 column 35: unknown function/constant lambda")
-;; sat
-#|
-(test "synthesize-triple-by-example-2d"
-  (run 1 (f)
-    (fresh (e)
-      (== `(lambda (x) ,e) f))
-    (evalo `(,f 0) 0)
-    (evalo `(,f 1) 3))
-  '?)
-|#
 
 (test "evalo-simple-let-a"
   (run* (q)
