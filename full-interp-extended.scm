@@ -25,13 +25,6 @@
          ;; Multi-argument
          ((list-of-symbolso x)))
        (not-in-envo 'lambda env)))
-
-    ((fresh (x e body a env^)
-       (== `(let ((,x ,e)) ,body) expr)
-       (symbolo x)
-       (ext-envo x a env env^)
-       (eval-expo e env a)
-       (eval-expo body env^ val)))
     
     ((fresh (rator x rands body env^ a* res)
        (== `(,rator . ,rands) expr)
@@ -58,6 +51,13 @@
     
     ((handle-matcho expr env val))
 
+    ((fresh (x e body a env^)
+       (== `(let ((,x ,e)) ,body) expr)
+       (symbolo x)
+       (ext-envo x a env env^)
+       (eval-expo e env a)
+       (eval-expo body env^ val)))
+        
     ((fresh (p-name x body letrec-body)
        ;; single-function variadic letrec version
        (== `(letrec ((,p-name (lambda ,x ,body)))
