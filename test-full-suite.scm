@@ -10,4 +10,3 @@
 (load "abstract-interp-tagged.scm")
 (load "twenty-four-puzzle.scm")
 (load "twenty-four-puzzle-smart.scm")
-(load "twenty-four-puzzle-smart.scm")

@@ -97,7 +97,7 @@
   (run* (q)
     (s/declareo q)
     (s/declareo q))
-  '())
+  '(_.0))
 
 ;;; Compare with declareo-1 -- now can see that we have bit patterns.
 (test "declaro-3"
@@ -112,7 +112,7 @@
 ;;; Non-declarative behavior
 ;;; compare with declareo-3 -- just swapped order of goals
 ;;; An error would be friendlier
-(test "declareo-4"
+(todo "declareo-4"
   (run* (q)
     (s/chas-poso q)
     (s/declareo q))
@@ -293,36 +293,16 @@
       (== `(let ([,id ,e]) x) expr)
       (== (list expr aenv aval) q)
       (aevalo expr aenv aval)))
-  '((((let ([_.0 0]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 -1]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 1]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 2]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 -2]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 3]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 4]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 5]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))
-    (((let ([_.0 0]) x) ((_.1 . _.2) (x . _.3) . _.4) _.3)
-     (=/= ((_.0 x)) ((_.1 x)))
-     (sym _.0 _.1))
-    (((let ([_.0 -3]) x) ((x . _.1) . _.2) _.1)
-     (=/= ((_.0 x)))
-     (sym _.0))))
+  '(((let ((x 0)) x) _.0 bitvec-010)
+    ((let ((x -1)) x) _.0 bitvec-001)
+    ((let ((x 1)) x) _.0 bitvec-100)
+    ((let ((x 2)) x) _.0 bitvec-100)
+    ((let ((x -2)) x) _.0 bitvec-001)
+    ((let ((x 3)) x) _.0 bitvec-100)
+    ((let ((x 4)) x) _.0 bitvec-100)
+    ((let ((x 5)) x) _.0 bitvec-100)
+    ((let ((x -3)) x) _.0 bitvec-001)
+    ((let ((x 6)) x) _.0 bitvec-100)))
 
 (test "aevalo-5"
   (run 10 (q)

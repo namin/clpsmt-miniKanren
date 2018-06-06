@@ -131,17 +131,16 @@
     bitvec-110
     bitvec-101))
 
-#|
 ;;; Non-declarative behavior
 ;;; compare with declareo-3 -- just swapped order of goals
-(test "declareo-4"
+(todo "declareo-4"
   (run* (q)
     (s/chas-poso q)
     (s/declareo q))
   '?)
-Exception in call-z3: error in z3 out.smt > out.txt
-Type (debug) to enter the debugger.
-|#
+;Exception in call-z3: error in z3 out.smt > out.txt
+;Type (debug) to enter the debugger.
+
 
 (test "declareo-5"
   (run* (q)
