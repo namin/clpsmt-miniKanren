@@ -209,3 +209,35 @@
     (0 -5 -5 ((z . 2) (y . 1) (a . 0) (b . -5) (c . -5)))
     (0 -6 -6 ((z . 2) (y . 1) (a . 0) (b . -6) (c . -6)))
     (0 2 -7 ((z . 2) (y . 1) (a . 0) (b . 2) (c . -7)))))
+
+
+
+
+(test "lool"
+  (run 4 (f)
+    (evalo `(list (,f 1) (,f 2) (,f 3)) '(1 2 3)))
+  '(quote and or ((lambda (_.0) _.0) (sym _.0))))
+
+(test "f"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f)
+      (absento 'match e))
+    (evalo `(list (,f 1) (,f 2) (,f 3)) '(173 174 175)))
+  '((lambda (x) (+ 172 x))))
+
+(test "g"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f)
+      (absento 'match e))
+    (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 2 4)))
+  '((lambda (x) (+ x x))))
+
+(test "h"
+  (run 1 (f)
+    (fresh (e)
+      (== `(lambda (x) ,e) f)
+      (absento 'match e))
+    (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
+  '((lambda (x) (* 3 x))))
