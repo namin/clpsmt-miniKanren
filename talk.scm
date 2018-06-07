@@ -234,10 +234,10 @@
     (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 2 4)))
   '((lambda (x) (+ x x))))
 
-(test "h"
+(test "h-c"
   (run 1 (f)
     (fresh (e)
       (== `(lambda (x) ,e) f)
       (absento 'match e))
-    (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
-  '((lambda (x) (* 3 x))))
+    (evalo `(list (,f 2) (,f 3) (,f 4)) '(274 411 548)))
+  '((lambda (x) (* 137 x))))
