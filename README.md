@@ -3,7 +3,7 @@ CLP(SMT)-miniKanren
 
 Canonical miniKanren implementation, augmented with CLP(SMT).
 
-Added SMT hook: `z/assert` takes a boolean arithmetic expression with variables (integer by default), `z/` takes an SMT statement.
+Added SMT hooks: `z/assert` takes a boolean arithmetic expression with variables (integer by default), `z/` takes an SMT statement.
 
 Background on miniKanren
 ------------------------
