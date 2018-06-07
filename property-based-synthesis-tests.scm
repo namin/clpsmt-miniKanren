@@ -922,13 +922,33 @@
 
 (printf "this test takes several minutes\n")
 (time
-  (test "h"
+  (test "h-a"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
     '((lambda (x) (* 3 x)))))
+
+(printf "this test takes several minutes\n")
+(time
+  (test "h-b"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(137 274 411)))
+    '((lambda (x) (* 137 x)))))
+
+(printf "this test takes several minutes\n")
+(time
+  (test "h-c"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 2) (,f 3) (,f 4)) '(274 411 548)))
+    '((lambda (x) (* 137 x)))))
 
 (printf "this test takes several minutes\n")
 (time
