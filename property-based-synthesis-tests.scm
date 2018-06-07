@@ -849,6 +849,98 @@
              `(bad . ,vals))))
   '())
 
+
+
+
+(time
+  (test "a"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f))
+      (evalo `(list (,f 1)) '(3)))
+    '((lambda (x) 3))))
+
+(time
+  (test "b"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
+    '((lambda (x) (match x (1 3) (2 6) (3 9) . _.0)))))
+
+(time
+  (test "c"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(1 2 3)))
+    '((lambda (x) x))))
+
+(time
+  (test "d"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(2 3 4)))
+    '((lambda (x) (+ 1 x)))))
+
+(time
+  (test "e"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 4 5)))
+    '((lambda (x) (+ 2 x)))))
+
+(time
+  (test "f"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(173 174 175)))
+    '((lambda (x) (+ 172 x)))))
+
+(time
+  (test "lool"
+    (run 4 (f)
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(1 2 3)))
+    '(quote and or ((lambda (_.0) _.0) (sym _.0)))))
+
+(printf "this test takes a minute\n")
+(time
+  (test "g"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 2 4)))
+    '((lambda (x) (+ x x)))))
+
+(printf "this test takes several minutes\n")
+(time
+  (test "h"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
+    '((lambda (x) (* 3 x)))))
+
+(printf "this test takes several minutes\n")
+(time
+  (test "i"
+    (run 1 (f)
+      (fresh (e)
+        (== `(lambda (x) ,e) f)
+        (absento 'match e))
+      (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 3 6)))
+    '((lambda (x) (* 3 x)))))
+
+
 #!eof
 
 ;;; old tests:
@@ -1100,5 +1192,3 @@
       (evalo `(* (* ',x ',y) 2) 6)
       (== q (list x y))))
   '((3 1) (1 3) (-1 -3) (-3 -1)))
-
-;;; time to get interesting!
