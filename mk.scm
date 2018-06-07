@@ -863,39 +863,6 @@
            ((== (cdr (assq (caar m) s)) (cdar m)) c)
            (add-model (cdr m) s))))))
 
-(define purge-M
-  (lambdag@ (c : S D A T M)
-    (if (null? M)
-        c
-        (let ([SM ((z/reify-SM M) c)])
-          (if (not (check-sat (cdr SM)))
-              #f
-              (if (null? (car SM))
-                  `(,S ,D ,A ,T ())
-                  (let ([model (get-model (cdr SM))])
-                    (if (not (check-model-unique (cdr SM) model))
-                        c
-                        ((add-model model (car SM)) `(,S ,D ,A ,T ()))))))))))
-
-(define purge-M-all-models
-  (lambdag@ (c : S D A T M)
-    (if (null? M)
-        c
-        (let ([SM ((z/reify-SM M) c)])
-          (if (not (check-sat (cdr SM)))
-              #f
-              (if (null? (car SM))
-                  `(,S ,D ,A ,T ())
-                  (let ([ms (get-all-models (cdr SM) '())])
-                    (if (null? ms)
-                        c
-                        (let loop ((ms ms))
-                          (if (null? (cdr ms))
-                              ((add-model (car ms) (car SM)) `(,S ,D ,A ,T ()))
-                              (mplus
-                               ((add-model (car ms) (car SM)) `(,S ,D ,A ,T ()))
-                               (lambda () (loop (cdr ms))))))))))))))
-
 (define purge-M-inc-models
   (lambdag@ (c : S D A T M)
     (if (null? M)
@@ -911,10 +878,3 @@
                         (mplus
                          ((add-model m (car SM)) `(,S ,D ,A ,T ()))
                          (lambda () (loop (cons m ms)))))))))))))
-
-(define resume-each
-  (lambda (cs)
-    (if (null? cs)
-        #f
-        (mplus (car cs)
-               (lambda () (resume-each (cdr cs)))))))
