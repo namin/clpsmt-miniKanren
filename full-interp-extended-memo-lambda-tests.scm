@@ -214,6 +214,20 @@
       (== (list tables-out val) q)
       (eval-expo `(let ((square-mem (memo-lambda square (x)
                                       (* x x))))
+                    (list (square-mem 3)                          
+                          (square-mem 3)))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '?)
+
+(test "evalo-memo-lambda-8-c"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(let ((square-mem (memo-lambda square (x)
+                                      (* x x))))
                     (list (square-mem 3)
                           (square-mem 4)
                           (square-mem 3)))
