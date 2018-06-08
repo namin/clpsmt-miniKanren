@@ -89,7 +89,7 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(memo-lambda foo (x) x) initial-env initial-tables tables-out val)))
-  '((((foo))
+  '((((foo . ()))
      (closure
       (memo-lambda foo (x) x)
       ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
@@ -113,14 +113,14 @@
                  initial-tables
                  tables-out
                  val)))
-  '((((bar) (foo))
+  '((((bar .()) (foo . ()))
      ((closure (lambda (x) x)
                ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda foo (x) x)
+      (closure (memo-lambda . (foo (x) x))
                ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
       (closure (lambda (x) x)
                ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda bar (x) x)
+      (closure (memo-lambda . (bar (x) x))
                ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
       (closure (lambda (x) x)
                ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))))))
@@ -156,9 +156,10 @@
                  initial-tables
                  tables-out
                  val)))
-  '((((foo ((there) (memo-value there)) ((there) in-progress))
-      (foo ((there) in-progress))
-      (foo))
+  '((((foo . (((there) (memo-value there))
+              ((there) in-progress)))
+      (foo . (((there) in-progress)))
+      (foo . ()))
      (hi there))))
 
 #|
