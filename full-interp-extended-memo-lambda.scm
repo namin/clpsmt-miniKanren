@@ -92,6 +92,7 @@
             (== #f #t))
            ((== `(memo-value ,val) entry)
             ;;   if 'a*' is associated with '(memo-value val)', then the value of the call is 'val'
+            (== tables-in tables-out)
             )
            ((== 'no-entry entry)
 

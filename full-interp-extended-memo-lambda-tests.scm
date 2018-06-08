@@ -220,7 +220,11 @@
                  initial-tables
                  tables-out
                  val)))
-  '?)
+  '((((square . (((3) (memo-value 9))
+                 ((3) in-progress)))
+      (square . (((3) in-progress)))
+      (square . ()))
+     (9 9))))
 
 (test "evalo-memo-lambda-8-c"
   (run* (q)
@@ -235,7 +239,18 @@
                  initial-tables
                  tables-out
                  val)))
-  '?)
+  '((((square . (((4) (memo-value 16))
+                 ((4) in-progress)
+                 ((3) (memo-value 9))
+                 ((3) in-progress)))
+      (square . (((4) in-progress)
+                 ((3) (memo-value 9))
+                 ((3) in-progress)))
+      (square . (((3) (memo-value 9))
+                 ((3) in-progress)))
+      (square . (((3) in-progress)))
+      (square . ()))
+     (9 16 9))))
 
 
 
