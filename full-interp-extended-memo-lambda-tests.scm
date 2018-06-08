@@ -140,8 +140,8 @@
 (test "evalo-memo-lambda-6-a"
   (run* (q)
     (evalo `(list
-             ((lambda (a) a) 'hi)
-             ((memo-lambda foo (b) b) 'there))
+              ((lambda (a) a) 'hi)
+              ((memo-lambda foo (b) b) 'there))
            q))
   '((hi there)))
 
@@ -150,8 +150,8 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(list
-                   ((lambda (a) a) 'hi)
-                   ((memo-lambda foo (b) b) 'there))
+                    ((lambda (a) a) 'hi)
+                    ((memo-lambda foo (b) b) 'there))
                  initial-env
                  initial-tables
                  tables-out
@@ -202,9 +202,10 @@
                  initial-tables
                  tables-out
                  val)))
-  '((((square ((3) (memo-value 9)) ((3) in-progress))
-      (square ((3) in-progress))
-      (square))
+  '((((square . (((3) (memo-value 9))
+                 ((3) in-progress)))
+      (square . (((3) in-progress)))
+      (square . ()))
      9)))
 
 (test "evalo-memo-lambda-8-b"
