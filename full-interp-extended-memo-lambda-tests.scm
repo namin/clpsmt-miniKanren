@@ -188,13 +188,12 @@
     (run* (q)
       (fresh (tables-out val)
         (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib
-                              (memo-lambda fib (n)
-                                           (if (= n 0)
-                                               0
-                                               (if (= n 1)
-                                                   1
-                                                   (+ (fib (- n 1)) (fib (- n 2))))))))
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
                       (fib 3))
                    initial-env
                    initial-tables
@@ -240,17 +239,88 @@
        2))))
 
 (time
-  (test "evalo-fib-4-memod-show-table"
+  (test "evalo-fib-4-memod-show-table-a"
     (run* (q)
       (fresh (tables-out val)
         (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib
-                              (memo-lambda fib (n)
-                                           (if (= n 0)
-                                               0
-                                               (if (= n 1)
-                                                   1
-                                                   (+ (fib (- n 1)) (fib (- n 2))))))))
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 4))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       3))))
+
+(time
+  (test "evalo-fib-4-memod-show-table-b"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 1)) (fib (- n 2)))))))
                       (fib 4))
                    initial-env
                    initial-tables
