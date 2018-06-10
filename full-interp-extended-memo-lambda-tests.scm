@@ -4,6 +4,108 @@
 (load "full-interp-extended-memo-lambda.scm")
 
 
+(time
+  (test "evalo-fac-6-memod"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (memo-lambda fac (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac 6))
+             q))
+    '(720)))
+
+(time
+  (test "evalo-fac-6"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (fac 6))
+             q))
+    '(720)))
+
+
+(time
+  (test "evalo-fac-6-memod-list"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (memo-lambda fac (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6)))
+             q))
+    '((720))))
+
+(time
+  (test "evalo-fac-6-list"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6)))
+             q))
+    '((720))))
+
+
+(time
+  (test "evalo-fac-6-memod-double"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (memo-lambda fac (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6) (fac 6)))
+             q))
+    '((720 720))))
+
+(time
+  (test "evalo-fac-6-double"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6) (fac 6)))
+             q))
+    '((720 720))))
+
+
+
+(time
+  (test "evalo-fac-6-memod-thrice"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (memo-lambda fac (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6) (fac 6) (fac 6)))
+             q))
+    '((720 720 720))))
+
+(time
+  (test "evalo-fac-6-thrice"
+    (run* (q)
+      (evalo `(letrec ((fac
+                        (lambda (n)
+                          (if (< n 0) #f
+                              (if (= n 0) 1
+                                  (* n (fac (- n 1))))))))
+                (list (fac 6) (fac 6) (fac 6)))
+             q))
+    '((720 720 720))))
+
+
+
 (test "evalo-fac-6"
   (run* (q)
     (evalo `(letrec ((fac
