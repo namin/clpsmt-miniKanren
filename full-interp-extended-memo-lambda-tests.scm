@@ -193,6 +193,188 @@
      (#t #t))))
 
 
+
+(test "evalo-even?/odd?-even?-memod-4a"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 4))
+           q))
+  '(#t))
+
+(test "evalo-even?/odd?-even?-memod-4b"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (list (even? 4) (even? 4)))
+           q))
+  '((#t #t)))
+
+(test "evalo-even?/odd?-both-memod-4b-show-table"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(letrec ((even? (memo-lambda even? (n)
+                                               (if (= n 0)
+                                                   #t
+                                                   (odd? (- n 1)))))
+                           (odd? (lambda (n)
+                                   (if (= n 0)
+                                       #f
+                                       (even? (- n 1))))))
+                    (list (even? 4) (even? 4)))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '((((even? ((4) (memo-value #t))
+             ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) in-progress)
+             ((4) in-progress))
+      (even? ((4) in-progress))
+      (even?))
+     (#t #t))))
+
+(test "evalo-even?/odd?-even?-memod-4c"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (list (odd? 5) (odd? 5)))
+           q))
+  '((#t #t)))
+
+(test "evalo-even?/odd?-both-memod-4c-show-table"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(letrec ((even? (memo-lambda even? (n)
+                                               (if (= n 0)
+                                                   #t
+                                                   (odd? (- n 1)))))
+                           (odd? (lambda (n)
+                                   (if (= n 0)
+                                       #f
+                                       (even? (- n 1))))))
+                    (list (odd? 5) (odd? 5)))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '((((even? ((4) (memo-value #t))
+             ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) in-progress)
+             ((4) in-progress))
+      (even? ((4) in-progress))
+      (even?))
+     (#t #t))))
+
+(test "evalo-even?/odd?-even?-memod-4d"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (list (odd? 5) (even? 4)))
+           q))
+  '((#t #t)))
+
+(test "evalo-even?/odd?-both-memod-4d-show-table"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(letrec ((even? (memo-lambda even? (n)
+                                               (if (= n 0)
+                                                   #t
+                                                   (odd? (- n 1)))))
+                           (odd? (lambda (n)
+                                   (if (= n 0)
+                                       #f
+                                       (even? (- n 1))))))
+                    (list (odd? 5) (even? 4)))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '((((even? ((4) (memo-value #t))
+             ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((2) in-progress)
+             ((4) in-progress))
+      (even? ((4) in-progress))
+      (even?))
+     (#t #t))))
+
+
+
 (test "evalo-even?/odd?-1"
   (run* (q)
     (evalo `(letrec ((even? (lambda (n)
