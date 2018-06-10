@@ -4,6 +4,281 @@
 (load "full-interp-extended-memo-lambda.scm")
 
 
+(test "evalo-even?/odd?-both-memod-0"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 0))
+           q))
+  '(#t))
+
+(test "evalo-even?/odd?-both-memod-1"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 1))
+           q))
+  '(#f))
+
+(test "evalo-even?/odd?-both-memod-2"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 2))
+           q))
+  '(#t))
+
+(test "evalo-even?/odd?-both-memod-3"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 3))
+           q))
+  '(#f))
+
+(test "evalo-even?/odd?-both-memod-4a"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 4))
+           q))
+  '(#t))
+
+(test "evalo-even?/odd?-both-memod-4a-show-table"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(letrec ((even? (memo-lambda even? (n)
+                                               (if (= n 0)
+                                                   #t
+                                                   (odd? (- n 1)))))
+                           (odd? (memo-lambda odd? (n)
+                                              (if (= n 0)
+                                                  #f
+                                                  (even? (- n 1))))))
+                    (even? 4))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '((((even? ((4) (memo-value #t))
+             ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((3) (memo-value #t))
+            ((1) (memo-value #t))
+            ((1) in-progress)
+            ((3) in-progress))
+      (even? ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((1) (memo-value #t))
+            ((1) in-progress)
+            ((3) in-progress))
+      (even? ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((1) in-progress)
+            ((3) in-progress))
+      (even? ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((3) in-progress))
+      (even? ((4) in-progress))
+      (odd?)
+      (even?))
+     #t)))
+
+(test "evalo-even?/odd?-both-memod-4b"
+  (run* (q)
+    (evalo `(letrec ((even? (memo-lambda even? (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (memo-lambda odd? (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (list (even? 4) (even? 4)))
+           q))
+  '((#t #t)))
+
+(test "evalo-even?/odd?-both-memod-4b-show-table"
+  (run* (q)
+    (fresh (tables-out val)
+      (== (list tables-out val) q)
+      (eval-expo `(letrec ((even? (memo-lambda even? (n)
+                                               (if (= n 0)
+                                                   #t
+                                                   (odd? (- n 1)))))
+                           (odd? (memo-lambda odd? (n)
+                                              (if (= n 0)
+                                                  #f
+                                                  (even? (- n 1))))))
+                    (list (even? 4) (even? 4)))
+                 initial-env
+                 initial-tables
+                 tables-out
+                 val)))
+  '((((even? ((4) (memo-value #t))
+             ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((3) (memo-value #t))
+            ((1) (memo-value #t))
+            ((1) in-progress)
+            ((3) in-progress))
+      (even? ((2) (memo-value #t))
+             ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((1) (memo-value #t))
+            ((1) in-progress)
+            ((3) in-progress))
+      (even? ((0) (memo-value #t))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (even? ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((1) in-progress)
+            ((3) in-progress))
+      (even? ((2) in-progress)
+             ((4) in-progress))
+      (odd? ((3) in-progress))
+      (even? ((4) in-progress))
+      (odd?)
+      (even?))
+     (#t #t))))
+
+
+(test "evalo-even?/odd?-1"
+  (run* (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 3))
+           q))
+  '(#f))
+
+(test "evalo-even?/odd?-2"
+  (run* (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? 4))
+           q))
+  '(#t))
+
+(test "evalo-even?/odd?-3a"
+  (run 5 (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? ',q))
+           #t))
+  '(0 2 4 6 8))
+
+(test "evalo-even?/odd?-3b"
+  (run 5 (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? ,q))
+           #t))
+  '(0 2 '0 4 6))
+
+(test "evalo-even?/odd?-4a"
+  (run 5 (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? ',q))
+           #f))
+  '(1 3 5 7 9))
+
+(test "evalo-even?/odd?-4b"
+  (run 5 (q)
+    (evalo `(letrec ((even? (lambda (n)
+                              (if (= n 0)
+                                  #t
+                                  (odd? (- n 1)))))
+                     (odd? (lambda (n)
+                              (if (= n 0)
+                                  #f
+                                  (even? (- n 1))))))
+              (even? ,q))
+           #f))
+  '(1 3 5 '1 7))
+
+
+
 (test "evalo-simple-let-a"
   (run* (q)
     (evalo '(let ((foo (+ 1 2))) (* foo foo)) q))
@@ -51,22 +326,22 @@
            q))
   '(((closure
       (lambda (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=)))
+      ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+       (val symbol? prim . symbol?) (val cons prim . cons)
+       (val null? prim . null?) (val car prim . car)
+       (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+       (val * prim . *) (val / prim . /) (val = prim . =)
+       (val != prim . !=) (val > prim . >) (val >= prim . >=)
+       (val < prim . <) (val <= prim . <=)))
      (closure
       (memo-lambda foo (x y z) (+ x y z))
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
+      ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+       (val symbol? prim . symbol?) (val cons prim . cons)
+       (val null? prim . null?) (val car prim . car)
+       (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+       (val * prim . *) (val / prim . /) (val = prim . =)
+       (val != prim . !=) (val > prim . >) (val >= prim . >=)
+       (val < prim . <) (val <= prim . <=))))))
 
 (test "evalo-memo-lambda-2-a"
   (run* (q)
@@ -76,29 +351,29 @@
   '((()
      (closure
       (lambda (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
+      ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+       (val symbol? prim . symbol?) (val cons prim . cons)
+       (val null? prim . null?) (val car prim . car)
+       (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+       (val * prim . *) (val / prim . /) (val = prim . =)
+       (val != prim . !=) (val > prim . >) (val >= prim . >=)
+       (val < prim . <) (val <= prim . <=))))))
 
 (test "evalo-memo-lambda-3-a"
   (run* (q)
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(memo-lambda foo (x) x) initial-env initial-tables tables-out val)))
-  '((((foo . ()))
+  '((((foo))
      (closure
       (memo-lambda foo (x) x)
-      ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?)
-       (symbol? val prim . symbol?) (cons val prim . cons)
-       (null? val prim . null?) (car val prim . car)
-       (cdr val prim . cdr) (+ val prim . +) (- val prim . -)
-       (* val prim . *) (/ val prim . /) (= val prim . =)
-       (!= val prim . !=) (> val prim . >) (>= val prim . >=)
-       (< val prim . <) (<= val prim . <=))))))
+      ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+       (val symbol? prim . symbol?) (val cons prim . cons)
+       (val null? prim . null?) (val car prim . car)
+       (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+       (val * prim . *) (val / prim . /) (val = prim . =)
+       (val != prim . !=) (val > prim . >) (val >= prim . >=)
+       (val < prim . <) (val <= prim . <=))))))
 
 (test "evalo-memo-lambda-3-b"
   (run* (q)
@@ -113,17 +388,52 @@
                  initial-tables
                  tables-out
                  val)))
-  '((((bar .()) (foo . ()))
-     ((closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda . (foo (x) x))
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (memo-lambda . (bar (x) x))
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))
-      (closure (lambda (x) x)
-               ((list val closure (lambda x x) ()) (not val prim . not) (equal? val prim . equal?) (symbol? val prim . symbol?) (cons val prim . cons) (null? val prim . null?) (car val prim . car) (cdr val prim . cdr) (+ val prim . +) (- val prim . -) (* val prim . *) (/ val prim . /) (= val prim . =) (!= val prim . !=) (> val prim . >) (>= val prim . >=) (< val prim . <) (<= val prim . <=)))))))
+  '((((bar) (foo))
+   ((closure
+      (lambda (x) x)
+      ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+        (val symbol? prim . symbol?) (val cons prim . cons)
+        (val null? prim . null?) (val car prim . car)
+        (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+        (val * prim . *) (val / prim . /) (val = prim . =)
+        (val != prim . !=) (val > prim . >) (val >= prim . >=)
+        (val < prim . <) (val <= prim . <=)))
+     (closure
+       (memo-lambda foo (x) x)
+       ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+         (val symbol? prim . symbol?) (val cons prim . cons)
+         (val null? prim . null?) (val car prim . car)
+         (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+         (val * prim . *) (val / prim . /) (val = prim . =)
+         (val != prim . !=) (val > prim . >) (val >= prim . >=)
+         (val < prim . <) (val <= prim . <=)))
+     (closure
+       (lambda (x) x)
+       ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+         (val symbol? prim . symbol?) (val cons prim . cons)
+         (val null? prim . null?) (val car prim . car)
+         (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+         (val * prim . *) (val / prim . /) (val = prim . =)
+         (val != prim . !=) (val > prim . >) (val >= prim . >=)
+         (val < prim . <) (val <= prim . <=)))
+     (closure
+       (memo-lambda bar (x) x)
+       ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+         (val symbol? prim . symbol?) (val cons prim . cons)
+         (val null? prim . null?) (val car prim . car)
+         (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+         (val * prim . *) (val / prim . /) (val = prim . =)
+         (val != prim . !=) (val > prim . >) (val >= prim . >=)
+         (val < prim . <) (val <= prim . <=)))
+     (closure
+       (lambda (x) x)
+       ((val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?)
+         (val symbol? prim . symbol?) (val cons prim . cons)
+         (val null? prim . null?) (val car prim . car)
+         (val cdr prim . cdr) (val + prim . +) (val - prim . -)
+         (val * prim . *) (val / prim . /) (val = prim . =)
+         (val != prim . !=) (val > prim . >) (val >= prim . >=)
+         (val < prim . <) (val <= prim . <=)))))))
 
 (test "evalo-memo-lambda-4-a"
   (run* (q)

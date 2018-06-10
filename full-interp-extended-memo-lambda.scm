@@ -30,11 +30,14 @@
        (== `(lambda ,x ,body) expr)
        (== `(closure (lambda ,x ,body) ,env) val)
        (== tables-in tables-out)
+       (paramso x)
+       #|
        (conde
          ;; Variadic
          ((symbolo x))
          ;; Multi-argument
          ((list-of-symbolso x)))
+       |#
        (not-in-envo 'lambda env)))
 
     ((fresh (x body name)
@@ -55,7 +58,8 @@
        (== `(,rator . ,rands) expr)
        ;; variadic
        (symbolo x)
-       (== `((,x . (val . ,a*)) . ,env^) res)
+       (== `((val . (,x . ,a*)) . ,env^) res)
+       ;; (== `((,x . (val . ,a*)) . ,env^) res)
        (eval-expo rator env tables-in tables^ `(closure (lambda ,x ,body) ,env^))
        (eval-expo body res tables^ tables^^ val)
        (eval-listo rands env tables^^ tables-out a*)))
@@ -128,13 +132,12 @@
     ((handle-matcho expr env tables-in tables-out val))
     |#
 
-    ((fresh (x e body a env^ tables^)
-       (== `(let ((,x ,e)) ,body) expr)
-       (symbolo x)
-       (ext-envo x a env env^)
-       (eval-expo e env tables-in tables^ a)
-       (eval-expo body env^ tables^ tables-out val)))
-    
+    ((fresh (b* letrec-body)
+       (== `(letrec ,b* ,letrec-body) expr)
+       (not-in-envo 'letrec env)
+       (eval-letreco b* letrec-body env tables-in tables-out val)))
+
+    #|
     ((fresh (p-name x body letrec-body)
        ;; single-function variadic letrec version
        (== `(letrec ((,p-name (lambda ,x ,body)))
@@ -151,6 +154,14 @@
                   tables-in
                   tables-out
                   val)))
+    |#
+    
+    ((fresh (x e body a env^ tables^)
+       (== `(let ((,x ,e)) ,body) expr)
+       (symbolo x)
+       (ext-envo x a env env^)
+       (eval-expo e env tables-in tables^ a)
+       (eval-expo body env^ tables^ tables-out val)))
     
     ((prim-expo expr env tables-in tables-out val))
     
@@ -158,6 +169,26 @@
 
 (define empty-env '())
 
+(define (lookup-reco k renv x b* t)
+    (conde
+      ((== '() b*) (k))
+      ((fresh (b*-rest p-name lam-expr)
+         (== `((,p-name . ,lam-expr) . ,b*-rest) b*)
+         (conde
+           ((== p-name x) (== `(closure ,lam-expr ,renv) t))
+           ((=/= p-name x) (lookup-reco k renv x b*-rest t)))))))
+(define (lookupo x env t)
+  (conde
+    ((fresh (y b rest)
+       (== `((val . (,y . ,b)) . ,rest) env)
+       (conde
+         ((== x y) (== b t))
+         ((=/= x y) (lookupo x rest t)))))
+    ((fresh (b* rest)
+       (== `((rec . ,b*) . ,rest) env)
+       (lookup-reco (lambda () (lookupo x rest t)) env x b* t)))))
+
+#|
 (define (lookupo x env t)
   (fresh (y b rest)
     (== `((,y . ,b) . ,rest) env)
@@ -170,7 +201,28 @@
             (== `(closure ,lam-expr ,env) t)))))
       ((=/= x y)
        (lookupo x rest t)))))
+|#
 
+(define (not-in-envo x env)
+  (conde
+    ((== empty-env env))
+    ((fresh (y b rest)
+       (== `((val . (,y . ,b)) . ,rest) env)
+       (=/= x y)
+       (not-in-envo x rest)))
+    ((fresh (b* rest)
+       (== `((rec . ,b*) . ,rest) env)
+       (not-in-env-reco x b* rest)))))
+
+(define (not-in-env-reco x b* env)
+  (conde
+    ((== '() b*) (not-in-envo x env))
+    ((fresh (p-name lam-expr b*-rest)
+       (== `((,p-name . ,lam-expr) . ,b*-rest) b*)
+       (=/= p-name x)
+       (not-in-env-reco x b*-rest env)))))
+
+#|
 (define (not-in-envo x env)
   (conde
     ((== empty-env env))
@@ -178,6 +230,50 @@
        (== `((,y . ,b) . ,rest) env)
        (=/= y x)
        (not-in-envo x rest)))))
+|#
+
+(define (eval-letreco b* letrec-body env tables-in tables-out val)
+  (let loop ((b* b*) (rb* '()) (tables-in tables-in))
+    (conde
+      ((== '() b*)
+       (eval-expo letrec-body `((rec . ,rb*) . ,env) tables-in tables-out val))
+      ((fresh (p-name x body b*-rest)
+         (== `((,p-name (lambda ,x ,body)) . ,b*-rest) b*)
+         (symbolo p-name)
+         (paramso x)
+         (loop b*-rest `((,p-name . (lambda ,x ,body)) . ,rb*) tables-in)))
+      ((fresh (p-name name x body b*-rest tables^)
+         (== `((,p-name (memo-lambda ,name ,x ,body)) . ,b*-rest) b*)
+         (symbolo p-name)
+         (paramso x)
+         ;; add a new, empty memo table for the new memo'd closure
+         (== `((,name . ()) . ,tables-in) tables^)         
+         (loop b*-rest `((,p-name . (memo-lambda ,name ,x ,body)) . ,rb*) tables^))))))
+
+(define (paramso params)
+  (conde
+    ; Multiple argument
+    ((list-of-paramso params))
+    ; Variadic
+    ((symbolo params))))
+
+(define (not-in-paramso x params)
+  (conde
+    ((== '() params))
+    ((fresh (a d)
+       (== `(,a . ,d) params)
+       (=/= a x)
+       (not-in-paramso x d)))))
+
+(define (list-of-paramso los)
+  (conde
+    ((== '() los))
+    ((fresh (a d)
+       (== `(,a . ,d) los)
+       (symbolo a)
+       (list-of-paramso d)
+       (not-in-paramso a d)))))
+
 
 (define (find-tableo tables table-name table)
   (fresh (tn t rest)
@@ -222,9 +318,27 @@
 
 (define (ext-envo x a env out)
   (fresh ()
-    (== `((,x . (val . ,a)) . ,env) out)
+    (== `((val . (,x . ,a)) . ,env) out)
     (symbolo x)))
 
+#|
+(define (ext-envo x a env out)
+  (fresh ()
+    (== `((,x . (val . ,a)) . ,env) out)
+    (symbolo x)))
+|#
+
+(define (ext-env*o x* a* env out)
+  (conde
+    ((== '() x*) (== '() a*) (== env out))
+    ((fresh (x a dx* da* env2)
+       (== `(,x . ,dx*) x*)
+       (== `(,a . ,da*) a*)
+       (== `((val . (,x . ,a)) . ,env) env2)
+       (symbolo x)
+       (ext-env*o dx* da* env2 out)))))
+
+#|
 (define (ext-env*o x* a* env out)
   (conde
     ((== '() x*) (== '() a*) (== env out))
@@ -234,6 +348,7 @@
        (== `((,x . (val . ,a)) . ,env) env2)
        (symbolo x)
        (ext-env*o dx* da* env2 out)))))
+|#
 
 (define (eval-primo prim-id a* val)
   (conde
@@ -385,6 +500,27 @@
       ((=/= #f t) (eval-expo e2 env tables^ tables-out val))
       ((== #f t) (eval-expo e3 env tables^ tables-out val)))))
 
+(define initial-env `((val . (list . (closure (lambda x x) ,empty-env)))
+                      (val . (not . (prim . not)))
+                      (val . (equal? . (prim . equal?)))
+                      (val . (symbol? . (prim . symbol?)))
+                      (val . (cons . (prim . cons)))
+                      (val . (null? . (prim . null?)))
+                      (val . (car . (prim . car)))
+                      (val . (cdr . (prim . cdr)))
+                      (val . (+ . (prim . +)))
+                      (val . (- . (prim . -)))
+                      (val . (* . (prim . *)))
+                      (val . (/ . (prim . /)))
+                      (val . (= . (prim . =)))
+                      (val . (!= . (prim . !=)))
+                      (val . (> . (prim . >)))
+                      (val . (>= . (prim . >=)))
+                      (val . (< . (prim . <)))
+                      (val . (<= . (prim . <=)))
+                      . ,empty-env))
+
+#|
 (define initial-env `((list . (val . (closure (lambda x x) ,empty-env)))
                       (not . (val . (prim . not)))
                       (equal? . (val . (prim . equal?)))
@@ -404,6 +540,7 @@
                       (< . (val . (prim . <)))
                       (<= . (val . (prim . <=)))
                       . ,empty-env))
+|#
 
 (define initial-tables '())
 
