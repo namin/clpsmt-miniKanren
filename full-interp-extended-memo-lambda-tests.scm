@@ -79,13 +79,13 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(letrec ((even? (memo-lambda even? (n)
-                                               (if (= n 0)
-                                                   #t
-                                                   (odd? (- n 1)))))
+                                    (if (= n 0)
+                                        #t
+                                        (odd? (- n 1)))))
                            (odd? (memo-lambda odd? (n)
-                                              (if (= n 0)
-                                                  #f
-                                                  (even? (- n 1))))))
+                                   (if (= n 0)
+                                       #f
+                                       (even? (- n 1))))))
                     (even? 4))
                  initial-env
                  initial-tables
@@ -145,13 +145,13 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(letrec ((even? (memo-lambda even? (n)
-                                               (if (= n 0)
-                                                   #t
-                                                   (odd? (- n 1)))))
+                                    (if (= n 0)
+                                        #t
+                                        (odd? (- n 1)))))
                            (odd? (memo-lambda odd? (n)
-                                              (if (= n 0)
-                                                  #f
-                                                  (even? (- n 1))))))
+                                   (if (= n 0)
+                                       #f
+                                       (even? (- n 1))))))
                     (list (even? 4) (even? 4)))
                  initial-env
                  initial-tables
@@ -227,9 +227,9 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(letrec ((even? (memo-lambda even? (n)
-                                               (if (= n 0)
-                                                   #t
-                                                   (odd? (- n 1)))))
+                                    (if (= n 0)
+                                        #t
+                                        (odd? (- n 1)))))
                            (odd? (lambda (n)
                                    (if (= n 0)
                                        #f
@@ -282,9 +282,9 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(letrec ((even? (memo-lambda even? (n)
-                                               (if (= n 0)
-                                                   #t
-                                                   (odd? (- n 1)))))
+                                    (if (= n 0)
+                                        #t
+                                        (odd? (- n 1)))))
                            (odd? (lambda (n)
                                    (if (= n 0)
                                        #f
@@ -337,9 +337,9 @@
     (fresh (tables-out val)
       (== (list tables-out val) q)
       (eval-expo `(letrec ((even? (memo-lambda even? (n)
-                                               (if (= n 0)
-                                                   #t
-                                                   (odd? (- n 1)))))
+                                    (if (= n 0)
+                                        #t
+                                        (odd? (- n 1)))))
                            (odd? (lambda (n)
                                    (if (= n 0)
                                        #f
