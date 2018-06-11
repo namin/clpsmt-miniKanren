@@ -2,6 +2,81 @@
 (load "z3-driver.scm")
 (load "test-check.scm")
 
+;; crash course on miniKanren
+(define appendo
+  (lambda (l s ls)
+    (conde
+      [(== '() l) (== s ls)]
+      [(fresh (a d res)
+         (== `(,a . ,d) l)
+         (== `(,a . ,res) ls)
+         (appendo d s res))])))
+
+(test "appendo-forward"
+  (run* (q)
+    (appendo '(a b) '(c d e) q))
+  '((a b c d e)))
+
+(test "appendo-backward"
+  (run* (q)
+    (fresh (l s)
+      (== q `(,l ,s))
+      (appendo l s '(a b c d e))))
+  '((() (a b c d e))
+    ((a) (b c d e))
+    ((a b) (c d e))
+    ((a b c) (d e))
+    ((a b c d) (e))
+    ((a b c d e) ())))
+
+(load "full-interp-quine.scm")
+
+(test "evalo-append-forward"
+  (run* (q)
+    (evalo
+     `(letrec ([append
+                (lambda (l s)
+                  (if (null? l)
+                      s
+                      (cons (car l) (append (cdr l) s))))])
+        (append '(a b) '(c d e)))
+     q))
+  '((a b c d e)))
+
+(test "evalo-append-backward"
+  (run* (q)
+    (fresh (s l)
+      (== q `(,s ,l))
+      (evalo
+       `(letrec ([append
+                  (lambda (l s)
+                    (if (null? l)
+                        s
+                        (cons (car l) (append (cdr l) s))))])
+          (append ',s ',l))
+       '(a b c d e))))
+  '((() (a b c d e))
+    ((a) (b c d e))
+    ((a b) (c d e))
+    ((a b c) (d e))
+    ((a b c d) (e))
+    ((a b c d e) ())))
+
+(test "evalo-quine"
+  (run 4 (q) (evalo q q))
+  '((_.0 (num _.0))
+    #t
+    #f
+    (((lambda (_.0) (list _.0 (list 'quote _.0)))
+      '(lambda (_.0) (list _.0 (list 'quote _.0))))
+     (=/= ((_.0 closure))
+          ((_.0 list))
+          ((_.0 prim))
+          ((_.0 quote)))
+     (sym _.0))))
+
+;; CLP(SMT)
+
 (test "basic-1"
   (run* (q)
     (z/assert `(> ,q 0))
