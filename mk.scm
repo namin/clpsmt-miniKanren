@@ -54,7 +54,7 @@
     ((_ n (x) g0 g ...)
      (take n
        (lambdaf@ ()
-         ((fresh (x) g0 g ... purge-M-inc-models
+         ((fresh (x) g0 g ... z/purge
             (lambdag@ (final-c)
               (let ((z ((reify x) final-c)))
                 (choice z empty-f))))
@@ -863,7 +863,7 @@
            ((== (cdr (assq (caar m) s)) (cdar m)) c)
            (add-model (cdr m) s))))))
 
-(define purge-M-inc-models
+(define z/purge
   (lambdag@ (c : S D A T M)
     (if (null? M)
         c
