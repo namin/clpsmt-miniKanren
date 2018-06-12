@@ -839,20 +839,23 @@
                (filter (undeclared? (map cadr ds)) (map cdr S)))
           M))))))
 
-(define z/assert
-  (lambda (e)
-    (lambdag@ (c : S D A T M)
-      (let* ((M (cons `(assert ,e) M))
-             (r (check-sat (cdr ((z/reify-SM M) c)))))
-        (if r
-            `(,S ,D ,A ,T ,M)
-            #f)))))
+(define z/check
+  (lambdag@ (c : S D A T M)
+    (if (check-sat (cdr ((z/reify-SM M) c)))
+        c
+        #f)))
 
 (define z/
   (lambda (line)
     (lambdag@ (c : S D A T M)
       (let ((M (cons line M)))
         `(,S ,D ,A ,T ,M)))))
+
+(define z/assert
+  (lambda (e)
+    (fresh ()
+      (z/ `(assert ,e))
+      z/check)))
 
 (define add-model
   (lambda (m s)
