@@ -37,6 +37,79 @@
   '(foo bar baz))
 
 
+
+;; some tests inspired by
+;; https://github.com/webyrd/tabling
+
+;; a -> b
+;; b -> a
+;; b -> d
+(test "path-1"
+  (run 3 (q)
+    (evalo `(let ((arc (lambda (x)
+                         (if (equal? 'a x)
+                             'b
+                             (if (equal? 'b x)
+                                 (amb 'a 'd)
+                                 'error)))))
+              (letrec ((path (lambda (x)
+                               (let ((a (arc x)))
+                                 (if (equal? 'error a)
+                                     'error
+                                     (amb a
+                                          (path a)))))))
+                (path 'a)))
+           q))
+  '(b a d))
+
+;; a -> b
+;; b -> a
+;; b -> d
+(test "path-2"
+  (run 10 (q)
+    (evalo `(let ((arc (lambda (x)
+                         (if (equal? 'a x)
+                             'b
+                             (if (equal? 'b x)
+                                 (amb 'a 'd)
+                                 'error)))))
+              (letrec ((path (lambda (x)
+                               (let ((a (arc x)))
+                                 (if (equal? 'error a)
+                                     'error
+                                     (amb a
+                                          (path a)))))))
+                (path 'a)))
+           q))
+  '(b a d b error a d b error a))
+
+;; a -> b
+;; b -> a
+;; b -> d
+(test "path-3"
+  (run 10 (q)
+    (evalo `(let ((arc (lambda (x)
+                         (if (equal? 'a x)
+                             'b
+                             (if (equal? 'b x)
+                                 (amb 'a 'd)
+                                 'error)))))
+              (letrec ((path (lambda (x)
+                               (let ((a (arc x)))
+                                 (if (equal? 'error a)
+                                     'error
+                                     (amb a
+                                          (path a)))))))
+                (let ((x (path 'a)))
+                  (begin
+                    (require (not (equal? 'error x)))
+                    x))))
+           q))
+  '(b a d b a d b a d b))
+
+
+
+
 (test "evalo-simple-let-a"
   (run* (q)
     (evalo '(let ((foo (+ 1 2))) (* foo foo)) q))
