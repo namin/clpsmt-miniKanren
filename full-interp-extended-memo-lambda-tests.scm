@@ -3,822 +3,254 @@
 (load "test-check.scm")
 (load "full-interp-extended-memo-lambda.scm")
 
+
+
 ;; some tests inspired by
 ;; https://github.com/webyrd/tabling
 
-(time
-  (test "evalo-fib-0"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 0))
-             q))
-    '(0)))
-
-(time
-  (test "evalo-fib-1"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 1))
-             q))
-    '(1)))
-
-(time
-  (test "evalo-fib-2"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 2))
-             q))
-    '(1)))
-
-(time
-  (test "evalo-fib-3"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 3))
-             q))
-    '(2)))
-
-(time
-  (test "evalo-fib-4"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 4))
-             q))
-    '(3)))
-
-(time
-  (test "evalo-fib-5"
-    (run* (q)
-      (evalo `(letrec ((fib (lambda (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 5))
-             q))
-    '(5)))
-
-
-
-
-
-
-
-(time
-  (test "evalo-fib-0-memod-show-table"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 0))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((0) (memo-value 0))
-             ((0) in-progress))
-        (fib ((0) in-progress))
-        (fib))
-       0))))
-
-(time
-  (test "evalo-fib-1-memod-show-table"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 1))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((1) (memo-value 1))
-             ((1) in-progress))
-        (fib ((1) in-progress))
-        (fib))
-       1))))
-
-(time
-  (test "evalo-fib-2-memod-show-table"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 2))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress))
-        (fib ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress))
-        (fib ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress))
-        (fib ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress))
-        (fib ((1) in-progress)
-             ((2) in-progress))
-        (fib ((2) in-progress))
-        (fib))
-       1))))
-
-(time
-  (test "evalo-fib-3-memod-show-table"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 3))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((3) (memo-value 2))
-             ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress))
-        (fib ((2) in-progress)
-             ((3) in-progress))
-        (fib ((3) in-progress))
-        (fib))
-       2))))
-
-(time
-  (test "evalo-fib-4-memod-show-table-a"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 4))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((4) (memo-value 3))
-             ((3) (memo-value 2))
-             ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((3) (memo-value 2))
-             ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((3) in-progress)
-             ((4) in-progress))
-        (fib ((4) in-progress))
-        (fib))
-       3))))
-
-(time
-  (test "evalo-fib-4-memod-show-table-b"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (<= n 1)
-                                        n
-                                        (+ (fib (- n 1)) (fib (- n 2)))))))
-                      (fib 4))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((4) (memo-value 3))
-             ((3) (memo-value 2))
-             ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((3) (memo-value 2))
-             ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((2) (memo-value 1))
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((0) (memo-value 0))
-             ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((0) in-progress)
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((1) (memo-value 1))
-             ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((1) in-progress)
-             ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((2) in-progress)
-             ((3) in-progress)
-             ((4) in-progress))
-        (fib ((3) in-progress)
-             ((4) in-progress))
-        (fib ((4) in-progress))
-        (fib))
-       3))))
-
-(time
-  (test "evalo-fib-4-memod-show-table-c"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (<= n 1)
-                                        n
-                                        (+ (fib (- n 2)) (fib (- n 1)))))))
-                      (fib 4))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '((((fib ((4) (memo-value 3))
-             ((3) (memo-value 2))
-             ((3) in-progress)
-             ((2) (memo-value 1))
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((3) (memo-value 2))
-             ((3) in-progress)
-             ((2) (memo-value 1))
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((3) in-progress)
-             ((2) (memo-value 1))
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((2) (memo-value 1))
-             ((1) (memo-value 1))
-             ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((1) (memo-value 1))
-             ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((1) in-progress)
-             ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((0) (memo-value 0))
-             ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((0) in-progress)
-             ((2) in-progress)
-             ((4) in-progress))
-        (fib ((2) in-progress)
-             ((4) in-progress))
-        (fib ((4) in-progress))
-        (fib))
-       3))))
-
-(time
-  (test "evalo-fib-5-memod-show-table-c"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (<= n 1)
-                                        n
-                                        (+ (fib (- n 2)) (fib (- n 1)))))))
-                      (fib 5))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '?))
-
-#!eof
-
-(time
-  (test "evalo-fib-5-memod-show-table"
-    (run* (q)
-      (fresh (tables-out val)
-        (== (list tables-out val) q)
-        (eval-expo `(letrec ((fib (memo-lambda fib (n)
-                                    (if (= n 0)
-                                        0
-                                        (if (= n 1)
-                                            1
-                                            (+ (fib (- n 1)) (fib (- n 2))))))))
-                      (fib 5))
-                   initial-env
-                   initial-tables
-                   tables-out
-                   val)))
-    '?))
-
-
-
-
-(time
-  (test "evalo-fib-0-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 0))
-             q))
-    '(0)))
-
-(time
-  (test "evalo-fib-1-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 1))
-             q))
-    '(1)))
-
-(time
-  (test "evalo-fib-2-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 2))
-             q))
-    '(1)))
-
-(time
-  (test "evalo-fib-3-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 3))
-             q))
-    '(2)))
-
-(time
-  (test "evalo-fib-4-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 4))
-             q))
-    '(3)))
-
-(time
-  (test "evalo-fib-5-memod"
-    (run* (q)
-      (evalo `(letrec ((fib (memo-lambda fib (n)
-                              (if (= n 0)
-                                  0
-                                  (if (= n 1)
-                                      1
-                                      (+ (fib (- n 1)) (fib (- n 2))))))))
-                (fib 5))
-             q))
-    '(5)))
-
-#!eof
-
-(time
-  (test "evalo-fac-6-memod"
-    (run* (q)
-      (evalo `(letrec ((fac (memo-lambda fac (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (fac 6))
-             q))
-    '(720)))
-
-(time
-  (test "evalo-fac-6"
-    (run* (q)
-      (evalo `(letrec ((fac (lambda (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (fac 6))
-             q))
-    '(720)))
-
-
-(time
-  (test "evalo-fac-6-memod-list"
-    (run* (q)
-      (evalo `(letrec ((fac (memo-lambda fac (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6)))
-             q))
-    '((720))))
-
-(time
-  (test "evalo-fac-6-list"
-    (run* (q)
-      (evalo `(letrec ((fac (lambda (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6)))
-             q))
-    '((720))))
-
-
-(time
-  (test "evalo-fac-6-memod-double"
-    (run* (q)
-      (evalo `(letrec ((fac (memo-lambda fac (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6) (fac 6)))
-             q))
-    '((720 720))))
-
-(time
-  (test "evalo-fac-6-double"
-    (run* (q)
-      (evalo `(letrec ((fac (lambda (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6) (fac 6)))
-             q))
-    '((720 720))))
-
-
-
-(time
-  (test "evalo-fac-6-memod-thrice"
-    (run* (q)
-      (evalo `(letrec ((fac (memo-lambda fac (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6) (fac 6) (fac 6)))
-             q))
-    '((720 720 720))))
-
-(time
-  (test "evalo-fac-6-thrice"
-    (run* (q)
-      (evalo `(letrec ((fac (lambda (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- n 1)))))))
-                (list (fac 6) (fac 6) (fac 6)))
-             q))
-    '((720 720 720))))
-
-
-
-(test "evalo-fac-6"
-  (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac 6))
+;; a -> b
+;; b -> a
+;; b -> d
+(test "reachable-1"
+  (run 3 (q)
+    (evalo `(letrec ((arc (lambda (x)
+                            (if (equal? 'a x)
+                                'b
+                                (if (equal? 'b x)
+                                    (amb 'a 'd)
+                                    'error))))
+                     (reachable (lambda (x)
+                                  (let ((a (arc x)))
+                                    (if (equal? 'error a)
+                                        'error
+                                        (amb a
+                                             (reachable a)))))))
+              (reachable 'a))
            q))
-  '(720))
+  '(b a d))
 
-;; slowish
-(test "evalo-fac-9"
-  (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac 9))
+;; a -> b
+;; b -> a
+;; b -> d
+(test "reachable-2a"
+  (run 10 (q)
+    (evalo `(letrec ((arc (lambda (x)
+                            (if (equal? 'a x)
+                                'b
+                                (if (equal? 'b x)
+                                    (amb 'a 'd)
+                                    'error))))
+                     (reachable (lambda (x)
+                                  (let ((a (arc x)))
+                                    (if (equal? 'error a)
+                                        'error
+                                        (amb a
+                                             (reachable a)))))))
+              (reachable 'a))
            q))
-  '(362880))
+  '(b a d b error a d b error a))
 
-(test "evalo-backwards-fac-6"
-  (run 1 (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac ,q))
-           720))
-  '(6))
-
-;; remember the quote!
-(test "evalo-backwards-fac-quoted-6"
-  (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac ',q))
-           720))
-  '(6))
-
-
-;; slowish
-(test "evalo-backwards-fac-9"
-  (run 1 (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac ,q))
-           362880))
-  '(9))
-
-;; remember the quote!
-(test "evalo-backwards-fac-quoted-9"
-  (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (fac ',q))
-           362880))
-  '(9))
-
-
-;; slowish
-(test "evalo-fac-table"
-  (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- n 1)))))))
-              (list
-               (fac 0)
-               (fac 1)
-               (fac 2)
-               (fac 3)))
+;; a -> b
+;; b -> a
+;; b -> d
+(test "reachable-2b"
+  (run 10 (q)
+    (evalo `(let ((arc (lambda (x)
+                         (if (equal? 'a x)
+                             'b
+                             (if (equal? 'b x)
+                                 (amb 'a 'd)
+                                 'error)))))
+              (letrec ((reachable (lambda (x)
+                                    (let ((a (arc x)))
+                                      (if (equal? 'error a)
+                                          'error
+                                          (amb a
+                                               (reachable a)))))))
+                (reachable 'a)))
            q))
-  '((1 1 2 6)))
+  '(b a d b error a d b error a))
 
-(test "evalo-fac-synthesis-hole-0"
+;; a -> b
+;; b -> a
+;; b -> d
+(test "reachable-3a"
+  (run 10 (q)
+    (evalo `(letrec ((arc (lambda (x)
+                            (if (equal? 'a x)
+                                'b
+                                (if (equal? 'b x)
+                                    (amb 'a 'd)
+                                    'error))))
+                     (reachable (lambda (x)
+                                  (let ((a (arc x)))
+                                    (if (equal? 'error a)
+                                        'error
+                                        (amb a
+                                             (reachable a)))))))
+              (let ((x (reachable 'a)))
+                (begin
+                  (require (not (equal? 'error x)))
+                  x)))
+           q))
+  '(b a d b a d b a d b))
+
+;; a -> b
+;; b -> a
+;; b -> d
+(test "reachable-3b"
+  (run 10 (q)
+    (evalo `(let ((arc (lambda (x)
+                         (if (equal? 'a x)
+                             'b
+                             (if (equal? 'b x)
+                                 (amb 'a 'd)
+                                 'error)))))
+              (letrec ((reachable (lambda (x)
+                                    (let ((a (arc x)))
+                                      (if (equal? 'error a)
+                                          'error
+                                          (amb a
+                                               (reachable a)))))))
+                (let ((x (reachable 'a)))
+                  (begin
+                    (require (not (equal? 'error x)))
+                    x))))
+           q))
+  '(b a d b a d b a d b))
+
+;; a -> b
+;; b -> a
+;; b -> d
+(test "memod-reachable-2"
   (run* (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                ',q
-                                (* n (fac (- n 1)))))))
-              (list
-               (fac 0)
-               (fac 1)
-               (fac 2)
-               (fac 3)))
-           '(1 1 2 6)))
-  '(1))
+    (evalo `(letrec ((arc (lambda (x)
+                            (if (equal? 'a x)
+                                'b
+                                (if (equal? 'b x)
+                                    (amb 'a 'd)
+                                    'error))))
+                     (reachable (memo-lambda reachable (x)
+                                  (let ((a (arc x)))
+                                    (if (equal? 'error a)
+                                        'error
+                                        (amb a
+                                             (reachable a)))))))
+              (reachable 'a))
+           q))
+  '(b a d error))
 
-(test "evalo-fac-synthesis-hole-2"
-  (run 1 (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (- ,q 1)))))))
-              (list
-               (fac 0)
-               (fac 1)
-               (fac 2)
-               (fac 3)))
-           '(1 1 2 6)))
-  '(n))
+;; a -> b
+;; b -> a
+;; b -> d
+(test "memod-reachable-3"
+  (run* (q)
+    (evalo `(letrec ((arc (lambda (x)
+                            (if (equal? 'a x)
+                                'b
+                                (if (equal? 'b x)
+                                    (amb 'a 'd)
+                                    'error))))
+                     (reachable (memo-lambda reachable (x)
+                                  (let ((a (arc x)))
+                                    (if (equal? 'error a)
+                                        'error
+                                        (amb a
+                                             (reachable a)))))))
+              (let ((x (reachable 'a)))
+                (begin
+                  (require (not (equal? 'error x)))
+                  x)))
+           q))
+  '(b a d))
 
-(test "evalo-fac-synthesis-hole-3"
-  (run 1 (q)
-    (fresh (r s)
-      (== (list r s) q)
-      (evalo `(letrec ((fac (lambda (n)
-                              (if (= n 0)
-                                  1
-                                  (* n (fac (- ,r ,s)))))))
-                (list
-                 (fac 0)
-                 (fac 1)
-                 (fac 2)
-                 (fac 3)))
-             '(1 1 2 6))))
-  '((n 1)))
+(test "memod-reachable-4"
+  (run* (q)
+    (fresh (n p)
+      (== (list n p) q)
+      (evalo `(letrec ((arc (lambda (x)
+                              (if (equal? 'a x)
+                                  'b
+                                  (if (equal? 'b x)
+                                      (amb 'a 'd)
+                                      'error))))
+                       (reachable (memo-lambda reachable (x)
+                                    (let ((a (arc x)))
+                                      (if (equal? 'error a)
+                                          'error
+                                          (amb a
+                                               (reachable a)))))))
+                (let ((x (reachable ',n)))
+                  (begin
+                    (require (not (equal? 'error x)))
+                    x)))
+             p)))
+  '((a b)
+    (b a)
+    (a a)
+    (b d)
+    (a d)
+    (b b)))
 
-;; slow, even with the 'symbolo' constraint on 'q'
-(test "evalo-fac-synthesis-hole-4"
-  (run 1 (q)
-    (symbolo q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (fac (,q n 1)))))))
-              (list
-               (fac 0)
-               (fac 1)
-               (fac 2)
-               (fac 3)))
-           '(1 1 2 6)))
-  '(-))
+(test "amb-0"
+  (run* (q)
+    (evalo `(amb)
+      q))
+  '())
+
+(test "amb-1"
+  (run* (q)
+    (evalo `(amb 'foo)
+      q))
+  '(foo))
+
+(test "amb-2"
+  (run* (q)
+    (evalo `(amb 'foo 'bar)
+      q))
+  '(foo bar))
+
+(test "amb-3"
+  (run* (q)
+    (evalo `(amb 'foo 'bar 'baz)
+      q))
+  '(foo bar baz))
+
+(test "amb-4"
+  (run* (q)
+    (evalo `(amb ((lambda (x) x) 'foo)
+                 ((lambda (x) x) 'bar)
+                 ((lambda (x) x) 'baz))
+      q))
+  '(foo bar baz))
 
 
 
+(test "cut-off-recursion-0"
+  (run* (q)
+    (evalo `(letrec ((f (memo-lambda f (x)
+                          x)))
+              (f 'foo))
+      q))
+  '(foo))
 
+(test "cut-off-recursion-1"
+  (run* (q)
+    (evalo `(letrec ((f (memo-lambda f (x)
+                          (f x))))
+              (f 'foo))
+      q))
+  '())
 
-(test "evalo-fac-synthesis-hole-1"
-  (run 1 (q)
-    (evalo `(letrec ((fac (lambda (n)
-                            (if (= n 0)
-                                1
-                                (* n (,q (- n 1)))))))
-              (list
-               (fac 0)
-               (fac 1)
-               (fac 2)
-               (fac 3)))
-           '(1 1 2 6)))
-  '(fac))
-
+(test "cut-off-mutual-recursion-1"
+  (run* (q)
+    (evalo `(letrec ((f (memo-lambda f (x)
+                          (g x)))
+                     (g (memo-lambda g (x)
+                          (f x))))
+              (f 'foo))
+      q))
+  '())
 
 
 
@@ -1280,6 +712,1355 @@
 
 
 
+#!eof
+
+
+(test "0"
+  (run* (q)
+    (fresh (rands env tables^ tables^^ a*)
+      (== (list rands env tables^ tables^^ a*) q)
+      (== '((- n 2)) rands)
+      (== '((val n . 42)
+            (val - prim . -))
+          env)
+      (== '() tables^)
+
+      #;(project (rands env tables^ tables^^ a*)
+        (begin
+          (printf "&&&&&&&&&&&&& before main call!\n")
+          (printf "*** rands: ~s\n" rands)
+          (printf "*** env: ~s\n" env)
+          (printf "*** tables^: ~s\n" tables^)
+          (printf "*** tables^^: ~s\n" tables^^)
+          (printf "*** a*: ~s\n" a*)
+          (== #f #f)))
+
+      #;(lambdag@ (c : S D A T M)
+        (begin
+          (printf "---- S before: ~s\n" S)
+          ((== #f #f) c)))
+
+      #;(lambdag@ (c)
+        (let ((z ((reify q) c)))
+          (begin
+          (printf "---- reified value before: ~s\n" z)
+          ((== #f #f) c))))
+      
+      (eval-listo-memod rands env tables^ tables^^ a*)
+
+      #;(project (rands env tables^ tables^^ a*)
+        (begin
+          (printf "&&&&&&&&&&&&& after main call!\n")
+          (printf "*** rands: ~s\n" rands)
+          (printf "*** env: ~s\n" env)
+          (printf "*** tables^: ~s\n" tables^)
+          (printf "*** tables^^: ~s\n" tables^^)
+          (printf "*** a*: ~s\n" a*)
+          (== #f #f)))
+
+      ;;(== '(3) a*)
+      
+      #;(lambdag@ (c : S D A T M)
+        (begin
+          (printf "---- S after: ~s\n" S)
+          ((== #f #f) c)))
+
+      #;(lambdag@ (c)
+        (let ((z ((reify q) c)))
+          (begin
+          (printf "---- reified value after: ~s\n" z)
+          ((== #f #f) c))))
+      
+      ))
+  '((((- n 2))
+     ((val n . 42)
+      (val - prim . -))
+     ()
+     ()
+     (40))))
+
+
+
+(test "1"
+  (run* (q)
+    (fresh (rands env tables^ tables^^ a*)
+      (== (list rands env tables^ tables^^ a*) q)
+      (== '((- n 2)) rands)
+      (== '((val n . 5)
+            (rec (fib memo-lambda fib (n) (if (<= n 1) n (+ (fib (- n 2)) (fib (- n 1))))))
+            (val list closure (lambda x x) ())
+            (val not prim . not)
+            (val equal? prim . equal?)
+            (val symbol? prim . symbol?)
+            (val cons prim . cons)
+            (val null? prim . null?)
+            (val car prim . car)
+            (val cdr prim . cdr)
+            (val + prim . +)
+            (val - prim . -)
+            (val * prim . *)
+            (val / prim . /)
+            (val = prim . =)
+            (val != prim . !=)
+            (val > prim . >)
+            (val >= prim . >=)
+            (val < prim . <)
+            (val <= prim . <=))
+          env)
+      (== '((fib ((5) in-progress) ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) in-progress) ((4) in-progress)) (fib ((4) in-progress)) (fib))
+          tables^)
+
+      #;(project (rands env tables^ tables^^ a*)
+         (begin
+           (printf "&&&&&&&&&&&&& before main call!\n")
+           (printf "*** rands: ~s\n" rands)
+           (printf "*** env: ~s\n" env)
+           (printf "*** tables^: ~s\n" tables^)
+           (printf "*** tables^^: ~s\n" tables^^)
+           (printf "*** a*: ~s\n" a*)
+           (== #f #f)))
+
+       #;(lambdag@ (c : S D A T M)
+         (begin
+           (printf "---- S before: ~s\n" S)
+           ((== #f #f) c)))
+       
+      (eval-listo-memod rands env tables^ tables^^ a*)
+
+      #;(project (rands env tables^ tables^^ a*)
+         (begin
+           (printf "&&&&&&&&&&&&& after main call!\n")
+           (printf "*** rands: ~s\n" rands)
+           (printf "*** env: ~s\n" env)
+           (printf "*** tables^: ~s\n" tables^)
+           (printf "*** tables^^: ~s\n" tables^^)
+           (printf "*** a*: ~s\n" a*)
+           (== #f #f)))
+
+       #;(lambdag@ (c : S D A T M)
+         (begin
+           (printf "---- S after: ~s\n" S)
+           ((== #f #f) c)))
+       
+      ))
+  '((((- n 2))
+     ((val n . 5) (rec (fib memo-lambda fib (n) (if (<= n 1) n (+ (fib (- n 2)) (fib (- n 1)))))) (val list closure (lambda x x) ()) (val not prim . not) (val equal? prim . equal?) (val symbol? prim . symbol?) (val cons prim . cons) (val null? prim . null?) (val car prim . car) (val cdr prim . cdr) (val + prim . +) (val - prim . -) (val * prim . *) (val / prim . /) (val = prim . =) (val != prim . !=) (val > prim . >) (val >= prim . >=) (val < prim . <) (val <= prim . <=))
+     ((fib ((5) in-progress) ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) in-progress) ((4) in-progress)) (fib ((4) in-progress)) (fib))
+     ((fib ((5) in-progress) ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((4) (memo-value 3)) ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) (memo-value 2)) ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((3) in-progress) ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) (memo-value 1)) ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) (memo-value 1)) ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((1) in-progress) ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) (memo-value 0)) ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((0) in-progress) ((2) in-progress) ((4) in-progress)) (fib ((2) in-progress) ((4) in-progress)) (fib ((4) in-progress)) (fib))
+     (3))))
+
+
+
+(time
+  (test "evalo-fib-5-memod-show-table-c-already-memod-up-to-4"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 2)) (fib (- n 1)))))))
+                      (fib 5))
+                   initial-env
+                   '((fib ((4) (memo-value 3))
+                          ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((4) in-progress))
+                     (fib))
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       '?))))
+
+
+(time
+  (test "evalo-fib-3-memod-show-table-c-already-memod-up-to-4"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 2)) (fib (- n 1)))))))
+                      (fib 3))
+                   initial-env
+                   '((fib ((4) (memo-value 3))
+                          ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((4) in-progress))
+                     (fib))
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       2))))
+
+
+
+(time
+  (test "evalo-fib-4-memod-show-table-c-already-memod-up-to-4"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 2)) (fib (- n 1)))))))
+                      (fib 4))
+                   initial-env
+                   '((fib ((4) (memo-value 3))
+                          ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) (memo-value 2))
+                          ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((3) in-progress)
+                          ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) (memo-value 1))
+                          ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) (memo-value 1))
+                          ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((1) in-progress)
+                          ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) (memo-value 0))
+                          ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((0) in-progress)
+                          ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((2) in-progress)
+                          ((4) in-progress))
+                     (fib ((4) in-progress))
+                     (fib))
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       3))))
+
+
+
+
+
+
+
+(time
+  (test "evalo-fib-0"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 0))
+             q))
+    '(0)))
+
+(time
+  (test "evalo-fib-1"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 1))
+             q))
+    '(1)))
+
+(time
+  (test "evalo-fib-2"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 2))
+             q))
+    '(1)))
+
+(time
+  (test "evalo-fib-3"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 3))
+             q))
+    '(2)))
+
+(time
+  (test "evalo-fib-4"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 4))
+             q))
+    '(3)))
+
+(time
+  (test "evalo-fib-5"
+    (run* (q)
+      (evalo `(letrec ((fib (lambda (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 5))
+             q))
+    '(5)))
+
+
+
+
+
+
+
+(time
+  (test "evalo-fib-0-memod-show-table"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 0))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((0) (memo-value 0))
+             ((0) in-progress))
+        (fib ((0) in-progress))
+        (fib))
+       0))))
+
+(time
+  (test "evalo-fib-1-memod-show-table"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 1))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((1) (memo-value 1))
+             ((1) in-progress))
+        (fib ((1) in-progress))
+        (fib))
+       1))))
+
+(time
+  (test "evalo-fib-2-memod-show-table"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 2))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress))
+        (fib ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress))
+        (fib ((1) in-progress)
+             ((2) in-progress))
+        (fib ((2) in-progress))
+        (fib))
+       1))))
+
+(time
+  (test "evalo-fib-3-memod-show-table"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 3))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress))
+        (fib ((2) in-progress)
+             ((3) in-progress))
+        (fib ((3) in-progress))
+        (fib))
+       2))))
+
+(time
+  (test "evalo-fib-4-memod-show-table-a"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 4))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       3))))
+
+(time
+  (test "evalo-fib-4-memod-show-table-b"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 1)) (fib (- n 2)))))))
+                      (fib 4))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((3) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       3))))
+
+(time
+  (test "evalo-fib-4-memod-show-table-c"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 2)) (fib (- n 1)))))))
+                      (fib 4))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '((((fib ((4) (memo-value 3))
+             ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) (memo-value 2))
+             ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((3) in-progress)
+             ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) (memo-value 1))
+             ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) (memo-value 1))
+             ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((1) in-progress)
+             ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) (memo-value 0))
+             ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((0) in-progress)
+             ((2) in-progress)
+             ((4) in-progress))
+        (fib ((2) in-progress)
+             ((4) in-progress))
+        (fib ((4) in-progress))
+        (fib))
+       3))))
+
+(time
+  (test "evalo-fib-5-memod-show-table-c"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (<= n 1)
+                                        n
+                                        (+ (fib (- n 2)) (fib (- n 1)))))))
+                      (fib 5))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '?))
+
+
+
+(time
+  (test "evalo-fib-5-memod-show-table"
+    (run* (q)
+      (fresh (tables-out val)
+        (== (list tables-out val) q)
+        (eval-expo `(letrec ((fib (memo-lambda fib (n)
+                                    (if (= n 0)
+                                        0
+                                        (if (= n 1)
+                                            1
+                                            (+ (fib (- n 1)) (fib (- n 2))))))))
+                      (fib 5))
+                   initial-env
+                   initial-tables
+                   tables-out
+                   val)))
+    '?))
+
+
+
+
+(time
+  (test "evalo-fib-0-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 0))
+             q))
+    '(0)))
+
+(time
+  (test "evalo-fib-1-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 1))
+             q))
+    '(1)))
+
+(time
+  (test "evalo-fib-2-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 2))
+             q))
+    '(1)))
+
+(time
+  (test "evalo-fib-3-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 3))
+             q))
+    '(2)))
+
+(time
+  (test "evalo-fib-4-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 4))
+             q))
+    '(3)))
+
+(time
+  (test "evalo-fib-5-memod"
+    (run* (q)
+      (evalo `(letrec ((fib (memo-lambda fib (n)
+                              (if (= n 0)
+                                  0
+                                  (if (= n 1)
+                                      1
+                                      (+ (fib (- n 1)) (fib (- n 2))))))))
+                (fib 5))
+             q))
+    '(5)))
+
+
+
+(time
+  (test "evalo-fac-6-memod"
+    (run* (q)
+      (evalo `(letrec ((fac (memo-lambda fac (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (fac 6))
+             q))
+    '(720)))
+
+(time
+  (test "evalo-fac-6"
+    (run* (q)
+      (evalo `(letrec ((fac (lambda (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (fac 6))
+             q))
+    '(720)))
+
+
+(time
+  (test "evalo-fac-6-memod-list"
+    (run* (q)
+      (evalo `(letrec ((fac (memo-lambda fac (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6)))
+             q))
+    '((720))))
+
+(time
+  (test "evalo-fac-6-list"
+    (run* (q)
+      (evalo `(letrec ((fac (lambda (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6)))
+             q))
+    '((720))))
+
+
+(time
+  (test "evalo-fac-6-memod-double"
+    (run* (q)
+      (evalo `(letrec ((fac (memo-lambda fac (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6) (fac 6)))
+             q))
+    '((720 720))))
+
+(time
+  (test "evalo-fac-6-double"
+    (run* (q)
+      (evalo `(letrec ((fac (lambda (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6) (fac 6)))
+             q))
+    '((720 720))))
+
+
+
+(time
+  (test "evalo-fac-6-memod-thrice"
+    (run* (q)
+      (evalo `(letrec ((fac (memo-lambda fac (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6) (fac 6) (fac 6)))
+             q))
+    '((720 720 720))))
+
+(time
+  (test "evalo-fac-6-thrice"
+    (run* (q)
+      (evalo `(letrec ((fac (lambda (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- n 1)))))))
+                (list (fac 6) (fac 6) (fac 6)))
+             q))
+    '((720 720 720))))
+
+
+
+(test "evalo-fac-6"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac 6))
+           q))
+  '(720))
+
+;; slowish
+(test "evalo-fac-9"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac 9))
+           q))
+  '(362880))
+
+(test "evalo-backwards-fac-6"
+  (run 1 (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac ,q))
+           720))
+  '(6))
+
+;; remember the quote!
+(test "evalo-backwards-fac-quoted-6"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac ',q))
+           720))
+  '(6))
+
+
+;; slowish
+(test "evalo-backwards-fac-9"
+  (run 1 (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac ,q))
+           362880))
+  '(9))
+
+;; remember the quote!
+(test "evalo-backwards-fac-quoted-9"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (fac ',q))
+           362880))
+  '(9))
+
+
+;; slowish
+(test "evalo-fac-table"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- n 1)))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           q))
+  '((1 1 2 6)))
+
+(test "evalo-fac-synthesis-hole-0"
+  (run* (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                ',q
+                                (* n (fac (- n 1)))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(1))
+
+(test "evalo-fac-synthesis-hole-2"
+  (run 1 (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (- ,q 1)))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(n))
+
+(test "evalo-fac-synthesis-hole-3"
+  (run 1 (q)
+    (fresh (r s)
+      (== (list r s) q)
+      (evalo `(letrec ((fac (lambda (n)
+                              (if (= n 0)
+                                  1
+                                  (* n (fac (- ,r ,s)))))))
+                (list
+                 (fac 0)
+                 (fac 1)
+                 (fac 2)
+                 (fac 3)))
+             '(1 1 2 6))))
+  '((n 1)))
+
+;; slow, even with the 'symbolo' constraint on 'q'
+(test "evalo-fac-synthesis-hole-4"
+  (run 1 (q)
+    (symbolo q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (fac (,q n 1)))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(-))
+
+
+
+
+
+(test "evalo-fac-synthesis-hole-1"
+  (run 1 (q)
+    (evalo `(letrec ((fac (lambda (n)
+                            (if (= n 0)
+                                1
+                                (* n (,q (- n 1)))))))
+              (list
+               (fac 0)
+               (fac 1)
+               (fac 2)
+               (fac 3)))
+           '(1 1 2 6)))
+  '(fac))
+
+
+
+
+
+
+
+
 (test "evalo-simple-let-a"
   (run* (q)
     (evalo '(let ((foo (+ 1 2))) (* foo foo)) q))
@@ -1586,7 +2367,7 @@
 
 
 
-#!eof
+
 
 ;;; takes about a minute on Will's laptop
 (test "evalo-fib-1-a"
@@ -1923,7 +2704,7 @@
              `(bad . ,vals))))
   '())
 
-#!eof
+
 
 ;;; old tests:
 
