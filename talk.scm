@@ -1,3 +1,7 @@
+;; CLP(SMT)
+;; Nada Amin, University of Cambridge, UK
+;; joint work with William E. Byrd, UAB, USA
+
 (load "mk.scm")
 (load "z3-driver.scm")
 (load "test-check.scm")
@@ -75,6 +79,39 @@
           ((_.0 quote)))
      (sym _.0))))
 
+;; constraints
+(test "numbero-0"
+  (run* (q)
+    (numbero q))
+  '((_.0 (num _.0))))
+
+(test "numbero-1"
+  (run* (q)
+    (numbero q)
+    (== q 1))
+  '(1))
+
+(test "numbero-2"
+  (run* (q)
+    (numbero q)
+    (== 'one q))
+  '())
+
+(test "symbolo-1"
+  (run* (q)
+    (symbolo q))
+  '((_.0 (sym _.0))))
+
+(test "absento-1"
+  (run* (q)
+    (absento 'one '(one two three)))
+  '())
+
+(test "absento-2"
+  (run* (q)
+    (absento 'one '(two three)))
+  '(_.0))
+
 ;; CLP(SMT)
 
 (test "basic-1"
@@ -99,6 +136,21 @@
               (z/assert `(= (- ,n 1) ,n-1))
               (z/assert `(= (* ,n ,r) ,out))
               (faco n-1 r))))))
+
+(define facto
+  (lambda (n out)
+    (conde ((== n 0)
+            (== out 1))
+           ((z/assert `(> ,n 0))
+            (fresh (n-1 r)
+              (z/assert `(= (- ,n 1) ,n-1))
+              (z/assert `(= (* ,n ,r) ,out))
+              (facto n-1 r))))))
+
+  (run 7 (q)
+    (fresh (n out)
+      (facto n out)
+      (== q `(,n ,out))))
 
 (test "faco-7"
   (run 7 (q)
@@ -179,6 +231,16 @@
         ',q)
       'foo))
   '(4786457243))
+
+ (test "synthesize-triple-by-example-2c20c"
+   (run 3 (f)
+     (fresh (op e1 e2)
+       (== `(lambda (x) (,op ,e1 ,e2)) f)
+       (symbolo op))
+     (evalo `(list (,f 1) (,f 2)) '(2 4)))
+   '((lambda (x) (+ x x))
+     (lambda (x) (* 2 x))
+     (lambda (x) (* x 2))))
 
 (load "while-abort.scm")
 
