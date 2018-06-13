@@ -40,6 +40,33 @@
        |#
        (not-in-envo 'lambda env)))
 
+
+    ;; McCarthy's 'amb' operator, with 'require'
+    ;; See http://community.schemewiki.org/?amb
+    ;;
+    ;;  (let ((a (amb 1 2))
+    ;;        (b (amb 1 2)))
+    ;;    (require (< a b))
+    ;;    (list a b))
+    ((fresh (e v)
+       (== `(require ,e) expr)
+       (== 'void val)
+       (=/= #f v)
+       (eval-expo e env tables-in tables-out v)
+       (not-in-envo 'require env)))
+
+    ;; McCarthy's 'amb' operator
+    ;; See http://community.schemewiki.org/?amb
+    ;;
+    ;;  (let ((a (amb 1 2))
+    ;;        (b (amb 1 2)))
+    ;;    (require (< a b))
+    ;;    (list a b))
+    ((fresh (e*)
+       (== `(amb . ,e*) expr)
+       (evaluate-oneo e* env tables-in tables-out val)
+       (not-in-envo 'amb env)))
+    
     ((fresh (x body name)
        ;; should memo-lambda take a user-defined name?
        ;; if not, how to lookup the right table for the resulting closure?
@@ -54,38 +81,46 @@
          ((list-of-symbolso x)))
        (not-in-envo 'memo-lambda env)))
     
-    ((fresh (rator x rands body env^ a* res tables^ tables^^)
+    ((fresh (rator x rands body env^ a* env^^ tables^ tables^^)
        (== `(,rator . ,rands) expr)
        ;; variadic
        (symbolo x)
-       (== `((val . (,x . ,a*)) . ,env^) res)
-       ;; (== `((,x . (val . ,a*)) . ,env^) res)
+       (== `((val . (,x . ,a*)) . ,env^) env^^)
+       ;; (== `((,x . (val . ,a*)) . ,env^) env^^)
        (eval-expo rator env tables-in tables^ `(closure (lambda ,x ,body) ,env^))
-       (eval-expo body res tables^ tables^^ val)
+       (eval-expo body env^^ tables^ tables^^ val)
        (eval-listo rands env tables^^ tables-out a*)))
 
-    ((fresh (rator x* rands body env^ a* res tables^ tables^^)
+    ((fresh (rator x* rands body env^ a* env^^ tables^ tables^^)
        (== `(,rator . ,rands) expr)
        ;; Multi-argument
        (eval-expo rator env tables-in tables^ `(closure (lambda ,x* ,body) ,env^))
        (eval-listo rands env tables^ tables^^ a*)
-       (ext-env*o x* a* env^ res)
-       (eval-expo body res tables^^ tables-out val)))
+       (ext-env*o x* a* env^ env^^)
+       (eval-expo body env^^ tables^^ tables-out val)))
 
     ((fresh (rator x* rands body env^ a* tables^ tables^^ name)
+
        (== `(,rator . ,rands) expr)
        ;; Multi-argument memo-lambda closure
+              
        (eval-expo rator env tables-in tables^ `(closure (memo-lambda ,name ,x* ,body) ,env^))
-       (eval-listo rands env tables^ tables^^ a*)
 
+       (eval-listo rands env tables^ tables^^ a*)
+       
        (fresh (table entry)
          ;; look up the memo table in 'tables^^' corresponding to 'name'.
          ;; there should be a table, since 'memo-lambda' adds an association of the name mapped to the empty table
          (find-tableo tables^^ name table)
          
-         ;; look up the arguments to the memo'd closure, 'a*', in the resulting table:         
+         ;; needed for SMT??
+         ;; purge-M-inc-models
+         z/purge
+         ;; z/check
+         
+         ;; look up the arguments to the memo'd closure, 'a*', in the resulting table:
          (table-lookupo a* table entry)
-
+                  
          (conde
            ((== 'in-progress entry)
             ;; fail, since the recursive function has been called
@@ -101,24 +136,24 @@
            ((== 'no-entry entry)
 
             ;;   if 'a*' does not yet have an entry in the table,
-            (fresh (res in-progress-table table^ final-value-table new-tables new-tables^)
+            (fresh (env^^ in-progress-table table^ final-value-table new-tables new-tables^)
 
               ;;   associate 'a*' with 'in-progress' in an extended table, and update a new tables to use the "in-progress" table
               (== `((,a* in-progress) . ,table) in-progress-table)
               (== `((,name . ,in-progress-table) . ,tables^^) new-tables)
 
-              ;;   let the result of evaluating the body of the memo-closure be 'val', as usual  (this is just the normal evaluation of a procedure call)
-              (ext-env*o x* a* env^ res)
-              (eval-expo body res new-tables new-tables^ val)
-
-              ;;   look up the memo table for name,
-              (find-tableo new-tables^ name table^)
-              
               ;;   associate 'a*' with '(memo-value val)',
               (== `((,a* (memo-value ,val)) . ,table^) final-value-table)
               
               ;;   unify the updated table with 'tables-out'
               (== `((,name . ,final-value-table) . ,new-tables^) tables-out)
+              
+              ;;   let the result of evaluating the body of the memo-closure be 'val', as usual  (this is just the normal evaluation of a procedure call)
+              (ext-env*o x* a* env^ env^^)
+              (eval-expo body env^^ new-tables new-tables^ val)
+              
+              ;;   look up the memo table for name,
+              (find-tableo new-tables^ name table^)              
               
               ))))))
 
@@ -155,6 +190,11 @@
                   tables-out
                   val)))
     |#
+
+    ((fresh (begin-body)
+       (== `(begin . ,begin-body) expr)
+       (eval-begino begin-body env tables-in tables-out val)
+       (not-in-envo 'begin env)))
     
     ((fresh (x e body a env^ tables^)
        (== `(let ((,x ,e)) ,body) expr)
@@ -168,6 +208,24 @@
     ))
 
 (define empty-env '())
+
+(define (evaluate-oneo e* env tables-in tables-out val)
+  (fresh (e e-rest)
+    (== `(,e . ,e-rest) e*)
+    (conde
+      ((eval-expo e env tables-in tables-out val))
+      ((evaluate-oneo e-rest env tables-in tables-out val)))))
+
+(define (eval-begino begin-body env tables-in tables-out val)
+  (conde
+    ((fresh (e)
+       (== `(,e) begin-body)
+       (== tables-in tables-out)
+       (eval-expo e env tables-in tables-out val)))
+    ((fresh (e e1 e-rest tables^ ignore-val)
+       (== `(,e ,e1 . ,e-rest) begin-body)
+       (eval-expo e env tables-in tables^ ignore-val)
+       (eval-begino `(,e1 . ,e-rest) env tables^ tables-out val)))))
 
 (define (lookup-reco k renv x b* t)
     (conde
@@ -233,21 +291,20 @@
 |#
 
 (define (eval-letreco b* letrec-body env tables-in tables-out val)
-  (let loop ((b* b*) (rb* '()) (tables-in tables-in))
+  (let loop ((b* b*) (rb* '()) (tables tables-in))
     (conde
       ((== '() b*)
-       (eval-expo letrec-body `((rec . ,rb*) . ,env) tables-in tables-out val))
+       (eval-expo letrec-body `((rec . ,rb*) . ,env) tables tables-out val))
       ((fresh (p-name x body b*-rest)
          (== `((,p-name (lambda ,x ,body)) . ,b*-rest) b*)
          (symbolo p-name)
          (paramso x)
-         (loop b*-rest `((,p-name . (lambda ,x ,body)) . ,rb*) tables-in)))
+         (loop b*-rest `((,p-name . (lambda ,x ,body)) . ,rb*) tables)))
       ((fresh (p-name name x body b*-rest tables^)
          (== `((,p-name (memo-lambda ,name ,x ,body)) . ,b*-rest) b*)
          (symbolo p-name)
          (paramso x)
-         ;; add a new, empty memo table for the new memo'd closure
-         (== `((,name . ()) . ,tables-in) tables^)         
+         (== `((,name . ()) . ,tables) tables^)        
          (loop b*-rest `((,p-name . (memo-lambda ,name ,x ,body)) . ,rb*) tables^))))))
 
 (define (paramso params)
@@ -297,14 +354,15 @@
 
 (define (eval-listo expr env tables-in tables-out val)
   (conde
-    ((== '() expr)
-     (== tables-in tables-out)
-     (== '() val))
-    ((fresh (a d v-a v-d tables^)
-       (== `(,a . ,d) expr)
-       (== `(,v-a . ,v-d) val)
-       (eval-expo a env tables-in tables^ v-a)
-       (eval-listo d env tables^ tables-out v-d)))))
+      ((== '() expr)
+       (== tables-in tables-out)
+       (== '() val))
+      ((fresh (a d v-a v-d tables^)
+         (== `(,a . ,d) expr)
+         (== `(,v-a . ,v-d) val)
+         (eval-expo a env tables-in tables^ v-a)    
+         (eval-listo d env tables^ tables-out v-d)))))
+
 
 ;; need to make sure lambdas are well formed.
 ;; grammar constraints would be useful here!!!
