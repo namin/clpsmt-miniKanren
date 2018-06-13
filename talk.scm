@@ -137,6 +137,7 @@
               (z/assert `(= (* ,n ,r) ,out))
               (faco n-1 r))))))
 
+;; equivalent
 (define facto
   (lambda (n out)
     (conde ((== n 0)
@@ -146,11 +147,6 @@
               (z/assert `(= (- ,n 1) ,n-1))
               (z/assert `(= (* ,n ,r) ,out))
               (facto n-1 r))))))
-
-  (run 7 (q)
-    (fresh (n out)
-      (facto n out)
-      (== q `(,n ,out))))
 
 (test "faco-7"
   (run 7 (q)
@@ -167,6 +163,24 @@
 (test "faco-backwards-720"
   (run* (q)
     (faco q 720))
+  '(6))
+
+;; equivalent
+(test "facto-7"
+  (run 7 (q)
+    (fresh (n out)
+      (facto n out)
+      (== q `(,n ,out))))
+  '((0 1) (1 1) (2 2) (3 6) (4 24) (5 120) (6 720)))
+
+(test "facto-backwards-2"
+  (run* (q)
+    (facto q 2))
+  '(2))
+
+(test "facto-backwards-720"
+  (run* (q)
+    (facto q 720))
   '(6))
 
 (load "full-interp.scm")
