@@ -1,59 +1,48 @@
 (define z3-counter-check-sat 0)
 (define z3-counter-get-model 0)
 
+(define-values (z3-out z3-in z3-err z3-p)
+  (open-process-ports "z3 -in" 'block (native-transcoder)))
+
 (define read-sat
-  (lambda (fn)
-    (let ([p (open-input-file fn)])
-      (let ([r (read p)])
-        (close-input-port p)
-        (eq? r 'sat)))))
+  (lambda ()
+    (let ([r (read z3-in)])
+      (eq? r 'sat))))
 
 (define call-z3
   (lambda (xs)
-    (let ([p (open-output-file "out.smt" 'replace)])
-      (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
-      (close-output-port p)
-      (system "sed -i '' 's/#t/true/g' out.smt")
-      (system "sed -i '' 's/#f/false/g' out.smt")
-      (system "sed -i '' 's/bitvec-/#b/g' out.smt")
-      (let ((r (system "z3 out.smt >out.txt")))
-        (system "sed -i '' 's/#b/bitvec-/g' out.txt")
-        (if (not (= r 0))
-            (error 'call-z3 "error in z3 out.smt > out.txt"))))))
+    (for-each (lambda (x) (fprintf z3-out "~a\n" x)) xs)
+    (flush-output-port z3-out)))
 
 (define check-sat
   (lambda (xs)
-    (call-z3 (append xs '((check-sat) (exit))))
+    (call-z3 (append (cons '(reset) xs) '((check-sat))))
     (set! z3-counter-check-sat (+ z3-counter-check-sat 1))
-    (read-sat "out.txt")))
+    (read-sat)))
 
 (define read-model
-  (lambda (fn)
-    (let ([p (open-input-file fn)])
-      (let ([r (read p)])
-        (if (eq? r 'sat)
-            (let ([m (read p)])
-              (close-input-port p)
-              (map (lambda (x)
-                     (cons (cadr x)
-                           (if (null? (caddr x))
-                               (let ([r (cadddr (cdr x))])
-                                 (cond
-                                   ((eq? r 'false) #f)
-                                   ((eq? r 'true) #t)
-                                   ((and (pair? (cadddr x)) (eq? (cadr (cadddr x)) 'BitVec)) r)
-                                   (else (eval r))))
-                               `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
-                   (cdr m)))
-            (begin
-              (close-input-port p)
-              #f))))))
+  (lambda ()
+    (let ([r (read z3-in)])
+      (if (eq? r 'sat)
+          (let ([m (read z3-in)])
+            (map (lambda (x)
+                   (cons (cadr x)
+                         (if (null? (caddr x))
+                             (let ([r (cadddr (cdr x))])
+                               (cond
+                                 ((eq? r 'false) #f)
+                                 ((eq? r 'true) #t)
+                                 ((and (pair? (cadddr x)) (eq? (cadr (cadddr x)) 'BitVec)) r)
+                                 (else (eval r))))
+                             `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
+                 (cdr m)))
+          #f))))
 
 (define get-model
   (lambda (xs)
-    (call-z3 (append xs '((check-sat) (get-model) (exit))))
+    (call-z3 (append (cons '(reset) xs) '((check-sat) (get-model))))
     (set! z3-counter-get-model (+ z3-counter-get-model 1))
-    (read-model "out.txt")))
+    (read-model)))
 
 (define neg-model
   (lambda (model)
