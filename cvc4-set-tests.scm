@@ -17,3 +17,10 @@
     (singleton 1)
     (union [singleton 1] [singleton 2])))
 
+(test "set-3"
+  (run 4 (q)
+    (z/ `(declare-fun ,q () (Set Int))))
+  '((as emptyset (Set Int))
+    (singleton 0)
+    (singleton (- 1))
+    (singleton (- 2))))
