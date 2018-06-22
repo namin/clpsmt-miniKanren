@@ -42,10 +42,8 @@
                                  (cond
                                    ((eq? r 'false) #f)
                                    ((eq? r 'true) #t)
-                                   ((and (pair? (cadddr x)) (eq? (cadr (cadddr x)) 'BitVec)) r)
-                                   ((and (pair? r) (eq? 'emptyset (cadr r))) r)
-                                   ((and (pair? r) (eq? singleton (car r))) r)
-                                   (else (eval r))))
+                                   ((number? r) r)
+                                   (else r)))
                                `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
                    (cdr m)))
             (begin
@@ -86,13 +84,6 @@
 
 (define get-next-model
   (lambda (xs ms)
-    (let* ([ms (map (lambda (m)
-                      (filter (lambda (x) ; ignoring functions
-                                (or (number? (cdr x))
-                                    (symbol? (cdr x)) ; for bitvectors
-                                    )) m))
-                    ms)])
-      (if (member '() ms) #f  ; if we're skipping a model, let us stop
-          (let ([ys (append xs (map neg-model ms))])
-            (and (check-sat ys)
-                 (get-model ys)))))))
+    (let ([ys (append xs (map neg-model ms))])
+      (and (check-sat ys)
+           (get-model ys)))))

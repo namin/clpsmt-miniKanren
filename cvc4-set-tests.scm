@@ -12,6 +12,8 @@
   (run* (q)
     (z/ `(declare-fun ,q () (Set Int)))
     (z/assert `(subset ,q (insert 2 (singleton 1)))))
-  ;; TODO: why only one answer?
-  '((as emptyset (Set Int))))
+  '((as emptyset (Set Int))
+    (singleton 2)
+    (singleton 1)
+    (union [singleton 1] [singleton 2])))
 
