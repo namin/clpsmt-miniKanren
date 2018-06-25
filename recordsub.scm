@@ -24,7 +24,7 @@
          (typ-rcd sr er))))))
 
 '(
-  (run 2 (q) ;; cannot go above!
+  (run 10 (q)
     (fresh (s env)
       (== q (list s env))
       (z/set s)
