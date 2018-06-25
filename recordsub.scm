@@ -13,10 +13,10 @@
 (define typ-rcd
   (lambda (s env)
     (conde
-      ((== s ∅))
+      ((z/assert `(= ,s ,∅)))
       ((fresh (l ft sr er)
          (z/set sr)
-         (== s (set sr l))
+         (z/assert `(= ,s ,(set sr l)))
          (!ino l sr)
          (numbero l)
          (== (cons (cons l ft) er) env)

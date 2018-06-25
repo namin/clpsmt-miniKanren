@@ -830,7 +830,7 @@
              (ds-R (partition declares? M))
              (ds (car ds-R))
              (R (cdr ds-R))
-             (ds (filter (lambda (x) (symbol? (cadr x))) ds))
+             ;(ds (filter (lambda (x) (symbol? (cadr x))) ds))
              (ds (filter-redundant-declares ds ds))
              (M (append ds R)))
         (cons
