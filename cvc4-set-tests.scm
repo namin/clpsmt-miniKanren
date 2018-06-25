@@ -24,3 +24,14 @@
     (singleton 0)
     (singleton (- 1))
     (singleton (- 2))))
+
+(test "set-4"
+  (run* (q)
+    (z/ `(declare-fun ,q () (Set Int)))
+    (z/assert
+     `(= (insert 1 2 (singleton 3))
+         (union ,q (insert 1 (singleton 2))))))
+  '((singleton 3)
+    (union [singleton 1] [singleton 3])
+    (union [singleton 2] [singleton 3])
+    (union [union (singleton 1) (singleton 2)] [singleton 3])))
