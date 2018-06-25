@@ -36,19 +36,7 @@
     (union [singleton 2] [singleton 3])
     (union [union (singleton 1) (singleton 2)] [singleton 3])))
 
-(define subseto
-  (lambda (r1 r2)
-    (z/assert `(subset ,r1 ,r2))))
-
-(define !subseto
-  (lambda (r1 r2)
-    (z/assert `(not (subset ,r1 ,r2)))))
-
-(define set
-  (lambda (s . args)
-    `(insert ,@args ,s)))
-
-(define ∅ '(as emptyset (Set Int)))
+(load "clpset.scm")
 
 (test "subseto-1"
   (run* (q)
