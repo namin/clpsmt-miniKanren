@@ -12,7 +12,7 @@
   (lambda (xs)
     (let ([p (open-output-file "out.smt" 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x))
-                (cons '(set-logic QF_UFLIAFS) xs))
+                (cons '(set-logic QF_UFDTLIAFS) xs))
       (close-output-port p)
       (system "sed -i '' 's/#t/true/g' out.smt")
       (system "sed -i '' 's/#f/false/g' out.smt")
@@ -45,7 +45,7 @@
                                    ((number? r) r)
                                    (else r)))
                                `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
-                   (cdr m)))
+                   (filter (lambda (x) (not (declare-datatypes? x))) (cdr m))))
             (begin
               (close-input-port p)
               #f))))))

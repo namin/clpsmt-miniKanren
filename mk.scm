@@ -793,6 +793,12 @@
     (cons (filter p xs)
           (filter (lambda (x) (not (p x))) xs))))
 
+(define declare-datatypes?
+  (lambda (s)
+    (and (pair? s)
+         (eq? 'declare-datatypes (car s))
+         (cadr s))))
+
 (define declares?
   (lambda (s)
     (and (pair? s)
@@ -827,6 +833,9 @@
              (M (walk* (reverse M) S))
              (S (reify-S M '()))
              (M (walk* M S))
+             (dd-M (partition declare-datatypes? M))
+             (dd (car dd-M))
+             (M (cdr dd-M))
              (ds-R (partition declares? M))
              (ds (car ds-R))
              (R (cdr ds-R))
@@ -836,6 +845,7 @@
         (cons
          (map (lambda (x) (cons (cdr x) (car x))) S)
          (append
+          dd
           (apply append
            (map (lambda (x) `((declare-fun ,x () Int) (assert (>= ,x 0))))
                 (filter (undeclared? (map cadr ds)) (map cdr S))))

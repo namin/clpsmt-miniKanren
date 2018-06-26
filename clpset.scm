@@ -23,3 +23,11 @@
 (define !ino
   (lambda (x s)
     (z/assert `(not (member ,x ,s)))))
+
+(define uniono
+  (lambda (s1 s2 s3)
+    (z/assert `(= (union ,s1 ,s2) ,s3))))
+
+(define z/==
+  (lambda (a b)
+    (z/assert `(= ,a ,b))))
