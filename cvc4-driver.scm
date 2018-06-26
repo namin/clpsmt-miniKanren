@@ -12,7 +12,7 @@
   (lambda (xs)
     (let ([p (open-output-file "out.smt" 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x))
-                (cons '(set-logic QF_UFDTLIAFS) xs))
+                (cons '(set-logic ALL_SUPPORTED) xs))
       (close-output-port p)
       (system "sed -i '' 's/#t/true/g' out.smt")
       (system "sed -i '' 's/#f/false/g' out.smt")
