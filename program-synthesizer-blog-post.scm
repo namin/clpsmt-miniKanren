@@ -294,6 +294,27 @@
   #:guarantee (assert (= (interpret (mul c x)) (+ x x))))
 |#
 
+(test "challenge-5-interpreto-a"
+  (run 5 (q)
+    (fresh (c x y two-x two-y)
+      (== (list c x y) q)
+      (numbero c)
+      (numbero x)
+      (numbero y)
+      (=/= x y)
+      (numbero two-x)
+      (numbero two-y)
+      (z/assert `(= ,two-x (+ ,x ,x)))
+      (z/assert `(= ,two-y (+ ,y ,y)))
+      (interpreto `(mul ,c ,x) two-x)
+      (interpreto `(mul ,c ,y) two-y)))
+  '((2 1 -1)
+    (2 1 -2)
+    (2 1 -3)
+    (2 1 -4)
+    (2 1 -5)))
+
+
 ;; oh dear!
 ;; is there a way for us to emulate Rosette's #:forall functionality?
 (test "challenge-5-a"
