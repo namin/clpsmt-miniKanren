@@ -128,6 +128,121 @@
   '(0 2 1 -2 -1))
 
 
+;; Challenge 3: Little interpreter for arithmetic
+
+#|
+(define (interpret p)
+  (match p
+    [(plus a b)  (+ (interpret a) (interpret b))]
+    [(mul a b)   (* (interpret a) (interpret b))]
+    [(square a)  (expt (interpret a) 2)]
+    [_ p]))
+|#
+
+#|
+(interpret (plus (square 7) 3)) => 52
+|#
+
+;; Using evalo:
+(test "challenge-3-a"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((plus (lambda (a b) (+ a b))))
+              (let ((mul (lambda (a b) (* a b))))
+                (let ((square (lambda (a) (* a a))))
+                  (plus (square 7) 3))))
+           y))
+  '(52))
+
+(test "challenge-3-b"
+  (run* (y)
+    (evalo `(let ((plus (lambda (a b) (+ a b))))
+              (let ((mul (lambda (a b) (* a b))))
+                (let ((square (lambda (a) (* a a))))
+                  (plus (square 7) 3))))
+           y))
+  '(52))
+
+(test "challenge-3-c"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((square (lambda (a) (* a a))))
+              (+ (square 7) 3))
+           y))
+  '(52))
+
+(test "challenge-3-d"
+  (run* (y)
+    (evalo `(let ((square (lambda (a) (* a a))))
+              (+ (square 7) 3))
+           y))
+  '(52))
+
+
+;; Challenge 4: Find 'y' such that (square (plus y 2)) => 25
+
+#|
+(solve 
+  (assert 
+    (= (interpret (square (plus y 2))) 25)))
+|#
+
+(test "challenge-4-a"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((plus (lambda (a b) (+ a b))))
+              (let ((mul (lambda (a b) (* a b))))
+                (let ((square (lambda (a) (* a a))))
+                  (square (+ ',y 2)))))
+           25))
+  '(-7 3))
+
+(test "challenge-4-b"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((plus (lambda (a b) (+ a b))))
+              (let ((mul (lambda (a b) (* a b))))
+                (let ((square (lambda (a) (* a a))))
+                  (square (+ ,y 2)))))
+           25))
+  '(-7 3))
+
+(test "challenge-4-c"
+  (run* (y)
+    (evalo `(let ((plus (lambda (a b) (+ a b))))
+              (let ((mul (lambda (a b) (* a b))))
+                (let ((square (lambda (a) (* a a))))
+                  (square (+ ',y 2)))))
+           25))
+  '(-7 3))
+
+(test "challenge-4-d"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((square (lambda (a) (* a a))))
+              (square (+ ',y 2)))
+           25))
+  '(-7 3))
+
+(test "challenge-4-e"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((square (lambda (a) (* a a))))
+              (square (+ ,y 2)))
+           25))
+  '(-7 3))
+
+(test "challenge-4-f"
+  (run* (y)
+    (evalo `(let ((square (lambda (a) (* a a))))
+              (square (+ ',y 2)))
+           25))
+  '(-7 3))
+
+
+
+
+
 
 
 #!eof
