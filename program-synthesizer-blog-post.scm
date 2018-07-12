@@ -2,7 +2,7 @@
 (load "z3-driver.scm")
 ;;(load "cvc4-driver.scm")
 (load "test-check.scm")
-(load "full-interp-extended.scm")
+(load "interp-program-synthesizer-blog-post.scm")
 
 
 ;; Attempt to use miniKanren + SMT to solve synthesis problems described in the blog post:
@@ -39,6 +39,42 @@
 (solve
   (assert (= (absv y) 5)))
 |#
+
+(test "foo-a"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (absv ',y))
+           5))
+  '(5 -5))
+
+(test "foo-b"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (absv ,y))
+           5))
+  '(5 -5))
+
+(test "foo-c"
+  (run* (y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (absv ',y))
+           5))
+  '(5 -5))
+
+(test "foo-d"
+  (run 5 (y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (absv ,y))
+           5))
+  '(5 -5 '5 '-5 ((let ([_.0 _.1]) 5) (num _.1) (sym _.0))))
+
+
 
 (test "primitive-positive"
   (run* (q)
