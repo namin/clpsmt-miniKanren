@@ -143,6 +143,35 @@
 (interpret (plus (square 7) 3)) => 52
 |#
 
+
+(define interpreto
+  (lambda (p val)
+    (fresh ()
+      (numbero val)
+      (conde
+        [(numbero p) (== p val)]
+        [(fresh (a n)
+           (== `(square ,a) p)
+           (numbero n)
+           (z/assert `(= ,val (* ,n ,n)))
+           (interpreto a n))]
+        [(fresh (prim op a b n m)
+           (== `(,prim ,a ,b) p)
+           (conde
+             [(== 'plus prim) (== '+ op)]
+             [(== 'mul prim) (== '* op)])
+           (numbero n)
+           (numbero m)
+           (z/assert `(= ,val (,op ,n ,m)))
+           (interpreto a n)
+           (interpreto b m))]))))
+
+(test "challenge-3-interpreto-a"
+  (run* (y)
+    (interpreto '(plus (square 7) 3) y))
+  '(52))
+
+
 ;; Using evalo:
 (test "challenge-3-a"
   (run* (y)
@@ -186,6 +215,23 @@
   (assert 
     (= (interpret (square (plus y 2))) 25)))
 |#
+
+(test "challenge-4-interpreto-a"
+  (run* (y)
+    (numbero y)
+    (interpreto `(square (plus ,y 2)) 25))
+  '(-7 3))
+
+(test "challenge-4-interpreto-b"
+  (run 2 (y)
+    (interpreto `(square (plus ,y 2)) 25))
+  '(-7 3))
+
+(test "challenge-4-interpreto-c"
+  (run 5 (y)
+    (interpreto `(square (plus ,y 2)) 25))
+  '(-7 3 (plus -7 0) (plus 1 -8) (plus 1 2)))
+
 
 (test "challenge-4-a"
   (run* (y)
