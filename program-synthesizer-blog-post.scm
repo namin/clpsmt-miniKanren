@@ -263,4 +263,102 @@
   '(2 2 2 2 2 2 2 2 2 2))
 
 
-;; Challenge 6: 
+;; Challenge 6:
+
+;; we'd have to implement choose* in order to handle this example,
+;; and would still need the universal quantification of challenge 5
+
+(test "challenge-6-a"
+  (run 5 (q)
+    (fresh (body e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      (== `(equal? (* 10 x) (+ ,e1 ,e2)) body)
+      (== (list y body) q)
+      (evalo `(let ((f (lambda (x) ,body)))
+                (f ',y))
+             #t)))
+  '((0 (equal? (* 10 x) (+ 0 0)))
+    (-1 (equal? (* 10 x) (+ 1 -11)))
+    (-2 (equal? (* 10 x) (+ -1 -19)))
+    (-3 (equal? (* 10 x) (+ 2 -32)))
+    (1 (equal? (* 10 x) (+ -2 12)))))
+
+(test "challenge-6-b"
+  (run 5 (q)
+    (fresh (body e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      (== `(+ ,e1 ,e2) body)
+      (== (list y body) q)
+      (evalo `(let ((f (lambda (x) ,body)))
+                (equal? (* 10 ',y) (f ',y)))
+             #t)))
+  '((0 (+ 0 0))
+    (-1 (+ 1 -11))
+    (-2 (+ -1 -19))
+    (-3 (+ 2 -32))
+    (1 (+ -2 12))))
+
+(test "challenge-6-c"
+  (run 1 (q)
+    (fresh (body e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      ;;
+      (== e1 `(* x 8))
+      (== e2 `(+ x x))
+      ;;
+      (== `(+ ,e1 ,e2) body)
+      (== (list y z body) q)
+      (evalo `(let ((f (lambda (x) ,body)))
+                (list (equal? (* 10 ',y) (f ',y))
+                      (equal? (* 10 ',z) (f ',z))))
+             '(#t #t))))
+  '((0 1 (+ (* x 8) (+ x x)))))
+
+#!eof
+
+(test "challenge-6-aa"
+  (run* (q)
+    (fresh (body e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      (== `(+ ,e1 ,e2) body)
+      (== (list y body) q)
+      (evalo `(let ((plus (lambda (a b) (+ a b))))
+                (let ((mul (lambda (a b) (* a b))))
+                  (let ((square (lambda (a) (* a a))))
+                    (let ((f (lambda (x) ,body)))
+                      (equal? (mul 10 ',y) (f ',y))))))
+             #t)))
+  '?)
+
+(test "challenge-6-d"
+  (run 1 (q)
+    (fresh (body e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      (== `(equal? (* 10 x) (+ ,e1 ,e2)) body)
+      (== (list y body) q)
+      (evalo `(let ((f (lambda (x) ,body)))
+                (list (f ',y) (f ',z)))
+             '(#t #t))))
+  '???)
+
+(test "challenge-6-b"
+  (run 1 (q)
+    (fresh (e1 e2 y z)
+      (numbero y)
+      (numbero z)
+      (=/= y z)
+      (== `(+ ,e1 ,e2) q)
+      (evalo `(let ((f (lambda (x) (equal? (* 10 x) ,q))))
+                (and (f ',y) (f ',z)))
+             #t)))
+  '?)
