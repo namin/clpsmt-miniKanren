@@ -40,7 +40,7 @@
   (assert (= (absv y) 5)))
 |#
 
-(test "foo-a"
+(test "challenge-1-a"
   (run* (y)
     (numbero y)
     (evalo `(let ((absv (lambda (x)
@@ -49,7 +49,7 @@
            5))
   '(5 -5))
 
-(test "foo-b"
+(test "challenge-1-b"
   (run* (y)
     (numbero y)
     (evalo `(let ((absv (lambda (x)
@@ -58,7 +58,7 @@
            5))
   '(5 -5))
 
-(test "foo-c"
+(test "challenge-1-c"
   (run* (y)
     (evalo `(let ((absv (lambda (x)
                           (if (< x 0) (- x) x))))
@@ -66,7 +66,7 @@
            5))
   '(5 -5))
 
-(test "foo-d"
+(test "challenge-1-d"
   (run 5 (y)
     (evalo `(let ((absv (lambda (x)
                           (if (< x 0) (- x) x))))
@@ -75,6 +75,62 @@
   '(5 -5 '5 '-5 ((let ([_.0 _.1]) 5) (num _.1) (sym _.0))))
 
 
+
+;; Challenge 2: Try to outsmart the solver by finding a 'y' whose
+;; absolute value is less than 0.  There is no such 'y'.
+
+#|
+(solve (assert (< (absv y) 0)))
+|#
+
+(test "challenge-2-a"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (< (absv ',y) 0))
+           #t))
+  '())
+
+(test "challenge-2-b"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (< (absv ,y) 0))
+           #t))
+  '())
+
+(test "challenge-2-c"
+  (run* (y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (< (absv ',y) 0))
+           #t))
+  '())
+
+(test "challenge-2-d"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (< (absv ',y) 1))
+           #t))
+  '(0))
+
+(test "challenge-2-e"
+  (run* (y)
+    (numbero y)
+    (evalo `(let ((absv (lambda (x)
+                          (if (< x 0) (- x) x))))
+              (< (absv ',y) 3))
+           #t))
+  '(0 2 1 -2 -1))
+
+
+
+
+#!eof
 
 (test "primitive-positive"
   (run* (q)
