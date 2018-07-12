@@ -846,10 +846,9 @@
          (map (lambda (x) (cons (cdr x) (car x))) S)
          (append
           dd
-          (apply append
-           (map (lambda (x) `((declare-fun ,x () Int) (assert (>= ,x 0))))
-                (filter (undeclared? (map cadr ds)) (map cdr S))))
-          M))))))
+          (map (lambda (x) `(declare-fun ,x () Int))
+               (filter (undeclared? (map cadr ds)) (map cdr S)))
+           M))))))
 
 (define z/check
   (lambdag@ (c : S D A T M)
