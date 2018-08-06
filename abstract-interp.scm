@@ -352,3 +352,8 @@
     ((ifzero 5 _.0 -5) bitvec-001)
     ((ifzero 5 _.0 -6) bitvec-001)
     ((ifzero 5 _.0 -7) bitvec-001)))
+
+(test "wish-1"
+  (run 10 (expr)
+    (aevalo expr '() vec-zero))
+  '(0 (+ 0 0) (* -1 0) (* 1 0) (* -2 0) (* 0 1) (* 0 0) (* -3 0) (* -4 0) (* -5 0)))
