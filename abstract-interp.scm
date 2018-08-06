@@ -18,6 +18,18 @@
 
 ;;; 4. The reified answer for (run* (q) (s/declareo q)) is just (_.0) -- no bit pattern in presented, no side-condition saying this is a set is included.  (See declaro-1 and declaro-3.)
 
+;; What we would really like to do:
+;; imagine a partially ground program
+;; in the DSL being abstractly interpreted
+;; you should be able to give abstract input/output pairs
+;; and use that to synthesize the code
+;; or
+;; ake a ground program
+;; and just run it backwards
+;; give it a set of abstract values
+;; and get back the input(s) that would produce that set of abstract values
+;; that's the easier one
+;; abstract angelic execution
 
 ;; should this code have any 's/declareo's?
 (define alookupo
