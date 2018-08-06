@@ -357,3 +357,8 @@
   (run 10 (expr)
     (aevalo expr '() vec-zero))
   '(0 (+ 0 0) (* -1 0) (* 1 0) (* -2 0) (* 0 1) (* 0 0) (* -3 0) (* -4 0) (* -5 0)))
+
+(test "wish-2"
+  (run 10 (expr)
+    (aevalo expr '() vec-pos))
+  '(1 2 3 4 5 6 7 8 9 10))
