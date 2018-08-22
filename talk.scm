@@ -1,6 +1,10 @@
 ;; CLP(SMT)
 ;; Nada Amin, University of Cambridge, UK
 ;; joint work with William E. Byrd, UAB, USA
+;;
+;; We show how easy it is to hook an SMT (Satisfiability Modulo Theory) solver such as CVC4 or Z3 as a backend to miniKanren,
+;; an embedded domain-specific language in Scheme, to create an environment for constraint logic programming.
+;; We describe the simple implementation and illustrate the technology through interpreters, synthesis, and symbolic execution.
 
 (load "mk.scm")
 (load "z3-driver.scm")
