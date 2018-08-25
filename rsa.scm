@@ -73,14 +73,25 @@
            #t))
   '(1))
 
-;;; why does this give an error???
-; Exception in cdr: #f is not a pair
-; Type (debug) to enter the debugger.
 (test "evalo-mod-1-backwards-1"
   (run 1 (q)
     (evalo `(mod ,q 3)
            2))
-  '??)
+  '(2))
+
+;; Y NO 5????  Interleaaaavvveeee plzzzzz!!
+(test "evalo-mod-1-backwards-2"
+  (run 20 (q)
+    (evalo `(mod ,q 3)
+           2))
+  '(2 -1 -4 -7 -10 -13 -16 -19 -22 -25 -28 -31 -34 -37 -40 -43
+   -46 -49 -52 -55))
+
+(test "evalo-mod-1-backwards-2"
+  (run 3 (q)
+    (evalo `(and (<= 0 ,q) (mod ,q 3))
+           2))
+  '(2 5 8))
 
 ;;; why does this give an error???
 ; Exception in cdr: #f is not a pair
