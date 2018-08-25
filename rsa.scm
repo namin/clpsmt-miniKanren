@@ -67,6 +67,21 @@
            q))
   '(#t))
 
+(test "evalo-=-backwards-1"
+  (run 1 (q)
+    (evalo `(= ,q 1)
+           #t))
+  '(1))
+
+;;; why does this give an error???
+; Exception in cdr: #f is not a pair
+; Type (debug) to enter the debugger.
+(test "evalo-mod-1-backwards-1"
+  (run 1 (q)
+    (evalo `(mod ,q 3)
+           2))
+  '??)
+
 ;;; why does this give an error???
 ; Exception in cdr: #f is not a pair
 ; Type (debug) to enter the debugger.
