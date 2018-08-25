@@ -48,6 +48,14 @@
   '((5 16)))
 
 
+;; test 'mod'
+(test "evalo-mod-1"
+  (run* (q)
+    (evalo `(mod 17 3)
+           q))
+  '(2))
+
+
 ;;; RSA time!
 
 ;; n = p * q, where p and q are given
