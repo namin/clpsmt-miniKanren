@@ -7,37 +7,95 @@
 (load "full-interp-with-let.scm")
 (load "test-check.scm")
 
+;; test 'begin' extension to evalo
+(test "evalo-begin-1"
+  (run* (q)
+    (evalo `(begin
+              (cons 3 4)
+              (* 5 6))            
+           q))
+  '(30))
+
+(test "evalo-begin-2"
+  (run* (q)
+    (evalo `(begin
+              (* 5 6))            
+           q))
+  '(30))
+
+(test "evalo-begin-3"
+  (run* (q)
+    (evalo `(begin
+              (cons 3 4)
+              (+ 2 3)
+              (* 5 6))            
+           q))
+  '(30))
+
+
+;; test 'assert' extension to evalo
+(test "evalo-assert-0"
+  (run* (q)
+    (evalo `(assert #t)
+           q))
+  '(_.0))
+
+(test "evalo-assert-1"
+  (run* (q)
+    (evalo `(begin
+              (assert #t)
+              (* 5 6))
+           q))
+  '(30))
+
+(test "evalo-assert-2"
+  (run* (q)
+    (evalo `(begin
+              (assert (<= 4 (* 2 3)))
+              (* 5 6))
+           q))
+  '(30))
+
+(test "evalo-assert-3"
+  (run* (q)
+    (evalo `(begin
+              (assert (<= 7 (* 2 3)))
+              (* 5 6))
+           q))
+  '())
+
+
 ;; test 'let' extension to evalo
 (test "evalo-let-1"
-   (run* (q)
-     (evalo `(let ((y 5))
-               y)            
-            q))
-   '(5))
+  (run* (q)
+    (evalo `(let ((y 5))
+              y)            
+           q))
+  '(5))
 
 (test "evalo-let-2"
-   (run* (q)
-     (evalo `(let ((y 5)
-                   (z 6))
-               z)
-            q))
-   '(6))
+  (run* (q)
+    (evalo `(let ((y 5)
+                  (z 6))
+              z)
+           q))
+  '(6))
 
 (test "evalo-let-3"
-   (run* (q)
-     (evalo `(let ((y 5)
-                   (z 6))
-               (* y z))
-            q))
-   '(30))
+  (run* (q)
+    (evalo `(let ((y 5)
+                  (z 6))
+              (* y z))
+           q))
+  '(30))
 
 (test "evalo-let-4"
-   (run* (q)
-     (evalo `(let ((y 5)
-                   (z 6))
-               (list y z))
-            q))
-   '((5 6)))
+  (run* (q)
+    (evalo `(let ((y 5)
+                  (z 6))
+              (list y z))
+           q))
+  '((5 6)))
 
 (test "evalo-let-5"
   (run* (q)
@@ -139,6 +197,27 @@
                                public-key
                                d))))))
               `(#t . ,k))))
+   '((143 120 (7 . 143) 103))))
+
+(time
+ (test "evalo-rsa-small-nums-assert"
+   (run 1 (k)
+     (fresh (d?)
+       (evalo `(let ((p 11)
+                     (q 13))
+                 (let ((n (* p q))
+                       (phi (* (- p 1) (- q 1))))
+                   (let ((e 7))
+                     (let ((d ,d?))
+                       (let ((public-key (cons e n)))                         
+                         (begin
+                           (assert (<= 0 ,d?))
+                           (assert (= (mod (* e ,d?) phi) 1))
+                           (list n
+                                 phi
+                                 public-key
+                                 d)))))))
+              k)))
    '((143 120 (7 . 143) 103))))
 
 ;;; hmmm!  maybe not so fast using big nums!

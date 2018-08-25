@@ -71,6 +71,17 @@
        (eval-expo letrec-body
                   `((,p-name . (rec . (lambda ,x ,body))) . ,env)
                   val)))
+
+    ;; could add assert to prims
+    ((fresh (e)
+       (== `(assert ,e) expr)
+       (not-in-envo 'assert env)
+       (eval-expo e env #t)))
+
+    ((fresh (e*)
+       (== `(begin . ,e*) expr)
+       (not-in-envo 'begin env)
+       (eval-begino e* env val)))
     
     ((prim-expo expr env val))
     
@@ -98,6 +109,17 @@
        (== `((,y . ,b) . ,rest) env)
        (=/= y x)
        (not-in-envo x rest)))))
+
+(define (eval-begino e* env val)
+  (fresh (e rest)
+    (== `(,e . ,rest) e*)
+    (conde
+      ((== '() rest)
+       (eval-expo e env val))
+      ((fresh (a d ignore)
+         (== `(,a . ,d) rest)
+         (eval-expo e env ignore)
+         (eval-begino rest env val))))))
 
 (define (eval-listo expr env val)
   (conde
@@ -212,7 +234,7 @@
        (numbero a2)
        (conde
          [(z/assert `(,prim-id ,a1 ,a2)) (== #t val)]
-         [(z/assert `(not (,prim-id ,a1 ,a2))) (== #f val)]))]
+         [(z/assert `(not (,prim-id ,a1 ,a2))) (== #f val)]))]    
     ))
 
 (define (prim-expo expr env val)
@@ -300,7 +322,8 @@
                       (> . (val . (prim . >)))
                       (>= . (val . (prim . >=)))
                       (< . (val . (prim . <)))
-                      (<= . (val . (prim . <=))) 
+                      (<= . (val . (prim . <=)))
+                                                                  
                       . ,empty-env))
 
 (define handle-matcho
