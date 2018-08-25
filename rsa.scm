@@ -132,7 +132,8 @@
                    (let ((e 7))
                      (let ((d ,d?))
                        (let ((public-key (cons e n)))
-                         (list (and (<= 0 ,d?) (= (mod (* e ,d?) phi) 1))
+                         (list (and (<= 0 ,d?)
+                                    (= (mod (* e ,d?) phi) 1))
                                n
                                phi
                                public-key
@@ -156,7 +157,8 @@
                    (let ((e 65537))
                      (let ((d ,d?))
                        (let ((public-key (cons e n)))
-                         (list (and (<= 0 ,d?) (= (mod (* e ,d?) phi) 1))
+                         (list (and (<= 0 ,d?)
+                                    (= (mod (* e ,d?) phi) 1))
                                n
                                phi
                                public-key
