@@ -186,7 +186,8 @@
        [(== prim-id '+)]
        [(== prim-id '-)]
        [(== prim-id '*)]
-       [(== prim-id '/)])
+       [(== prim-id '/)]
+       [(== prim-id 'mod)])
      (fresh (a1 a2)
        (== `(,a1 ,a2) a*)
        ;; we could use list-of-numbero instead
@@ -283,19 +284,23 @@
                       (not . (val . (prim . not)))
                       (equal? . (val . (prim . equal?)))
                       (symbol? . (val . (prim . symbol?)))
+
                       (cons . (val . (prim . cons)))
                       (null? . (val . (prim . null?)))
                       (car . (val . (prim . car)))
                       (cdr . (val . (prim . cdr)))
+
                       (+ . (val . (prim . +)))
                       (- . (val . (prim . -)))
                       (* . (val . (prim . *)))
                       (/ . (val . (prim . /)))
+                      (mod . (val . (prim . mod)))
+                      
                       (= . (val . (prim . =)))
                       (> . (val . (prim . >)))
                       (>= . (val . (prim . >=)))
                       (< . (val . (prim . <)))
-                      (<= . (val . (prim . <=)))
+                      (<= . (val . (prim . <=))) 
                       . ,empty-env))
 
 (define handle-matcho
