@@ -55,6 +55,26 @@
            q))
   '(2))
 
+(test "evalo-mod-2"
+  (run* (q)
+    (evalo `(mod 721 120)
+           q))
+  '(1))
+
+(test "evalo-mod-3"
+  (run* (q)
+    (evalo `(= (mod 721 120) 1)
+           q))
+  '(#t))
+
+;;; why does this give an error???
+; Exception in cdr: #f is not a pair
+; Type (debug) to enter the debugger.
+(test "evalo-mod-3-backwards-1"
+  (run 1 (q)
+    (evalo `(= (mod ,q 120) 1)
+           #t))
+  '?)
 
 ;;; RSA time!
 
