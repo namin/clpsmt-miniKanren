@@ -67,6 +67,12 @@
            q))
   '(#t))
 
+(test "evalo-mod-4"
+  (run* (q)
+    (evalo `(= (mod (* 7 103) 120) 1)
+           #t))
+  '(_.0))
+
 (test "evalo-=-backwards-1"
   (run 1 (q)
     (evalo `(= ,q 1)
@@ -93,16 +99,46 @@
            2))
   '(2 5 8))
 
-;;; why does this give an error???
-; Exception in cdr: #f is not a pair
-; Type (debug) to enter the debugger.
 (test "evalo-mod-3-backwards-1"
   (run 1 (q)
     (evalo `(= (mod ,q 120) 1)
            #t))
-  '?)
+  '(1))
+
+(test "evalo-mod-4-backwards-1"
+  (run 1 (q)
+    (evalo `(= (mod (* 7 ,q) 120) 1)
+           #t))
+  '(-17))
+
+(test "evalo-mod-4-backwards-2"
+  (run 1 (q)
+    (evalo `(and (<= 0 ,q) (= (mod (* 7 ,q) 120) 1))
+           #t))
+  '(103))
 
 ;;; RSA time!
+
+(time
+ (test "evalo-rsa-small-nums"
+   (run 1 (k)
+     (fresh (d?)
+       (numbero d?)
+       (evalo `(let ((p 11)
+                     (q 13))
+                 (let ((n (* p q))
+                       (phi (* (- p 1) (- q 1))))
+                   (let ((e 7))
+                     (let ((d ,d?)) 
+                       (let ((public-key (cons e n)))
+                         (list (and (<= 0 ,d?) (= (mod (* e ,d?) phi) 1))
+                               n
+                               phi
+                               public-key
+                               d))))))
+              `(#t . ,k))))
+   '((143 120 (7 . 143) 103))))
+
 
 ;; n = p * q, where p and q are given
 (time
