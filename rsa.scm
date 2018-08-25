@@ -119,6 +119,8 @@
 
 ;;; RSA time!
 
+;; use SMT constraints to calculate d, instead of explicitly using the
+;; Extended Euclidean Algorithm
 (time
  (test "evalo-rsa-small-nums"
    (run 1 (k)
@@ -129,7 +131,7 @@
                  (let ((n (* p q))
                        (phi (* (- p 1) (- q 1))))
                    (let ((e 7))
-                     (let ((d ,d?)) 
+                     (let ((d ,d?))
                        (let ((public-key (cons e n)))
                          (list (and (<= 0 ,d?) (= (mod (* e ,d?) phi) 1))
                                n
@@ -139,6 +141,31 @@
               `(#t . ,k))))
    '((143 120 (7 . 143) 103))))
 
+;;; hmmm!  maybe not so fast using big nums!
+;;; aka, "I've made a terrible mistake!"
+#|
+;; use SMT constraints to calculate d, instead of explicitly using the
+;; Extended Euclidean Algorithm
+(time
+ (test "evalo-rsa-big-nums"
+   (run 1 (k)
+     (fresh (d?)
+       (numbero d?)
+       (evalo `(let ((p 12131072439211271897323671531612440428472427633701410925634549312301964373042085619324197365322416866541017057361365214171711713797974299334871062829803541)
+                     (q 12027524255478748885956220793734512128733387803682075433653899983955179850988797899869146900809131611153346817050832096022160146366346391812470987105415233))
+                 (let ((n (* p q))
+                       (phi (* (- p 1) (- q 1))))
+                   (let ((e 65537))
+                     (let ((d ,d?))
+                       (let ((public-key (cons e n)))
+                         (list (and (<= 0 ,d?) (= (mod (* e ,d?) phi) 1))
+                               n
+                               phi
+                               public-key
+                               d))))))
+              `(#t . ,k))))
+   '??))
+|#
 
 ;; n = p * q, where p and q are given
 (time
