@@ -25,22 +25,29 @@
        (L/dec x)
        (z/== `(succ ,x) l)
        (z/== `(+ 1 ,i) v)
-       (evalo x i)))))
+       (evalo x i)))
+    ((fresh (x y i j)
+       (L/dec x)
+       (L/dec y)
+       (z/== `(plus ,x ,y) l)
+       (z/== `(+ ,i ,j) v)
+       (evalo x i)
+       (evalo y j)))))
 
 (test "evalo-0"
   (run* (q) (L) (evalo 'zero q))
   '(0))
 
 (test "evalo-0-backwards"
-  (run 1 (q) (L) (L/dec q) (evalo q 0))
-  '(zero))
+  (run 2 (q) (L) (L/dec q) (evalo q 0))
+  '(zero (plus zero zero)))
 
 (test "evalo-1"
   (run* (q) (L) (evalo '(succ zero) q))
   '(1))
 
 (test "evalo-1-backwards"
-  (run 1 (q) (L) (L/dec q) (evalo q 1))
-  '((succ zero)))
+  (run 2 (q) (L) (L/dec q) (evalo q 1))
+  '((succ zero) (succ (plus zero zero))))
 
 
