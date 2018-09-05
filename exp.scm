@@ -32,7 +32,18 @@
        (z/== `(plus ,x ,y) l)
        (z/== `(+ ,i ,j) v)
        (evalo x i)
-       (evalo y j)))))
+       (evalo y j)))
+    ((fresh (x y z i)
+       (L/dec x)
+       (L/dec y)
+       (L/dec z)
+       (z/== `(ifz ,x ,y ,z) l)
+       (conde
+         ((z/== i 0)
+          (evalo y v))
+         ((z/assert `(not (= ,i 0)))
+          (evalo z v)))
+       (evalo x i)))))
 
 (test "evalo-0"
   (run* (q) (L) (evalo 'zero q))
@@ -49,5 +60,9 @@
 (test "evalo-1-backwards"
   (run 2 (q) (L) (L/dec q) (evalo q 1))
   '((succ zero) (succ (plus zero zero))))
+
+(test "evalo-if"
+  (run 1 (q) (L) (L/dec q) (evalo `(ifz ,q zero (succ zero)) 1))
+  '((succ zero)))
 
 
