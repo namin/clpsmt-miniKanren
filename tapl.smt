@@ -1,7 +1,8 @@
+(set-logic ALL_SUPPORTED)
+
 (declare-datatypes
- ()
- ((L
-   zero
+ ((L 0))
+ (((zero)
    (succ (pred L))
    (plus (a L) (b L))
    (ifz (is_zero L) (yes L) (no L)))))
