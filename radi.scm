@@ -197,7 +197,7 @@
                         (opo is1 is2 is3)
                         (== o2 `((aval ,is3 ()) ,sp2 ,icachep2)))))
               (set-unionso oi o))))
-    (== r out)))
+    (set-unionso2 r out)))
 
 (define (adivalo e s ocache icache out)
   (conde
@@ -218,10 +218,31 @@
       (== `(times ,e1 ,e2) e)
       (adivalo-op2 timesso e1 e2 s ocache icache out))]
    [(fresh [x y e0]
-      (== `(lam ,x ,y ,e) e)
-      (== out `(((aval () ((,x ,y ,e0)))) ,s ,icache)))]
+      (== `(lam ,x ,y ,e0) e)
+      (== out `(((aval () ((,x ,y ,e0))) ,s ,icache))))]
    [(fresh [e1 e2]
-      (== `(app ,e1 ,e2) e))]
+      (== `(app ,e1 ,e2) e)
+      (fresh [r1 s1]
+        (adivalpto e1 s ocache icache s1)
+        (mapo r1 s1
+          (lambda (a1 o)
+            (fresh [r2 is1 cs1 sp icachep s2]
+              (== a1 `((aval ,is1 ,cs1) ,sp ,icachep))
+              (adivalpto e2 sp ocache icachep s2)
+              (mapo r2 s2
+                    (lambda (a2 o2)
+                      (fresh [r3 v2 sp2 icachep2 is3]
+                        (== a2 `(,v2 ,sp2 ,icachep2))
+                        (mapo r3 cs1
+                              (lambda (a3 o3)
+                                (fresh [x y e0 s0]
+                                  (== a3 `(,x ,y ,e0))
+                                  (== s0 `((,x (aval () (,x ,y ,e)))
+                                           (,y ,v2) . ,sp2))
+                                  (adivalpto e0 s0 ocache icachep2 o3))))
+                        (set-unionso r3 o2))))
+              (set-unionso r2 o))))
+        (set-unionso r1 out)))]
    [(fresh [e1 e2 e3]
       (== `(if0 ,e1 ,e2 ,e3) e))]))
 

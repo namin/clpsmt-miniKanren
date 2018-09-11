@@ -12,3 +12,10 @@
   (run 1 [q]
     (analyzeo `(plus (int 1) (int 2)) q))
   '((((aval (pos) ()) ()))))
+
+(test "radi-app-1"
+  (run 1 [q]
+    (analyzeo `(app (lam x y (var y)) (int 1)) q))
+  '((((aval (pos) ())
+      ((x (aval () (x y (app (lam x y (var y)) (int 1)))))
+       (y (aval (pos) ())))))))
