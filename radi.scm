@@ -82,7 +82,7 @@
     (includo b a)))
 
 (define (excludo a b)
-  (fresh [a1 ar b]
+  (fresh [a1 ar]
     (conso a1 ar a)
     (conde
      [(not-ino a1 b)]
