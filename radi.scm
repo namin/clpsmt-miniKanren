@@ -85,7 +85,7 @@
   (fresh [a1 ar b]
     (conde
      [(not-ino a1 b)]
-     [(excludo ar b)])))
+     [(ino a1 b) (excludo ar b)])))
 
 (define (not-set-equivo a b)
   (conde
