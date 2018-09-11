@@ -91,7 +91,7 @@
 (define (not-set-equivo a b)
   (conde
    [(excludo a b)]
-   [(excludo b a)]))
+   [(includo a b) (excludo b a)]))
 
 (define (set-uniono a b c)
   (conde
