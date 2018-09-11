@@ -250,7 +250,7 @@
                               (lambda (a3 o3)
                                 (fresh [x y e0 s0]
                                   (== a3 `(,x ,y ,e0))
-                                  (== s0 `((,x (aval () (,x ,y ,e)))
+                                  (== s0 `((,x (aval () ((,x ,y ,e))))
                                            (,y ,v2) . ,sp2))
                                   (adivalpto e0 s0 ocache icachep2 o3))))
                         (set-unionso r3 o2))))
