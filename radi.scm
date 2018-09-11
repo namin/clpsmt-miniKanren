@@ -199,6 +199,19 @@
               (set-unionso oi o))))
     (set-unionso2 r out)))
 
+(define  (adivalo-condo c e r icachep ocache out)
+  (fresh [s]
+    (mapo s r
+          (lambda (a o)
+            (fresh [is cs sp]
+              (== a `((aval ,is ,cs) ,sp))
+              (conde
+                [(ino c is)
+                 (adivalpto e sp ocache icachep o)]
+                [(not-ino c is)
+                 (== o '())]))))
+    (set-unionso s out)))
+
 (define (adivalo e s ocache icache out)
   (conde
    [(fresh [x l]
@@ -244,7 +257,14 @@
               (set-unionso r2 o))))
         (set-unionso r1 out)))]
    [(fresh [e1 e2 e3]
-      (== `(if0 ,e1 ,e2 ,e3) e))]))
+      (== `(if0 ,e1 ,e2 ,e3) e)
+      (fresh [r1 icachep s1 s2 s3 si]
+        (adivalpo e1 s ocache icache `(,r1 ,icachep))
+        (adivalo-condo 'zer e2 r1 icachep ocache s1)
+        (adivalo-condo 'pos e3 r1 icachep ocache s2)
+        (adivalo-condo 'neg e3 r1 icachep ocache s3)
+        (set-uniono s1 s2 si)
+        (set-uniono si s3 out)))]))
 
  (define (adivalwo e s ocache icache out)
   (fresh [res r c r-out c-out]

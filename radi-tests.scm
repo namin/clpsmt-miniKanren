@@ -19,3 +19,8 @@
   '((((aval (pos) ())
       ((x (aval () (x y (app (lam x y (var y)) (int 1)))))
        (y (aval (pos) ())))))))
+
+(test "radi-if0-1"
+  (run 1 [q]
+    (analyzeo `(if0 (int 0) (int 1) (int -1)) q))
+  '((((aval (pos) ()) ()))))
