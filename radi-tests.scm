@@ -16,9 +16,7 @@
 (test "radi-app-1"
   (run 2 [q]
     (analyzeo `(app (lam x y (var y)) (int 1)) q))
-  '((((aval (pos) ())
-      ((x (aval () ((x y (app (lam x y (var y)) (int 1))))))
-       (y (aval (pos) ())))))))
+  '((((aval (pos) ()) ((x (aval () ((x y (var y))))) (y (aval (pos) ())))))))
 
 (test "radi-if0-1"
   (run 2 [q]
@@ -53,15 +51,24 @@
     (analyzeo `(app (lam self n (if0 (var n) (int 1) (app (var self) (var n)))) (int 1)) q))
   '(()))
 
-(todo "radi-loop-2b"
+(test "radi-loop-2b"
   (run 2 [q]
     (analyzeo `(app (lam self n (app (var self) (plus (var n) (int -1)))) (int 1)) q))
   '(()))
 
-(todo "radi-loop-2"
+(test "radi-loop-2"
   (run 2 [q]
     (analyzeo `(app (lam self n (if0 (var n) (int 1) (app (var self) (plus (var n) (int -1))))) (int 1)) q))
-  '(()))
+  '((((aval (pos) ())
+    ((self
+       (aval
+         ()
+         ((self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (app (var self) (plus (var n) (int -1))))))))
+      (n (aval (neg zer pos) ())))))))
 
 (define fact
   `(lam self n
@@ -76,7 +83,7 @@
 (define efact
   `(app ,fact (int 5)))
 
-(todo "radi-efact-1"
+(test "radi-efact-1"
   (run 1 [q]
     (analyzeo efact q))
-  '((((aval (pos) ()) ()))))
+  '()) ;; TODO

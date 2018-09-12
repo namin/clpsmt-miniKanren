@@ -285,7 +285,7 @@
                                      (fresh [x y e0 s0 sp2y]
                                        (== `(,x ,y ,e0) a3)
                                        (add-lubo y v2 sp2 sp2y)
-                                       (add-lubo x `(aval () ((,x ,y ,e))) sp2y s0)
+                                       (add-lubo x `(aval () ((,x ,y ,e0))) sp2y s0)
                                        (adivalpto e0 s0 ocache icachep2 o3))))
                              (set-unionso r3 o2))))
                    (set-unionso r2 o))))
