@@ -44,7 +44,7 @@
 
 (define (lookupo x bs out)
   (conde
-    [(== bs '()) (== out #f)]
+    [(== bs '()) (== out #f)] ;;; WEB this means '#f' can't be a value bound in the store--is that okay?
     [(fresh [b br y v]
        (conso b br bs)
        (== b `(,y ,v))
