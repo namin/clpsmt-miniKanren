@@ -3,8 +3,6 @@
 (load "test-check.scm")
 (load "radi.scm")
 
-;; TODO: check results again haskell version
-
 (test "radi-int-1"
   (run 2 [q]
     (analyzeo `(int 1) q))
