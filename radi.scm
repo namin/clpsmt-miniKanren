@@ -297,8 +297,8 @@
          (adivalo-condo 'zer e2 r1 icachep ocache s1)
          (adivalo-condo 'pos e3 r1 icachep ocache s2)
          (adivalo-condo 'neg e3 r1 icachep ocache s3)
-         (set-uniono s1 s2 si)
-         (set-uniono si s3 out)))]))
+         (set-uniono s2 s3 si)
+         (set-uniono s1 si out)))]))
 
  (define (adivalwo e s ocache icache out)
    (fresh [res r c r-out c-out]
