@@ -219,10 +219,10 @@
   (conde
     [(fresh [x l]
        (== `(var ,x) e)
+       (lookupo x s l)
        (conde
          [(== l #f) (== '() out)]
-         [(=/= l #f) (== `((,l ,s ,icache)) out)])
-       (lookupo x s l))]
+         [(=/= l #f) (== `((,l ,s ,icache)) out)]))]
     [(fresh [i a]
        (== `(int ,i) e)
        (== `(((aval (,a) ()) ,s ,ocache)) out)
