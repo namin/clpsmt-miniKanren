@@ -41,7 +41,12 @@
 (test "radi-loop-1"
   (run 2 [q]
     (analyzeo `(app (lam self n (app (var self) (var n))) (int 1)) q))
-  '(())) ;; is this right?
+  '(()))
+
+(test "radi-loop-1a"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (if0 (var n) (app (var self) (var n)) (app (var self) (var n)))) (int 1)) q))
+  '(()))
 
 (todo "radi-loop-2"
   (run 2 [q]
