@@ -263,10 +263,10 @@
     [(fresh [e1 e2 e3]
        (== `(if0 ,e1 ,e2 ,e3) e)
        (fresh [r1 icachep s1 s2 s3 si]
-         (adivalpo e1 s ocache icache `(,r1 ,icachep))
-         (adivalo-condo 'zer e2 r1 icachep ocache s1)
-         (adivalo-condo 'pos e3 r1 icachep ocache s2)
-         (adivalo-condo 'neg e3 r1 icachep ocache s3)
+         (adivalpo e1 s ocache icache `(,r1 ,icachep)) ;;; WEB don't you have to thread the store through monadically?
+         (adivalo-condo 'zer e2 r1 icachep ocache s1)  ;;; I don't understand how all these calls can use the same 
+         (adivalo-condo 'pos e3 r1 icachep ocache s2)  ;;; icachep and ocache variables.  Am I missing something?
+         (adivalo-condo 'neg e3 r1 icachep ocache s3)  ;;; Should you really get the same ocache for all of these calls?
          (set-uniono s1 s2 si)
          (set-uniono si s3 out)))]))
 
