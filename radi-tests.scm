@@ -25,6 +25,24 @@
     (analyzeo `(if0 (int 0) (int 1) (int -1)) q))
   '((((aval (pos) ()) ()))))
 
+(test "radi-lam-1"
+  (run 2 [q]
+    (analyzeo `(lam self n (var n)) q))
+  '((((aval () ((self n (var n)))) ()))))
+
+(test "radi-app-2"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (var n)) (int 1)) q))
+  '((((aval (pos) ())
+    ((self
+       (aval () ((self n (app (lam self n (var n)) (int 1))))))
+     (n (aval (pos) ())))))))
+
+(todo "radi-loop-1"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (app (var self) (var n))) (int 1)) q))
+  '())
+
 (define fact
   `(lam self n
         (if0 (var n)
