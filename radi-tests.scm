@@ -31,10 +31,7 @@
 (test "radi-app-2"
   (run 2 [q]
     (analyzeo `(app (lam self n (var n)) (int 1)) q))
-  '((((aval (pos) ())
-    ((self
-       (aval () ((self n (app (lam self n (var n)) (int 1))))))
-     (n (aval (pos) ())))))))
+  '((((aval (pos) ()) ((self (aval () ((self n (var n))))) (n (aval (pos) ())))))))
 
 (test "radi-loop-1"
   (run 2 [q]
@@ -68,7 +65,12 @@
             (if0 (var n)
                  (int 1)
                  (app (var self) (plus (var n) (int -1))))))))
-      (n (aval (neg zer pos) ())))))))
+     (n (aval (neg zer pos) ())))))))
+
+(todo "radi-loop-3"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (if0 (var n) (int 1) (plus (int 1) (app (var self) (plus (var n) (int -1)))))) (int 1)) q))
+  '())
 
 (define fact
   `(lam self n
