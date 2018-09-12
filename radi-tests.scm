@@ -38,10 +38,10 @@
        (aval () ((self n (app (lam self n (var n)) (int 1))))))
      (n (aval (pos) ())))))))
 
-(todo "radi-loop-1"
+(test "radi-loop-1"
   (run 2 [q]
     (analyzeo `(app (lam self n (app (var self) (var n))) (int 1)) q))
-  '())
+  '(())) ;; is this right?
 
 (define fact
   `(lam self n

@@ -185,6 +185,27 @@
     (set-uniono is1 is2 is3)
     (set-uniono cs1 cs2 cs3)))
 
+(define (replaceo x vo bs out)
+  (fresh [b br y v]
+    (conso b br bs)
+    (== b `(,y ,v))
+    (conde
+      [(== y x) (conso `(,x ,vo) br out)]
+      [(=/= y x)
+       (fresh [r-out]
+         (conso b r-out out)
+         (replaceo x vo br r-out))])))
+
+(define (add-lubo x v s out)
+  (fresh [l]
+    (lookupo x s l)
+    (conde
+      [(== l #f) (== out `((,x ,v) . ,s))]
+      [(=/= l #f)
+       (fresh [vo]
+         (lubo v l vo)
+         (replaceo x vo s out))])))
+
 (define (adivalo-op2 opo e1 e2 s ocache icache out)
   (fresh [s1 r]
     (adivalpto e1 s ocache icache s1)
@@ -251,10 +272,10 @@
                              (== `(,v2 ,sp2 ,icachep2) a2)
                              (mapo r3 cs1
                                    (lambda (a3 o3)
-                                     (fresh [x y e0 s0]
+                                     (fresh [x y e0 s0 sp2y]
                                        (== `(,x ,y ,e0) a3)
-                                       (== s0 `((,x (aval () ((,x ,y ,e))))
-                                                (,y ,v2) . ,sp2))
+                                       (add-lubo y v2 sp2 sp2y)
+                                       (add-lubo x `(aval () ((,x ,y ,e))) sp2y s0)
                                        (adivalpto e0 s0 ocache icachep2 o3))))
                              (set-unionso r3 o2))))
                    (set-unionso r2 o))))
