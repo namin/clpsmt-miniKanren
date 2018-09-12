@@ -206,6 +206,16 @@
          (lubo v l vo)
          (replaceo x vo s out))])))
 
+(define (add-uniono x v s out)
+  (fresh [l]
+    (lookupo x s l)
+    (conde
+      [(== l #f) (== out `((,x ,v) . ,s))]
+      [(=/= l #f)
+       (fresh [vo]
+         (set-uniono v l vo)
+         (replaceo x vo s out))])))
+
 (define (adivalo-op2 opo e1 e2 s ocache icache out)
   (fresh [s1 r]
     (adivalpto e1 s ocache icache s1)
@@ -313,13 +323,13 @@
       [(== r #f)
        (fresh [r0 o icachep r icachepp icacheppp]
          (== `(,r ,icacheppp) out)
-         (conso `((,e ,s) ,r0) icache icachep)
+         (add-uniono `(,e ,s) r0 icache icachep)
          (conde
            [(== o #f) (== r0 '())]
            [(=/= o #f) (== r0 o)])
          (lookupo `(,e ,s) ocache o)
          (adivalwo e s ocache icachep `(,r ,icachepp))
-         (set-uniono `(((,e ,s) ,r)) icachepp icacheppp))])))
+         (add-uniono `(,e ,s) r icachepp icacheppp))])))
 
 (define (adivalpto e s ocache icache out)
   (fresh [r icachep]
