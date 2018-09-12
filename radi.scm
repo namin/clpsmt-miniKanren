@@ -326,11 +326,12 @@
 
 (define (iterpo n e cache)
   (conde
-    [(== n 0) cache] ;;; WEB what is going on here????
+    [(== n 0) cache] ;;; WEB what is going on here????  unify with the missing 'out' argument?
     [(fresh [r cachep n-1]
        (z/assert `(= (+ 1 ,n-1) ,n))
        (adivalpo e '() cache '() `(,r ,cachep))
        (iterpo n-1 e cachep))]))
 
 (define (itero n e out)
+  ;;; WEB interpo takes 3 arguments, not 4!
   (iterpo n e '() out))
