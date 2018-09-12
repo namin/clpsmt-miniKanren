@@ -221,7 +221,7 @@
     [(fresh [x l]
        (== `(var ,x) e)
        (conde
-         [(== l #f) (== '() out)] ;;; WEB what's going on with 'l'???  It's not used anywhere!
+         [(== l #f) (== '() out)]
          [(=/= l #f) (== `((,l ,s ,icache)) out)])
        (lookupo x s l))]
     [(fresh [i a]
