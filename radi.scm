@@ -44,7 +44,9 @@
 
 (define (lookupo x bs out)
   (conde
-    [(== bs '()) (== out #f)] ;;; WEB this means '#f' can't be a value bound in the store--is that okay?
+    ;; #f is never bound as a value in the store,
+    ;; we don't have booleans.
+    [(== bs '()) (== out #f)]
     [(fresh [b br y v]
        (conso b br bs)
        (== b `(,y ,v))
@@ -158,22 +160,19 @@
 (define (plusso s1 s2 s3)
   (combino plusdo s1 s2 s3))
 
-;;; WEB this is messed up!  First two clauses overlap!
-;;; Why aren't there 8 cases?
 (define (timeso a b c)
   (conde
     [(== a 'zer) (== c 'zer)]
-    [(== b 'zer) (== c 'zer)]
+    [(=/= a 'zer) (== b 'zer) (== c 'zer)]
     [(== a 'neg) (== b 'neg) (== c 'pos)]
     [(== a 'neg) (== b 'pos) (== c 'neg)]
     [(== a 'pos) (== b 'neg) (== c 'neg)]
     [(== a 'pos) (== b 'pos) (== c 'pos)]))
 
-;;; WEB broken!  What is [c] supposed to be?? `(,c)?  Something else?
 (define (timesdo a b s)
   (fresh [c]
     (timeso a b c)
-    (== s [c])))
+    (== s `(,c))))
 
 (define (timesso s1 s2 s3)
   (combino timesdo s1 s2 s3))
@@ -210,10 +209,10 @@
             (fresh [is cs sp]
               (== `((aval ,is ,cs) ,sp) a)
               (conde
-                [(ino c is) ;;; WEB -- should we unify 'o' with a pair?  Why the asymmetry between clauses?
-                 (adivalpto e sp ocache icachep o)] ;;; Is it true that the ocache should be the same for all of these???
-                [(== '() o)
-                 (not-ino c is)]))))
+                [(ino c is)
+                 (adivalpto e sp ocache icachep o)]
+                [(not-ino c is)
+                 (== '() o)]))))
     (set-unionso s out)))
 
 (define (adivalo e s ocache icache out)
@@ -263,10 +262,10 @@
     [(fresh [e1 e2 e3]
        (== `(if0 ,e1 ,e2 ,e3) e)
        (fresh [r1 icachep s1 s2 s3 si]
-         (adivalpo e1 s ocache icache `(,r1 ,icachep)) ;;; WEB don't you have to thread the store through monadically?
-         (adivalo-condo 'zer e2 r1 icachep ocache s1)  ;;; I don't understand how all these calls can use the same 
-         (adivalo-condo 'pos e3 r1 icachep ocache s2)  ;;; icachep and ocache variables.  Am I missing something?
-         (adivalo-condo 'neg e3 r1 icachep ocache s3)  ;;; Should you really get the same ocache for all of these calls?
+         (adivalpo e1 s ocache icache `(,r1 ,icachep))
+         (adivalo-condo 'zer e2 r1 icachep ocache s1)
+         (adivalo-condo 'pos e3 r1 icachep ocache s2)
+         (adivalo-condo 'neg e3 r1 icachep ocache s3)
          (set-uniono s1 s2 si)
          (set-uniono si s3 out)))]))
 
@@ -324,14 +323,13 @@
     (lfpo e cache)
     (lookupo `(,e ()) cache out)))
 
-(define (iterpo n e cache)
+(define (iterpo n e cache out)
   (conde
-    [(== n 0) cache] ;;; WEB what is going on here????  unify with the missing 'out' argument?
+    [(== n 0) (== out cache)]
     [(fresh [r cachep n-1]
        (z/assert `(= (+ 1 ,n-1) ,n))
        (adivalpo e '() cache '() `(,r ,cachep))
-       (iterpo n-1 e cachep))]))
+       (iterpo n-1 e cachep out))]))
 
 (define (itero n e out)
-  ;;; WEB interpo takes 3 arguments, not 4!
   (iterpo n e '() out))
