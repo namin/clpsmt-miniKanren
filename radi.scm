@@ -211,7 +211,7 @@
               (== `((aval ,is ,cs) ,sp) a)
               (conde
                 [(ino c is) ;;; WEB -- should we unify 'o' with a pair?  Why the asymmetry between clauses?
-                 (adivalpto e sp ocache icachep o)]
+                 (adivalpto e sp ocache icachep o)] ;;; Is it true that the ocache should be the same for all of these???
                 [(== '() o)
                  (not-ino c is)]))))
     (set-unionso s out)))
