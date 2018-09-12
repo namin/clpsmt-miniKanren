@@ -246,6 +246,13 @@
                  (== '() o)]))))
     (set-unionso s out)))
 
+;; AVal is of the form (aval (Set AInt) (Set (Symbol,Symbol,Exp)))
+;; AInt is one of neg zer pos
+;; e: Exp
+;; s: ASto (Map from symbol to AVal)
+;; ocache: Cache (Map from (Exp,ASto) to (Set (AVal,ASto)))
+;; icache: Cache
+;; out: Set (AVal,ASto,Cache)
 (define (adivalo e s ocache icache out)
   (conde
     [(fresh [x l]
@@ -300,6 +307,7 @@
          (set-uniono s2 s3 si)
          (set-uniono s1 si out)))]))
 
+;; out: (Set (AVal,ASto),Cache)
  (define (adivalwo e s ocache icache out)
    (fresh [res r c r-out c-out]
      (== `(,r-out ,c-out) out)
@@ -315,6 +323,7 @@
      (set-unionso2 r r-out)
      (set-unionso c c-out)))
 
+;; out: (Set (Aval,Asto),Cache)
 (define (adivalpo e s ocache icache out)
   (fresh [r]
     (lookupo `(,e ,s) icache r)
@@ -331,6 +340,7 @@
          (adivalwo e s ocache icachep `(,r ,icachepp))
          (add-uniono `(,e ,s) r icachepp icacheppp))])))
 
+;; out: Set (Aval,ASto,Cache)
 (define (adivalpto e s ocache icache out)
   (fresh [r icachep]
     (adivalpo e s ocache icache `(,r ,icachep))
@@ -339,6 +349,7 @@
                     (== `(,vs ,sp) a)
                     (== `(,vs ,sp ,icachep) o))))))
 
+;; out: Cache
 (define (lfppo e cache out)
   (fresh [r cachep]
     (adivalpo e '() cache '() `(,r ,cachep))
@@ -346,14 +357,17 @@
       [(== out cache) (set-equivo cache cachep)]
       [(not-set-equivo cache cachep) (lfppo e cachep out)])))
 
+;; out: Cache
 (define (lfpo e out)
   (lfppo e '() out))
 
+;; out: Set (AVal,Asto)
 (define (analyzeo e out)
   (fresh [cache]
     (lfpo e cache)
     (lookupo `(,e ()) cache out)))
 
+;; out: Cache
 (define (iterpo n e cache out)
   (conde
     [(== n 0) (== out cache)]
@@ -362,5 +376,6 @@
        (adivalpo e '() cache '() `(,r ,cachep))
        (iterpo n-1 e cachep out))]))
 
+;; out: Cache
 (define (itero n e out)
   (iterpo n e '() out))
