@@ -127,8 +127,8 @@
 
 (define (combo f u os1 s1 s2 s3)
   (conde
-    [(== s2 '())
-     (== s3 '())]
+    [(== '() s2)
+     (== '() s3)]
     [(== s1 '())
      (fresh [a2 r2]
        (conso a2 r2 s2)
@@ -192,14 +192,14 @@
     (mapo r s1
           (lambda (a1 o)
             (fresh [oi is1 cs1 sp icachep s2]
-              (== a1 `((aval ,is1 ,cs1) ,sp ,icachep))
+              (== `((aval ,is1 ,cs1) ,sp ,icachep) a1)
               (adivalpto e2 sp ocache icachep s2)
               (mapo oi s2
                     (lambda (a2 o2)
                       (fresh [is2 cs2 sp2 icachep2 is3]
-                        (== a2 `((aval ,is2 ,cs2) ,sp2 ,icachep2))
-                        (opo is1 is2 is3)
-                        (== o2 `((aval ,is3 ()) ,sp2 ,icachep2)))))
+                        (== `((aval ,is2 ,cs2) ,sp2 ,icachep2) a2)
+                        (== `((aval ,is3 ()) ,sp2 ,icachep2) o2)
+                        (opo is1 is2 is3))))
               (set-unionso oi o))))
     (set-unionso2 r out)))
 
@@ -208,26 +208,26 @@
     (mapo s r
           (lambda (a o)
             (fresh [is cs sp]
-              (== a `((aval ,is ,cs) ,sp))
+              (== `((aval ,is ,cs) ,sp) a)
               (conde
-                [(ino c is)
+                [(ino c is) ;;; WEB -- should we unify 'o' with a pair?  Why the asymmetry between clauses?
                  (adivalpto e sp ocache icachep o)]
-                [(not-ino c is)
-                 (== o '())]))))
+                [(== '() o)
+                 (not-ino c is)]))))
     (set-unionso s out)))
 
 (define (adivalo e s ocache icache out)
   (conde
     [(fresh [x l]
        (== `(var ,x) e)
-       (lookupo x s l)
        (conde
-         [(== l #f) (== out '())]
-         [(=/= l #f) (== out `((,l ,s ,icache)))]))]
+         [(== l #f) (== '() out)]
+         [(=/= l #f) (== `((,l ,s ,icache)) out)])
+       (lookupo x s l))]
     [(fresh [i a]
        (== `(int ,i) e)
-       (injo i a)
-       (== out `(((aval (,a) ()) ,s ,ocache))))]
+       (== `(((aval (,a) ()) ,s ,ocache)) out)
+       (injo i a))]
     [(fresh [e1 e2 s1 s2]
        (== `(plus ,e1 ,e2) e)
        (adivalo-op2 plusso e1 e2 s ocache icache out))]
@@ -236,7 +236,7 @@
        (adivalo-op2 timesso e1 e2 s ocache icache out))]
     [(fresh [x y e0]
        (== `(lam ,x ,y ,e0) e)
-       (== out `(((aval () ((,x ,y ,e0))) ,s ,icache))))]
+       (== `(((aval () ((,x ,y ,e0))) ,s ,icache)) out))]
     [(fresh [e1 e2]
        (== `(app ,e1 ,e2) e)
        (fresh [r1 s1]
@@ -244,16 +244,16 @@
          (mapo r1 s1
                (lambda (a1 o)
                  (fresh [r2 is1 cs1 sp icachep s2]
-                   (== a1 `((aval ,is1 ,cs1) ,sp ,icachep))
+                   (== `((aval ,is1 ,cs1) ,sp ,icachep) a1)
                    (adivalpto e2 sp ocache icachep s2)
                    (mapo r2 s2
                          (lambda (a2 o2)
                            (fresh [r3 v2 sp2 icachep2 is3]
-                             (== a2 `(,v2 ,sp2 ,icachep2))
+                             (== `(,v2 ,sp2 ,icachep2) a2)
                              (mapo r3 cs1
                                    (lambda (a3 o3)
                                      (fresh [x y e0 s0]
-                                       (== a3 `(,x ,y ,e0))
+                                       (== `(,x ,y ,e0) a3)
                                        (== s0 `((,x (aval () ((,x ,y ,e))))
                                                 (,y ,v2) . ,sp2))
                                        (adivalpto e0 s0 ocache icachep2 o3))))
@@ -272,6 +272,7 @@
 
  (define (adivalwo e s ocache icache out)
    (fresh [res r c r-out c-out]
+     (== `(,r-out ,c-out) out)
      (adivalo e s ocache icache res)
      (mapo r res (lambda (a o)
                    (fresh [x y z]
@@ -282,38 +283,37 @@
                      (== a `(,x ,y ,z))
                      (== o z))))
      (set-unionso2 r r-out)
-     (set-unionso c c-out)
-     (== out `(,r-out ,c-out))))
+     (set-unionso c c-out)))
 
 (define (adivalpo e s ocache icache out)
   (fresh [r]
     (lookupo `(,e ,s) icache r)
     (conde
-      [(=/= r #f) (== out `(,r ,icache))]
+      [(=/= r #f) (== `(,r ,icache) out)]
       [(== r #f)
        (fresh [r0 o icachep r icachepp icacheppp]
-         (lookupo `(,e ,s) ocache o)
+         (== `(,r ,icacheppp) out)
+         (conso `((,e ,s) ,r0) icache icachep)
          (conde
            [(== o #f) (== r0 '())]
            [(=/= o #f) (== r0 o)])
-         (conso `((,e ,s) ,r0) icache icachep)
+         (lookupo `(,e ,s) ocache o)
          (adivalwo e s ocache icachep `(,r ,icachepp))
-         (set-uniono `(((,e ,s) ,r)) icachepp icacheppp)
-         (== out `(,r ,icacheppp)))])))
+         (set-uniono `(((,e ,s) ,r)) icachepp icacheppp))])))
 
 (define (adivalpto e s ocache icache out)
   (fresh [r icachep]
     (adivalpo e s ocache icache `(,r ,icachep))
     (mapo out r (lambda (a o)
                   (fresh [vs sp]
-                    (== a `(,vs ,sp))
-                    (== o `(,vs ,sp ,icachep)))))))
+                    (== `(,vs ,sp) a)
+                    (== `(,vs ,sp ,icachep) o))))))
 
 (define (lfppo e cache out)
   (fresh [r cachep]
     (adivalpo e '() cache '() `(,r ,cachep))
     (conde
-      [(set-equivo cache cachep) (== out cache)]
+      [(== out cache) (set-equivo cache cachep)]
       [(not-set-equivo cache cachep) (lfppo e cachep out)])))
 
 (define (lfpo e out)
@@ -326,7 +326,7 @@
 
 (define (iterpo n e cache)
   (conde
-    [(== n 0) cache]
+    [(== n 0) cache] ;;; WEB what is going on here????
     [(fresh [r cachep n-1]
        (z/assert `(= (+ 1 ,n-1) ,n))
        (adivalpo e '() cache '() `(,r ,cachep))
