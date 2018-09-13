@@ -3,6 +3,9 @@
 (load "test-check.scm")
 (load "radi.scm")
 
+;;; WEB Compare "radi-app-0j" with "radi-app-0k".  The first one fails, while the second returns the empty set.
+;;; I think this shows the core of the problem.
+
 (test "alloco-0"
   (run 10 [q]
     (fresh (s n)
