@@ -198,16 +198,12 @@
   (run 1 [q]
     (analyzeo `(app ,fact (int 0)) q))
   '((((aval (pos) ())
-      ((self
-        (aval
-         ()
-         ((self
-           n
-           (if0 (var n)
-                (int 1)
-                (times
-                 (var n)
-                 (app (var self) (plus (var n) (int -1)))))))))
+      ((self (aval ()
+                   ((self n
+                          (if0 (var n)
+                               (int 1)
+                               (times (var n)
+                                      (app (var self) (plus (var n) (int -1)))))))))
        (n (aval (zer) ())))))))
 
 (define efact
