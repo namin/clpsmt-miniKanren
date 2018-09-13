@@ -48,6 +48,51 @@
     (analyzeo `(plus (int -3) (int -2)) q))
   '((((aval (neg) ()) ()))))
 
+(test "radi-times-1"
+  (run 2 [q]
+    (analyzeo `(times (int 3) (int 2)) q))
+  '((((aval (pos) ()) ()))))
+
+(test "radi-times-2"
+  (run 2 [q]
+    (analyzeo `(times (int 0) (int 2)) q))
+  '((((aval (zer) ()) ()))))
+
+(test "radi-times-3"
+  (run 2 [q]
+    (analyzeo `(times (int 2) (int 0)) q))
+  '((((aval (zer) ()) ()))))
+
+(test "radi-times-4"
+  (run 2 [q]
+    (analyzeo `(times (int -2) (int 0)) q))
+  '((((aval (zer) ()) ()))))
+
+(test "radi-times-5"
+  (run 2 [q]
+    (analyzeo `(times (int 0) (int -2)) q))
+  '((((aval (zer) ()) ()))))
+
+(test "radi-times-6"
+  (run 2 [q]
+    (analyzeo `(times (int 3) (int -2)) q))
+  '((((aval (neg) ()) ()))))
+
+(test "radi-times-7"
+  (run 2 [q]
+    (analyzeo `(times (int -2) (int 3)) q))
+  '((((aval (neg) ()) ()))))
+
+(test "radi-times-8"
+  (run 2 [q]
+    (analyzeo `(times (int -2) (int -3)) q))
+  '((((aval (pos) ()) ()))))
+
+(test "radi-times-9"
+  (run 2 [q]
+    (analyzeo `(times (int 0) (int 0)) q))
+  '((((aval (zer) ()) ()))))
+
 (test "radi-app-1"
   (run 2 [q]
     (analyzeo `(app (lam x y (var y)) (int 1)) q))
