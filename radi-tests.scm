@@ -213,7 +213,7 @@
                            (int -1)))))))
 
 (test "radi-fact-1"
-  (run 1 [q]
+  (run 2 [q]
     (analyzeo fact q))
   '((((aval () ((self n
                       (if0 (var n)
@@ -223,7 +223,7 @@
       ()))))
 
 (test "radi-fact-app-0"
-  (run 1 [q]
+  (run 2 [q]
     (analyzeo `(app ,fact (int 0)) q))
   '((((aval (pos) ())
       ((self (aval () ((self n
