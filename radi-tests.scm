@@ -182,6 +182,18 @@
                      (plus (var n)
                            (int -1)))))))
 
+(test "radi-fact-1"
+  (run 1 [q]
+    (analyzeo fact q))
+  '((((aval
+       ()
+       ((self n
+              (if0 (var n)
+                   (int 1)
+                   (times (var n)
+                          (app (var self) (plus (var n) (int -1))))))))
+      ()))))
+
 (define efact
   `(app ,fact (int 5)))
 
