@@ -53,7 +53,7 @@
     [(== bs '()) (== out #f)]
     [(fresh [b br y v]
        (conso b br bs)
-       (== b `(,y ,v))
+       (== `(,y ,v) b)
        (conde
          [(== y x) (== v out)]
          [(=/= y x) (lookupo x br out)]))]))
