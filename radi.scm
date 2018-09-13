@@ -2,6 +2,10 @@
 ;; based on work by David Darais
 ;; For ADI, see http://david.darais.com/assets/papers/abstracting-definitional-interpreters/adi.pdf
 
+;;; 'icache' stands for "inner cache"
+;;;
+;;; 'ocache' stands for "outer cache"
+
 (define (conso x xs r)
   (== (cons x xs) r))
 
