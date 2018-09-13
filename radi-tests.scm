@@ -3,10 +3,20 @@
 (load "test-check.scm")
 (load "radi.scm")
 
+(test "radi-int-0"
+  (run 2 [q]
+    (analyzeo `(int 0) q))
+  '((((aval (zer) ()) ()))))
+
 (test "radi-int-1"
   (run 2 [q]
     (analyzeo `(int 1) q))
   '((((aval (pos) ()) ()))))
+
+(test "radi-int-2"
+  (run 2 [q]
+    (analyzeo `(int -1) q))
+  '((((aval (neg) ()) ()))))
 
 (test "radi-plus-1"
   (run 2 [q]
