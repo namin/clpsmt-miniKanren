@@ -260,6 +260,16 @@
     (analyzeo `(app (lam self n (app (var self) (plus (var n) (int -1)))) (int 1)) q))
   '(()))
 
+(todo "radi-loop-2c"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (if0 (var n) (int 1) (app (var self) (plus (var n) (int 1))))) (int 1)) q))
+  '(()))
+
+(todo "radi-loop-2d"
+  (run 2 [q]
+    (analyzeo `(app (lam self n (if0 (var n) (int 1) (app (var self) (plus (var n) (int 0))))) (int 1)) q))
+  '(()))
+
 (todo "radi-loop-2"
   (run 2 [q]
     (analyzeo `(app (lam self n (if0 (var n) (int 1) (app (var self) (plus (var n) (int -1))))) (int 1)) q))
