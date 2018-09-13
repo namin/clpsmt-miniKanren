@@ -347,6 +347,42 @@
               q))
   '()) ;; TODO
 
+(test "radi-loop-3b"
+  (run 2 [q]
+    (analyzeo `(app (lam self n
+                         (if0 (var n)
+                              (int 1)
+                              (plus (int 0)
+                                    (app (var self)
+                                         (plus (var n) (int -1))))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-loop-3c"
+  (run 2 [q]
+    (analyzeo `(app (lam self n
+                         (if0 (var n)
+                              (int 1)
+                              (plus (int 1)
+                                    (app (var self)
+                                         (var n)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-loop-3d"
+  (run 2 [q]
+    (analyzeo `(app (lam self n
+                         (if0 (var n)
+                              (int 1)
+                              (plus (int 1)
+                                    (app (var self)
+                                         (int 1)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
 (define fact
   `(lam self n
         (if0 (var n)
