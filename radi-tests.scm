@@ -103,6 +103,16 @@
     (analyzeo `(if0 (int 0) (int 1) (int -1)) q))
   '((((aval (pos) ()) ()))))
 
+(test "radi-if0-2"
+  (run 2 [q]
+    (analyzeo `(if0 (int -2) (int 1) (int -1)) q))
+  '((((aval (neg) ()) ()))))
+
+(test "radi-if0-3"
+  (run 2 [q]
+    (analyzeo `(if0 (times (int -2) (int 0)) (int 1) (int -1)) q))
+  '((((aval (pos) ()) ()))))
+
 (test "radi-lam-1"
   (run 2 [q]
     (analyzeo `(lam self n (var n)) q))
