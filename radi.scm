@@ -267,7 +267,7 @@
          [(=/= l #f) (== `((,l ,s ,icache)) out)]))]
     [(fresh [i a]
        (== `(int ,i) e)
-       (== `(((aval (,a) ()) ,s ,ocache)) out)
+       (== `(((aval (,a) ()) ,s ,icache)) out)
        (injo i a))]
     [(fresh [e1 e2 s1 s2]
        (== `(plus ,e1 ,e2) e)
