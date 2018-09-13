@@ -242,6 +242,13 @@
                       (var n))))
       ()))))
 
+(test "radi-app-0"
+  (run 2 [q]
+    (analyzeo `(plus (app (lam x y (var y)) (int 1)) (int -1)) q))
+  '((((aval (neg zer pos) ())
+    ((x (aval () ((x y (var y)))))
+     (y (aval (pos) ())))))))
+
 (test "radi-app-1"
   (run 2 [q]
     (analyzeo `(app (lam x y (var y)) (int 1)) q))
