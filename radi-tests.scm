@@ -133,7 +133,10 @@
 
 (test "radi-app-plus-1"
   (run 2 [q]
-    (analyzeo `(app (lam self n (plus (var n) (int -1))) (int 1)) q))
+    (analyzeo `(app (lam self n
+                         (plus (var n) (int -1)))
+                    (int 1))
+              q))
   '((((aval (neg zer pos) ())
       ((self (aval () ((self n
                              (plus (var n) (int -1))))))
@@ -141,10 +144,12 @@
 
 (test "radi-app-if-plus-1"
   (run 2 [q]
-    (analyzeo `(app (lam self n (if0 (var n)
-                                     (int 1)
-                                     (plus (var n) (int -1))))
-                    (int 1)) q))
+    (analyzeo `(app (lam self n
+                         (if0 (var n)
+                              (int 1)
+                              (plus (var n) (int -1))))
+                    (int 1))
+              q))
   '((((aval (neg zer pos) ())
       ((self (aval () ((self n
                              (if0 (var n)
