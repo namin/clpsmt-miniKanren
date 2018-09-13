@@ -23,6 +23,31 @@
     (analyzeo `(plus (int 1) (int 2)) q))
   '((((aval (pos) ()) ()))))
 
+(test "radi-plus-2"
+  (run 2 [q]
+    (analyzeo `(plus (int 0) (int 0)) q))
+  '((((aval (zer) ()) ()))))
+
+(test "radi-plus-3"
+  (run 2 [q]
+    (analyzeo `(plus (int 0) (int 5)) q))
+  '((((aval (pos) ()) ()))))
+
+(test "radi-plus-4"
+  (run 2 [q]
+    (analyzeo `(plus (int -3) (int 5)) q))
+  '((((aval (neg zer pos) ()) ()))))
+
+(test "radi-plus-5"
+  (run 2 [q]
+    (analyzeo `(plus (int -3) (int 0)) q))
+  '((((aval (neg) ()) ()))))
+
+(test "radi-plus-6"
+  (run 2 [q]
+    (analyzeo `(plus (int -3) (int -2)) q))
+  '((((aval (neg) ()) ()))))
+
 (test "radi-app-1"
   (run 2 [q]
     (analyzeo `(app (lam x y (var y)) (int 1)) q))
