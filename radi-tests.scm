@@ -250,7 +250,7 @@
                      (int -1))
               q))
   '((((aval (neg zer pos) ())
-    ((x (aval () ((self y (var y)))))
+    ((self (aval () ((self y (var y)))))
      (y (aval (pos) ())))))))
 
 (test "radi-app-0b"
