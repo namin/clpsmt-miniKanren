@@ -240,3 +240,52 @@
   (run 1 [q]
     (analyzeo efact q))
   '()) ;; TODO
+
+
+(test "radi-fact-app-2"
+  (run 3 [q]
+    (fresh (e n out a d)
+      (== (list e out) q)
+      (== `(,a . ,d) out)
+      (== `(app ,fact ,n) e)
+      (analyzeo e out)))
+  '(((app (lam self n
+               (if0 (var n)
+                    (int 1)
+                    (times (var n)
+                           (app (var self) (plus (var n) (int -1))))))
+          (int 0))
+     (((aval (pos) ())
+       ((self (aval () ((self n
+                              (if0 (var n)
+                                   (int 1)
+                                   (times (var n)
+                                          (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (zer) ()))))))
+    ((app (lam self n
+               (if0 (var n)
+                    (int 1)
+                    (times (var n)
+                           (app (var self) (plus (var n) (int -1))))))
+          (plus (int 0) (int 0)))
+     (((aval (pos) ())
+       ((self (aval () ((self n
+                              (if0 (var n)
+                                   (int 1)
+                                   (times (var n)
+                                          (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (zer) ()))))))
+    ((app (lam self n
+               (if0 (var n)
+                    (int 1)
+                    (times (var n)
+                           (app (var self) (plus (var n) (int -1))))))
+          (times (int 0) (int 0)))
+     (((aval (pos) ())
+       ((self (aval () ((self n
+                              (if0 (var n)
+                                   (int 1)
+                                   (times (var n)
+                                          (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (zer) ()))))))))
+
