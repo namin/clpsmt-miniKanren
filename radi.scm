@@ -336,11 +336,11 @@
       [(== r #f)
        (fresh [r0 o icachep r icachepp icacheppp]
          (== `(,r ,icacheppp) out)
-         (add-uniono `(,e ,s) r0 icache icachep)
          (conde
            [(== o #f) (== r0 '())]
            [(=/= o #f) (== r0 o)])
          (lookupo `(,e ,s) ocache o)
+         (add-uniono `(,e ,s) r0 icache icachep)
          (adivalwo e s ocache icachep `(,r ,icachepp))
          (add-uniono `(,e ,s) r icachepp icacheppp))])))
 
