@@ -253,6 +253,117 @@
     ((x (aval () ((self y (var y)))))
      (y (aval (pos) ())))))))
 
+(test "radi-app-0b"
+  (run 2 [q]
+    (analyzeo `(plus (app (lam self y
+                               (if0 (var y)
+                                    (int 1)
+                                    (int 1)))
+                          (int 1))
+                     (int -1))
+              q))
+  '((((aval (neg zer pos) ())
+      ((self (aval () ((self y (if0 (var y) (int 1) (int 1))))))
+       (y (aval (pos) ())))))))
+
+(test "radi-app-0c"
+  (run 2 [q]
+    (analyzeo `(plus (app (lam self y
+                               (if0 (var y)
+                                    (var y)
+                                    (var y)))
+                          (int 1))
+                     (int -1))
+              q))
+  '((((aval (neg zer pos) ())
+      ((self (aval () ((self y (if0 (var y) (var y) (var y))))))
+       (y (aval (pos) ())))))))
+
+(test "radi-app-0d"
+  (run 2 [q]
+    (analyzeo `(plus (app (lam self y
+                               (if0 (var y)
+                                    (var y)
+                                    (app (var self) (var y))))
+                          (int 1))
+                     (int -1))
+              q))
+  '(()))
+
+(test "radi-app-0e"
+  (run 2 [q]
+    (analyzeo `(plus (app (lam self y
+                               (if0 (var y)
+                                    (var y)
+                                    (plus (int 1)
+                                          (app (var self) (var y)))))
+                          (int 1))
+                     (int -1))
+              q))
+  '()) ;; TODO
+
+(test "radi-app-0f"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (if0 (var y)
+                              (var y)
+                              (plus (int 1)
+                                    (app (var self) (var y)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-app-0g"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (if0 (var y)
+                              (var y)
+                              (plus (int 1)
+                                    (app (var self) (int 1)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-app-0h"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (if0 (var y)
+                              (int 1)
+                              (plus (int 1)
+                                    (app (var self) (int 1)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-app-0i"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (if0 (int 1)
+                              (int 1)
+                              (plus (int 1)
+                                    (app (var self) (int 1)))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+(test "radi-app-0j"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (plus (int 1)
+                               (app (var self) (int 1))))
+                    (int 1))
+              q))
+  '()) ;; TODO
+
+;;; Compare this test with the previous one!
+(test "radi-app-0k"
+  (run 2 [q]
+    (analyzeo `(app (lam self y
+                         (app (var self) (int 1)))
+                    (int 1))
+              q))
+  '(()))
+
 (test "radi-app-1"
   (run 2 [q]
     (analyzeo `(app (lam x y (var y)) (int 1)) q))
