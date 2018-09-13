@@ -194,6 +194,22 @@
                           (app (var self) (plus (var n) (int -1))))))))
       ()))))
 
+(test "radi-fact-app-0"
+  (run 1 [q]
+    (analyzeo `(app ,fact (int 0)) q))
+  '((((aval (pos) ())
+      ((self
+        (aval
+         ()
+         ((self
+           n
+           (if0 (var n)
+                (int 1)
+                (times
+                 (var n)
+                 (app (var self) (plus (var n) (int -1)))))))))
+       (n (aval (zer) ())))))))
+
 (define efact
   `(app ,fact (int 5)))
 
