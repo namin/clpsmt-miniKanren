@@ -3,6 +3,18 @@
 (load "test-check.scm")
 (load "radif.scm")
 
+;;; WEB uh oh
+(test "set-equivo-0"
+  (run 10 (q)
+    (set-equivo '(a) q))
+  '((a)))
+
+(test "set-equivo-1"
+  (run 10 (q)
+    (set-equivo '(a b) q))
+  '((a b) (b a)))
+
+
 (define fact
   `(lam self n
         (if0 (var n)
@@ -237,6 +249,25 @@
                     ((aval (pos) ())
                      ,astore2)))))
     '(n)))
+
+(time
+ (test "radi-efact-backwards-5-honest"
+   (run* [q]
+     (fresh (astore1 astore2 answer-set)
+       (set-equivo `(((aval (neg zer pos) ())
+                      ,astore1)
+                     ((aval (pos) ())
+                      ,astore2))
+                   answer-set)
+       (analyzeo `(app (lam self n
+                            (if0 (var n)
+                                 (int 1)
+                                 (times (var n)
+                                        (app (var self)
+                                             (plus (var ,q) (int -1))))))
+                       (int 1))
+                 answer-set)))
+   '(n)))
 
 (time
   (test "radi-efact-backwards-6-EZ"
