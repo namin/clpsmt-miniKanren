@@ -460,17 +460,30 @@
                 (plus (int 1) (plus (var n) (int -1))))))))
        (n (aval (pos) ())))))))
 
-(todo "radi-loop-3"
-  (run 2 [q]
-    (analyzeo `(app (lam self n
-                         (if0 (var n)
-                              (int 1)
-                              (plus (int 1)
-                                    (app (var self)
-                                         (plus (var n) (int -1))))))
-                    (int 1))
-              q))
-  '(()))
+(printf "warning--this test takes a while!\n")
+(time
+ (test "radi-loop-3"
+   (run 2 [q]
+     (analyzeo `(app (lam self n
+                          (if0 (var n)
+                               (int 1)
+                               (plus (int 1)
+                                     (app (var self)
+                                          (plus (var n) (int -1))))))
+                     (int 1))
+               q))
+   '((((aval (pos) ())
+       ((self
+         (aval
+          ()
+          ((self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (plus
+                  (int 1)
+                  (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (neg zer pos) ()))))))))
 
 (todo "radi-loop-3b"
   (run 2 [q]
