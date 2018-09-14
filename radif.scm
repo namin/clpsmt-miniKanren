@@ -107,9 +107,9 @@
 
 (define (injo i a)
   (conde
-    [(z/assert `(< ,i 0)) (== a 'neg)]
+    [(== -1 i) (== a 'neg)]
     [(== i 0) (== a 'zer)]
-    [(z/assert `(> ,i 0)) (== a 'pos)]))
+    [(== 1 i) (== a 'pos)]))
 
 (define (combo f u os1 s1 s2 s3)
   (conde
@@ -350,16 +350,3 @@
   (fresh [cache]
     (lfpo e cache)
     (lookupo `(,e ()) cache out)))
-
-;; out: Cache
-(define (iterpo n e cache out)
-  (conde
-    [(== n 0) (== out cache)]
-    [(fresh [r cachep n-1]
-       (z/assert `(= (+ 1 ,n-1) ,n))
-       (adivalpo e '() cache '() `(,r ,cachep))
-       (iterpo n-1 e cachep out))]))
-
-;; out: Cache
-(define (itero n e out)
-  (iterpo n e '() out))
