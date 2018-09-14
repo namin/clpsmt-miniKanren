@@ -303,7 +303,7 @@
                           (int 1))
                      (int -1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-app-0f"
   (run 2 [q]
@@ -314,7 +314,7 @@
                                     (app (var self) (var y)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-app-0g"
   (run 2 [q]
@@ -325,7 +325,7 @@
                                     (app (var self) (int 1)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-app-0h"
   (run 2 [q]
@@ -336,7 +336,7 @@
                                     (app (var self) (int 1)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-app-0i"
   (run 2 [q]
@@ -347,7 +347,7 @@
                                     (app (var self) (int 1)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-app-0j"
   (run 2 [q]
@@ -356,7 +356,7 @@
                                (app (var self) (int 1))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 ;;; Compare this test with the previous one!
 (test "radi-app-0k"
@@ -423,7 +423,7 @@
 
 (printf "warning--this test takes a while!\n")
 (time
- (test "radi-loop-2"
+ (todo "radi-loop-2"
    (run 2 [q]
      (analyzeo `(app (lam self n
                           (if0 (var n)
@@ -460,7 +460,7 @@
                 (plus (int 1) (plus (var n) (int -1))))))))
        (n (aval (pos) ())))))))
 
-(test "radi-loop-3"
+(todo "radi-loop-3"
   (run 2 [q]
     (analyzeo `(app (lam self n
                          (if0 (var n)
@@ -470,9 +470,9 @@
                                          (plus (var n) (int -1))))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
-(test "radi-loop-3b"
+(todo "radi-loop-3b"
   (run 2 [q]
     (analyzeo `(app (lam self n
                          (if0 (var n)
@@ -482,7 +482,7 @@
                                          (plus (var n) (int -1))))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-loop-3c"
   (run 2 [q]
@@ -494,7 +494,7 @@
                                          (var n)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (test "radi-loop-3d"
   (run 2 [q]
@@ -506,7 +506,7 @@
                                          (int 1)))))
                     (int 1))
               q))
-  '()) ;; TODO
+  '(()))
 
 (define fact
   `(lam self n
@@ -542,13 +542,13 @@
 (define efact
   `(app ,fact (int 5)))
 
-(test "radi-efact-1"
+(todo "radi-efact-1"
   (run 1 [q]
     (analyzeo efact q))
-  '()) ;; TODO
+  '())
 
 
-(test "radi-fact-app-2"
+(todo "radi-fact-app-2"
   (run 3 [q]
     (fresh (e n out a d)
       (== (list e out) q)

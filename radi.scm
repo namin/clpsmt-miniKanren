@@ -234,8 +234,8 @@
                         (== `((aval ,is2 ,cs2) ,sp2 ,icachep2) a2)
                         (== `((aval ,is3 ()) ,sp2 ,icachep2) o2)
                         (opo is1 is2 is3))))
-              (set-unionso r2 o))))
-    (set-unionso2 r1 out)))
+              (set-unionso2 r2 o))))
+    (set-unionso r1 out)))
 
 (define  (adivalo-condo c e r icachep ocache out)
   (fresh [s]
