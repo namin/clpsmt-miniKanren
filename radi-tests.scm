@@ -423,7 +423,7 @@
 
 (printf "warning--this test takes a while!\n")
 (time
- (todo "radi-loop-2"
+ (test "radi-loop-2"
    (run 2 [q]
      (analyzeo `(app (lam self n
                           (if0 (var n)
