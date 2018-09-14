@@ -221,21 +221,21 @@
          (replaceo x vo s out))])))
 
 (define (adivalo-op2 opo e1 e2 s ocache icache out)
-  (fresh [s1 r]
+  (fresh [s1 r1]
     (adivalpto e1 s ocache icache s1)
-    (mapo r s1
+    (mapo r1 s1
           (lambda (a1 o)
-            (fresh [oi is1 cs1 sp icachep s2]
+            (fresh [is1 cs1 sp icachep s2 r2]
               (== `((aval ,is1 ,cs1) ,sp ,icachep) a1)
               (adivalpto e2 sp ocache icachep s2)
-              (mapo oi s2
+              (mapo r2 s2
                     (lambda (a2 o2)
                       (fresh [is2 cs2 sp2 icachep2 is3]
                         (== `((aval ,is2 ,cs2) ,sp2 ,icachep2) a2)
                         (== `((aval ,is3 ()) ,sp2 ,icachep2) o2)
                         (opo is1 is2 is3))))
-              (set-unionso oi o))))
-    (set-unionso2 r out)))
+              (set-unionso r2 o))))
+    (set-unionso2 r1 out)))
 
 (define  (adivalo-condo c e r icachep ocache out)
   (fresh [s]
