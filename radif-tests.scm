@@ -153,6 +153,24 @@
                     (n (aval (neg zer pos) ())))))))
     '(times)))
 
+;; Note that 'plus' is an answer, along with the expected 'mult'
+(time
+  (test "radi-efact-backwards-4-harder"
+    (run* [q]
+      (fresh (astore1 astore2)
+        (analyzeo `(app (lam self n
+                             (if0 (var n)
+                                  (int 1)
+                                  (,q (var n)
+                                      (app (var self)
+                                           (plus (var n) (int -1))))))
+                        (int 1))
+                  `(((aval (neg zer pos) ())
+                     ,astore1)
+                    ((aval (pos) ())
+                     ,astore2)))))
+    '(plus times)))
+
 (time
   (test "radi-efact-backwards-5-EZ"
     (run* [q]
