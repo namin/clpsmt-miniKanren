@@ -200,6 +200,23 @@
     '(n)))
 
 (time
+  (test "radi-efact-backwards-5-harder"
+    (run* [q]
+      (fresh (astore1 astore2)
+        (analyzeo `(app (lam self n
+                             (if0 (var n)
+                                  (int 1)
+                                  (times (var n)
+                                         (app (var self)
+                                              (plus (var ,q) (int -1))))))
+                        (int 1))
+                  `(((aval (neg zer pos) ())
+                     ,astore1)
+                    ((aval (pos) ())
+                     ,astore2)))))
+    '(n)))
+
+(time
   (test "radi-efact-backwards-6-EZ"
     (run 1 [q]
       (analyzeo `(app (lam self n
