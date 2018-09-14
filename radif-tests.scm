@@ -244,3 +244,19 @@
                     (n (aval (neg zer pos) ())))))))
     '((var n))))
 
+(time
+  (test "radi-efact-backwards-6-harder"
+    (run 1 [q]
+      (fresh (astore1 astore2)
+        (analyzeo `(app (lam self n
+                             (if0 (var n)
+                                  (int 1)
+                                  (times (var n)
+                                         (app (var self)
+                                              (plus ,q (int -1))))))
+                        (int 1))
+                  `(((aval (neg zer pos) ())
+                     ,astore1)
+                    ((aval (pos) ())
+                     ,astore2)))))
+    '((var n))))
