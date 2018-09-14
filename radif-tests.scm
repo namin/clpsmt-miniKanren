@@ -16,7 +16,7 @@
 
 (time
   (test "radi-efact-1"
-    (run 1 [q]
+    (run* [q]
       (analyzeo efact q))
     '((((aval (neg zer pos) ())
         ((self (aval () ((self n
@@ -34,3 +34,4 @@
                                            (app (var self)
                                                 (plus (var n) (int -1)))))))))
          (n (aval (neg zer pos) ()))))))))
+
