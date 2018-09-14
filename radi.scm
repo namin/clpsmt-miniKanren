@@ -26,26 +26,6 @@
        (f x y z)
        (foldlo f z ys r))]))
 
-(define (keyso s ks)
-  (conde
-    [(== s '()) (== ks '())]
-    [(fresh [kv r k v kr]
-       (conso kv r s)
-       (== kv `(,k ,v))
-       (conso k kr ks)
-       (keyso r kr))]))
-
-(define (maxo x y z)
-  (conde
-    [(z/assert `(<= ,x ,y)) (== y z)]
-    [(z/assert `(> ,x ,y)) (== x z)]))
-
-(define (alloco s n)
-  (fresh [ks r]
-    (keyso s ks)
-    (foldlo maxo 0 ks r)
-    (z/assert `(= (+ ,r 1) ,n))))
-
 (define (lookupo x bs out)
   (conde
     ;; #f is never bound as a value in the store,
