@@ -92,6 +92,17 @@
     '(1)))
 
 (time
+  (test "radi-efact-backwards-2-harder"
+    (run* [q]
+      (fresh (astore1 astore2)
+        (analyzeo `(app ,fact (int ,q))
+                  `(((aval (neg zer pos) ())
+                     ,astore1)
+                    ((aval (pos) ())
+                     ,astore2)))))
+    '(1)))
+
+(time
   (test "radi-efact-backwards-3-EZ"
     (run* [q]
       (analyzeo `(app (lam self n
