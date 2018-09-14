@@ -485,17 +485,30 @@
                   (app (var self) (plus (var n) (int -1)))))))))
         (n (aval (neg zer pos) ()))))))))
 
-(todo "radi-loop-3b"
-  (run 2 [q]
-    (analyzeo `(app (lam self n
-                         (if0 (var n)
-                              (int 1)
-                              (plus (int 0)
-                                    (app (var self)
-                                         (plus (var n) (int -1))))))
-                    (int 1))
-              q))
-  '(()))
+(printf "warning--this test takes a while!\n")
+(time
+ (test "radi-loop-3b"
+   (run 2 [q]
+     (analyzeo `(app (lam self n
+                          (if0 (var n)
+                               (int 1)
+                               (plus (int 0)
+                                     (app (var self)
+                                          (plus (var n) (int -1))))))
+                     (int 1))
+               q))
+   '((((aval (pos) ())
+       ((self
+         (aval
+          ()
+          ((self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (plus
+                  (int 0)
+                  (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (neg zer pos) ()))))))))
 
 (test "radi-loop-3c"
   (run 2 [q]
