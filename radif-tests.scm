@@ -59,6 +59,17 @@
     '(_.0)))
 
 (time
+  (test "radi-efact-backwards-1-harder"
+    (run* [q]
+      (fresh (astore1 astore2)
+        (analyzeo efact
+                  `(((aval (neg zer pos) ())
+                     ,astore1)
+                    ((aval (pos) ())
+                     ,astore2)))))
+    '(_.0)))
+
+(time
   (test "radi-efact-backwards-2-EZ"
     (run* [q]
       (analyzeo `(app ,fact (int ,q))
