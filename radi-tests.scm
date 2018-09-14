@@ -568,10 +568,35 @@
 (define efact
   `(app ,fact (int 5)))
 
-(todo "radi-efact-1"
-  (run 1 [q]
-    (analyzeo efact q))
-  '())
+(printf "warning--this test takes a while!\n")
+(time
+ (test "radi-efact-1"
+   (run 1 [q]
+     (analyzeo efact q))
+   '((((aval (neg zer pos) ())
+       ((self
+         (aval
+          ()
+          ((self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (times
+                  (var n)
+                  (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (neg zer pos) ()))))
+      ((aval (pos) ())
+       ((self
+         (aval
+          ()
+          ((self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (times
+                  (var n)
+                  (app (var self) (plus (var n) (int -1)))))))))
+        (n (aval (neg zer pos) ()))))))))
 
 
 (todo "radi-fact-app-2"
