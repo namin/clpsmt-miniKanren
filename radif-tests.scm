@@ -8,38 +8,29 @@
         (if0 (var n)
              (int 1)
              (times (var n)
-                    (app
-                     (var self)
-                     (plus (var n)
-                           (int -1)))))))
+                    (app (var self)
+                         (plus (var n) (int -1)))))))
 
 (define efact
   `(app ,fact (int 1)))
 
-(test "radi-efact-1"
-  (run 1 [q]
-    (analyzeo efact q))
-  '((((aval (neg zer pos) ())
-      ((self
-        (aval
-         ()
-         ((self
-           n
-           (if0 (var n)
-                (int 1)
-                (times
-                 (var n)
-                 (app (var self) (plus (var n) (int -1)))))))))
-       (n (aval (neg zer pos) ()))))
-     ((aval (pos) ())
-      ((self
-        (aval
-         ()
-         ((self
-           n
-           (if0 (var n)
-                (int 1)
-                (times
-                 (var n)
-                 (app (var self) (plus (var n) (int -1)))))))))
-       (n (aval (neg zer pos) ())))))))
+(time
+  (test "radi-efact-1"
+    (run 1 [q]
+      (analyzeo efact q))
+    '((((aval (neg zer pos) ())
+        ((self (aval () ((self n
+                               (if0 (var n)
+                                    (int 1)
+                                    (times (var n)
+                                           (app (var self)
+                                                (plus (var n) (int -1)))))))))
+         (n (aval (neg zer pos) ()))))
+       ((aval (pos) ())
+        ((self (aval () ((self n
+                               (if0 (var n)
+                                    (int 1)
+                                    (times (var n)
+                                           (app (var self)
+                                                (plus (var n) (int -1)))))))))
+         (n (aval (neg zer pos) ()))))))))
