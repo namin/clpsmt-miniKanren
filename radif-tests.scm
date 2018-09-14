@@ -107,3 +107,31 @@
                                                            (plus (var n) (int -1)))))))))
                     (n (aval (neg zer pos) ())))))))
     '(n)))
+
+(time
+  (test "radi-efact-backwards-4"
+    (run* [q]
+      (analyzeo `(app (lam self n
+                           (if0 (var n)
+                                (int 1)
+                                (,q (var n)
+                                       (app (var self)
+                                            (plus (var n) (int -1))))))
+                      (int 1))
+                '(((aval (neg zer pos) ())
+                   ((self (aval () ((self n
+                                          (if0 (var n)
+                                               (int 1)
+                                               (times (var n)
+                                                      (app (var self)
+                                                           (plus (var n) (int -1)))))))))
+                    (n (aval (neg zer pos) ()))))
+                  ((aval (pos) ())
+                   ((self (aval () ((self n
+                                          (if0 (var n)
+                                               (int 1)
+                                               (times (var n)
+                                                      (app (var self)
+                                                           (plus (var n) (int -1)))))))))
+                    (n (aval (neg zer pos) ())))))))
+    '(times)))
