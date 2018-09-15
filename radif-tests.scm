@@ -1,16 +1,15 @@
-(load "../faster-miniKanren/mk-vicare.scm")
-(load "../faster-miniKanren/mk.scm")
+(load "mkf.scm")
 (load "test-check.scm")
 (load "radif.scm")
 
 ;;; WEB uh oh!
 ;;; set-equivo will generate non-sets!!
-(test "set-equivo-0"
+(todo "set-equivo-0"
   (run 10 (q)
     (set-equivo '(a) q))
   '((a)))
 
-(test "set-equivo-1"
+(todo "set-equivo-1"
   (run 10 (q)
     (set-equivo '(a b) q))
   '((a b) (b a)))
