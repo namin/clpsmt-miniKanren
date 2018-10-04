@@ -14,6 +14,11 @@
     (set-equivo '(a b) q))
   '((a b) (b a)))
 
+(todo "set-equivo-2"
+  (run 10 (q)
+    (set-equivo q q))
+  '???)
+
 
 (define fact
   `(lam self n
