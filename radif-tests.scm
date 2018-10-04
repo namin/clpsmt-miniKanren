@@ -36,7 +36,7 @@
                   (plus (app (var self)
                              (plus (var n) (int -1)))
                         (app (var self)
-                             ;; really should use -2 instead of -1,
+                             ;; WEB really should use -2 instead of -1,
                              ;; but the current abstraction doesn't
                              ;; support this!
                              (plus (var n) (int -1))))))))
@@ -44,7 +44,7 @@
 (define efib
   `(app ,fib (int 1)))
 
-;; No 'neg' in the answers!
+;; WEB Yay! No 'neg' in the answers!
 (time
   (test "radi-efib-1"
     (run* [q]
