@@ -38,11 +38,13 @@
          [(== y x) (== v out)]
          [(=/= y x) (lookupo x br out)]))]))
 
+;;; WEB ensure x occurs exactly once in xs
 (define (ino x xs)
   (fresh [y ys]
     (conso y ys xs)
     (conde
-      [(== y x)]
+      [(== y x)
+       (not-ino x ys)]
       [(=/= y x)
        (ino x ys)])))
 

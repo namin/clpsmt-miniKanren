@@ -2,22 +2,37 @@
 (load "test-check.scm")
 (load "radif.scm")
 
-;;; WEB uh oh!
-;;; set-equivo will generate non-sets!!
-(todo "set-equivo-0"
-  (run 10 (q)
+;;; WEB
+;;; set-equivo no longer generates non-sets, but can diverge on a run 2
+(test "set-equivo-0"
+  (run 1 (q)
     (set-equivo '(a) q))
   '((a)))
 
-(todo "set-equivo-1"
-  (run 10 (q)
+;;; WEB run 3 diverges
+(test "set-equivo-1"
+  (run 2 (q)
     (set-equivo '(a b) q))
   '((a b) (b a)))
 
-(todo "set-equivo-2"
-  (run 10 (q)
+(test "set-equivo-2"
+  (run 5 (q)
     (set-equivo q q))
-  '???)
+  '(()
+    (_.0)
+    ((_.0 _.1)
+     (=/= ((_.0 _.1))))
+    ((_.0 _.1 _.2)
+     (=/= ((_.0 _.1))
+          ((_.0 _.2))
+          ((_.1 _.2))))
+    ((_.0 _.1 _.2 _.3)
+     (=/= ((_.0 _.1))
+          ((_.0 _.2))
+          ((_.0 _.3))
+          ((_.1 _.2))
+          ((_.1 _.3))
+          ((_.2 _.3))))))
 
 
 (define fact
