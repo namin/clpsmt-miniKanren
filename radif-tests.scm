@@ -27,6 +27,38 @@
   `(app ,fact (int 1)))
 
 
+(define fib
+  `(lam self n
+        (if0 (var n)
+             (int 0)
+             (if0 (plus (var n) (int -1))
+                  (int 1)
+                  (plus (app (var self)
+                             (plus (var n) (int -1)))
+                        (app (var self)
+                             ;; really should use -2 instead of -1,
+                             ;; but the current abstraction doesn't
+                             ;; support this!
+                             (plus (var n) (int -1))))))))
+
+(define efib
+  `(app ,fib (int 1)))
+
+;; No 'neg' in the answers!
+(time
+  (test "radi-efib-1"
+    (run* [q]
+      (analyzeo efib q))
+    '((((aval (pos) ())
+        ((self (aval () ((self n (if0 (var n) (int 0) (if0 (plus (var n) (int -1)) (int 1) (plus (app (var self) (plus (var n) (int -1))) (app (var self) (plus (var n) (int -1))))))))))
+         (n (aval (pos) ()))))
+       ((aval (zer) ())
+        ((self (aval () ((self n (if0 (var n) (int 0) (if0 (plus (var n) (int -1)) (int 1) (plus (app (var self) (plus (var n) (int -1))) (app (var self) (plus (var n) (int -1))))))))))
+         (n (aval (neg zer pos) ()))))
+       ((aval (pos) ())
+        ((self (aval () ((self n (if0 (var n) (int 0) (if0 (plus (var n) (int -1)) (int 1) (plus (app (var self) (plus (var n) (int -1))) (app (var self) (plus (var n) (int -1))))))))))
+         (n (aval (neg zer pos) ()))))))))
+
 (time
   (test "radi-efact-1"
     (run* [q]
