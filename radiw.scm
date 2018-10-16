@@ -172,7 +172,7 @@
 (define (into i v)
   (fresh [a]
     (injo i a)
-    (== `(aval (,a) ()))))
+    (== v `(aval (,a) ()))))
 
 (define (combo f u os1 s1 s2 s3)
   (conde
