@@ -177,6 +177,20 @@
 (define (cloo x y body)
   (== `(aval () ((,x ,y ,body)))))
 
+(define (unzip3o rs as bs cs)
+  (conde
+    [(== rs '())
+     (== as '())
+     (== bs '())
+     (== cs '())]
+    [(fresh [r1 rr a1 ar b1 br c1 cr]
+       (conso r1 rr rs)
+       (conso a1 ar as)
+       (conso b1 br bs)
+       (conso c1 cr cs)
+       (== r1 `(,a1 ,b1 ,c1))
+       (unzip3 rr ar br cr))]))
+
 (define (adivalo e s oc ic v so co)
   (conde
     [(fresh [x l]
@@ -223,10 +237,12 @@
        (== `(aval ,is ,fs) v1)
        (adivalpo e2 s oc ic v2 s2 c2)
        (mapo r fs (lambda (i z)
-                    (fresh [x y body sa1 sa vo so co]
+                    (fresh [x y body c sa1 sa vo so co]
                       (== i `(,x ,y ,body))
                       (== z `(,vo ,so ,co))
-                      ;; TODO
+                      (cloo x y body c)
+                      (add-uo x c s sa1)
+                      (add-uo y v2 sa1 sa)
                       (adivalpo body sa oc ic vo so co))))
        (unzip3o r vs ss3 cs3)
        (joinso vs v3)
