@@ -239,7 +239,7 @@
        (conso b1 br bs)
        (conso c1 cr cs)
        (== r1 `(,a1 ,b1 ,c1))
-       (unzip3 rr ar br cr))]))
+       (unzip3o rr ar br cr))]))
 
 (define (adivalo e s oc ic v so co)
   (conde
