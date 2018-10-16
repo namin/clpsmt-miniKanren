@@ -174,6 +174,56 @@
     (injo i a)
     (== `(aval (,a) ()))))
 
+(define (combo f u os1 s1 s2 s3)
+  (conde
+    [(== '() s2)
+     (== '() s3)]
+    [(== s1 '())
+     (fresh [a2 r2]
+       (conso a2 r2 s2)
+       (combo f u os1 os1 r2 s3))]
+    [(fresh [a1 r1 a2 r2 sa sm]
+       (conso a1 r1 s1)
+       (conso a2 r2 s2)
+       (f a1 a2 sa)
+       (combo f u os1 r1 s2 sm)
+       (u sa sm s3))]))
+
+(define (combino f s1 s2 s3)
+  (combo f set-uniono s1 s1 s2 s3))
+
+(define (plusdo a b s)
+  (conde
+    [(== a 'neg) (== b 'neg) (== s `(neg))]
+    [(== a 'neg) (== b 'zer) (== s `(neg))]
+    [(== a 'neg) (== b 'pos) (== s `(neg zer pos))]
+    [(== a 'zer) (== b 'neg) (== s `(neg))]
+    [(== a 'zer) (== b 'zer) (== s `(zer))]
+    [(== a 'zer) (== b 'pos) (== s `(pos))]
+    [(== a 'pos) (== b 'neg) (== s `(neg zer pos))]
+    [(== a 'pos) (== b 'zer) (== s `(pos))]
+    [(== a 'pos) (== b 'pos) (== s `(pos))]))
+
+(define (plusso s1 s2 s3)
+  (combino plusdo s1 s2 s3))
+
+(define (timeso a b c)
+  (conde
+    [(== a 'zer) (== c 'zer)]
+    [(=/= a 'zer) (== b 'zer) (== c 'zer)]
+    [(== a 'neg) (== b 'neg) (== c 'pos)]
+    [(== a 'neg) (== b 'pos) (== c 'neg)]
+    [(== a 'pos) (== b 'neg) (== c 'neg)]
+    [(== a 'pos) (== b 'pos) (== c 'pos)]))
+
+(define (timesdo a b s)
+  (fresh [c]
+    (timeso a b c)
+    (== s `(,c))))
+
+(define (timesso s1 s2 s3)
+  (combino timesdo s1 s2 s3))
+
 (define (cloo x y body)
   (== `(aval () ((,x ,y ,body)))))
 
