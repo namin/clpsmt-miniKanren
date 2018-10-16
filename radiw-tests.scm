@@ -22,3 +22,20 @@
     (muo '((a (aval (pos) ())) (b (aval (neg) ())))
          '((a (aval (neg) ()))) q))
   '(((a (aval (neg pos) ())) (b (aval (neg) ())))))
+
+(define fact
+  `(lam self n
+        (if0 (var n)
+             (int 1)
+             (times (var n)
+                    (app (var self)
+                         (plus (var n) (int -1)))))))
+
+(define efact
+  `(app ,fact (int 1)))
+
+(test "radiw-efact"
+  (run 2 [q]
+    (analyzeo efact q))
+
+  )

@@ -224,8 +224,8 @@
 (define (timesso s1 s2 s3)
   (combino timesdo s1 s2 s3))
 
-(define (cloo x y body)
-  (== `(aval () ((,x ,y ,body)))))
+(define (cloo x y body out)
+  (== out `(aval () ((,x ,y ,body)))))
 
 (define (unzip3o rs as bs cs)
   (conde
@@ -256,7 +256,7 @@
        (into i v)
        (== s so)
        (== ic co))]
-    [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n]
+    [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n so1 co1 so2 co2]
        (== `(plus ,e1 ,e2) e)
        (== v1 `(aval ,n1 ,s1))
        (== v2 `(aval ,n2 ,s2))
@@ -264,9 +264,9 @@
        (adivalpo e2 s oc ic v2 so2 co2)
        (plusso n1 n2 n)
        (== v `(aval ,n ()))
-       (map-uniono so1 so2 so)
-       (map-uniono co1 co2 co))]
-    [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n]
+       (muo so1 so2 so)
+       (muo co1 co2 co))]
+    [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n so1 co1 so2 co2]
        (== `(times ,e1 ,e2) e)
        (== v1 `(aval ,n1 ,s1))
        (== v2 `(aval ,n2 ,s2))
@@ -274,8 +274,8 @@
        (adivalpo e2 s oc ic v2 so2 co2)
        (timesso n1 n2 n)
        (== v `(aval ,n ()))
-       (map-uniono so1 so2 so)
-       (map-uniono co1 co2 co))]
+       (muo so1 so2 so)
+       (muo co1 co2 co))]
     [(fresh [x y body]
        (== `(lam ,x ,y ,body) e)
        (cloo x y e v)
@@ -352,7 +352,7 @@
 (define (lfpo e so co)
   (lfppo e '() '() so co))
 
-(define (analyze e vo so)
-  (fresh [co]
+(define (analyzeo e vo)
+  (fresh [so co]
     (lfpo e so co)
     (lookupo e co vo)))
