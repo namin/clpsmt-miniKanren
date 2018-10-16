@@ -320,3 +320,21 @@
        (muo s1 s23 so)
        (muo c3 c3 c23)
        (muo c1 c23 co))]))
+
+(define (adivalpo e s oc ic v so co)
+  (fresh [r]
+    (lookupo e ic r)
+    (conde
+      [(=/= r #f)
+       (== v r)
+       (== s so)
+       (== ic co)]
+      [(== r #f)
+       (fresh [r0 v0 ic1 s1 ic2]
+         (lookupo e oc r0)
+         (conde
+           [(== r0 #f) (boto v0)]
+           [(=/= r0 #f) (== v0 r0)])
+         (add-uo e v0 ic ic1)
+         (adivalo e s oc ic1 v so ic2)
+         (add-uo e v ic2 co))])))
