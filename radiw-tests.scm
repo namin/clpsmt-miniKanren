@@ -34,6 +34,12 @@
 (define efact
   `(app ,fact (int 1)))
 
+(test "radiw-num-1"
+  (run 2 [q]
+    (analyzeo '(int 1) q))
+
+  )
+
 (test "radiw-efact"
   (run 2 [q]
     (analyzeo efact q))
