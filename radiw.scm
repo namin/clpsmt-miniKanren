@@ -338,3 +338,21 @@
          (add-uo e v0 ic ic1)
          (adivalo e s oc ic1 v so ic2)
          (add-uo e v ic2 co))])))
+
+(define (lfppo e s c so co)
+  (fresh [v sp cp]
+    (adivalpo e s c '() v sp cp)
+    (cond
+      [(== `(,sp ,cp) `(,s ,c))
+       (== so s)
+       (== co c)]
+      [(=/= `(,sp ,cp) `(,s ,c))
+       (lfppo e sp cp so co)])))
+
+(define (lfpo e so co)
+  (lfppo e '() '() so co))
+
+(define (analyze e vo so)
+  (fresh [co]
+    (lfpo e so co)
+    (lookupo e co vo)))
