@@ -247,5 +247,26 @@
        (unzip3o r vs ss3 cs3)
        (joinso vs v3)
        (mjoinso ss3 s3)
-       (mjoinso cs3 c3)
-       )]))
+       (mjoinso cs3 c3))]
+    [(fresh [e1 e2 e3 r2 r3p r3n r3 v1 n1 b1 s1 c1 v2 s2 c2 v3 s3 c3 s23 c23]
+       (== `(if0 ,e1 ,e2 ,e3) e)
+       (adivalpo e1 s oc ic v1 s1 c1)
+       (== v1 `(aval ,n1 ,b1))
+       (is-ino 'zer n1 r2)
+       (is-ino 'pos n1 r3p)
+       (is-ino 'neg n1 r3n)
+       (conde
+         [(== r2 #t) (adivalpo e2 s oc ic v2 s2 c2)]
+         [(== r2 #f) (bot v2) (== s s2) (== ic c2)])
+       (conde
+         [(== r3p #t) (== r3 #t)]
+         [(== r3p #f) (== r3n #t) (== r3 #t)]
+         [(== r3p #f) (== r3n #f) (== r3 #f)])
+       (conde
+         [(== r3 #t) (adivalpo e3 s oc ic v3 s3 c3)]
+         [(== r3 #f) (bot v3) (== s s3) (== ic c3)])
+       (uo v2 v3 v)
+       (muo s2 s3 s23)
+       (muo s1 s23 so)
+       (muo c3 c3 c23)
+       (muo c1 c23 co))]))
