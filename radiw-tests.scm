@@ -34,14 +34,50 @@
 (define efact
   `(app ,fact (int 1)))
 
+(test "radiw-step-1"
+  (run 2 [q]
+    (fresh [v s c]
+      (== q `(,v ,s ,c))
+      (adivalpo '(int 1) '() '() '() v s c)))
+  '(((aval (pos) ()) () (((int 1) (aval (pos) ()))))))
+
+(test "radiw-step-2"
+  (run 2 [q]
+    (fresh [v s c]
+      (== q `(,v ,s ,c))
+      (adivalpo '(int 1) '() '(((int 1) (aval (pos) ()))) '() v s c)))
+  '(((aval (pos) ()) () (((int 1) (aval (pos) ()))))))
+
+(test "radiw-lffpo-1"
+  (run 2 [q]
+    (fresh [s c]
+      (== q `(,s ,c))
+      (lfppo '(int 1) '() '() s c)))
+  '((() (((int 1) (aval (pos) ())))))) ;; why _.0 instead of ()
+
+(test "radiw-lffpo-2"
+  (run 2 [q]
+    (fresh [s c]
+      (== q `(,s ,c))
+      (lfppo '(int 1) '() '(((int 1) (aval (pos) ()))) s c)))
+  '((() (((int 1) (aval (pos) ())))))) ;; similarly...
+
 (test "radiw-num-1"
   (run 2 [q]
     (analyzeo '(int 1) q))
-
-  )
+  '((aval (pos) ())))
 
 (test "radiw-efact"
   (run 2 [q]
     (analyzeo efact q))
-
-  )
+  '((aval
+   ()
+   ((self
+      n
+      (lam self
+           n
+           (if0 (var n)
+                (int 1)
+                (times
+                  (var n)
+                  (app (var self) (plus (var n) (int -1)))))))))))

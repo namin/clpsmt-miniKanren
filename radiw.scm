@@ -281,7 +281,7 @@
        (cloo x y e v)
        (== s so)
        (== ic co))]
-    [(fresh [e1 e2 is fs v1 s1 c1 v2 s2 c2 r vs ss3 cs3 v3 s3 c3]
+    [(fresh [e1 e2 is fs v1 s1 c1 v2 s2 c2 r vs ss3 cs3]
        (== `(app ,e1 ,e2) e)
        (adivalpo e1 s oc ic v1 s1 c1)
        (== `(aval ,is ,fs) v1)
@@ -295,9 +295,9 @@
                       (add-uo y v2 sa1 sa)
                       (adivalpo body sa oc ic vo so co))))
        (unzip3o r vs ss3 cs3)
-       (joinso vs v3)
-       (mjoinso ss3 s3)
-       (mjoinso cs3 c3))]
+       (joinso vs v)
+       (mjoinso ss3 so)
+       (mjoinso cs3 co))]
     [(fresh [e1 e2 e3 r2 r3p r3n r3 v1 n1 b1 s1 c1 v2 s2 c2 v3 s3 c3 s23 c23]
        (== `(if0 ,e1 ,e2 ,e3) e)
        (adivalpo e1 s oc ic v1 s1 c1)
@@ -330,7 +330,7 @@
        (== s so)
        (== ic co)]
       [(== r #f)
-       (fresh [r0 v0 ic1 s1 ic2]
+       (fresh [r0 v0 ic1 ic2]
          (lookupo e oc r0)
          (conde
            [(== r0 #f) (boto v0)]
@@ -343,10 +343,18 @@
   (fresh [v sp cp]
     (adivalpo e s c '() v sp cp)
     (cond
-      [(== `(,sp ,cp) `(,s ,c))
-       (== so s)
-       (== co c)]
-      [(=/= `(,sp ,cp) `(,s ,c))
+      [(set-equivo sp s)
+       (set-equivo cp c)
+       (== so sp)
+       (== co cp)]
+      [(set-equivo sp s)
+       (non-set-equivo cp c)
+       (lfppo e sp cp so co)]
+      [(non-set-equivo sp s)
+       (set-equivo cp c)
+       (lfppo e sp cp so co)]
+      [(non-set-equivo sp s)
+       (non-set-equivo cp c)
        (lfppo e sp cp so co)])))
 
 (define (lfpo e so co)
