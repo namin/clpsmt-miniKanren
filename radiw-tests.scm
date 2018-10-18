@@ -107,6 +107,21 @@
     (analyzeo '(plus (int -1) (int 1)) q))
   '((aval (neg zer pos) ())))
 
+(test "radiw-times-0"
+  (run* [q]
+    (analyzeo '(times (int -1) (int 1)) q))
+  '((aval (neg) ())))
+
+(test "radiw-times-1"
+  (run* [q]
+    (analyzeo '(times (int -1) (int 0)) q))
+  '((aval (zer) ())))
+
+(test "radiw-times-2"
+  (run* [q]
+    (analyzeo '(times (int -1) (int -1)) q))
+  '((aval (pos) ())))
+
 ;; broken
 (test "radiw-efact-0"
   (run 2 [q]
