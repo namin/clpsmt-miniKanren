@@ -53,14 +53,14 @@
     (fresh [s c]
       (== q `(,s ,c))
       (lfppo '(int 1) '() '() s c)))
-  '((() (((int 1) (aval (pos) ())))))) ;; why _.0 instead of ()
+  '((() (((int 1) (aval (pos) ()))))))
 
 (test "radiw-lffpo-2"
   (run 2 [q]
     (fresh [s c]
       (== q `(,s ,c))
       (lfppo '(int 1) '() '(((int 1) (aval (pos) ()))) s c)))
-  '((() (((int 1) (aval (pos) ())))))) ;; similarly...
+  '((() (((int 1) (aval (pos) ()))))))
 
 (test "radiw-num-1"
   (run 2 [q]
