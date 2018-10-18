@@ -283,8 +283,8 @@
        (== ic co))]
     [(fresh [e1 e2 is fs v1 s1 c1 v2 s2 c2 r vs ss3 cs3]
        (== `(app ,e1 ,e2) e)
-       (adivalpo e1 s oc ic v1 s1 c1)
        (== `(aval ,is ,fs) v1)
+       (adivalpo e1 s oc ic v1 s1 c1)
        (adivalpo e2 s oc ic v2 s2 c2)
        (mapo r fs (lambda (i z)
                     (fresh [x y body c sa1 sa vo so co]

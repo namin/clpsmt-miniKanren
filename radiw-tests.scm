@@ -142,6 +142,21 @@
     (analyzeo '(if0 (times (int 1) (int 1)) (int 1) (int -1)) q))
   '((aval (neg) ())))
 
+(test "radiw-lam-0"
+  (run* [q]
+    (analyzeo '(lam self n (int -1)) q))
+  '((aval () ((self n (lam self n (int -1)))))))
+
+(test "radiw-app-0"
+  (run* [q]
+    (analyzeo '(app (lam self n (int -1)) (int 1)) q))
+  'broken)
+
+(test "radiw-app-1"
+  (run* [q]
+    (analyzeo '(app (lam self n (var n)) (int 1)) q))
+  'broken)
+
 ;; broken
 (test "radiw-efact-0"
   (run 2 [q]
