@@ -77,6 +77,36 @@
     (analyzeo '(int -1) q))
   '((aval (neg) ())))
 
+(test "radiw-plus-0"
+  (run* [q]
+    (analyzeo '(plus (int 1) (int 1)) q))
+  '((aval (pos) ())))
+
+(test "radiw-plus-1"
+  (run* [q]
+    (analyzeo '(plus (int -1) (int -1)) q))
+  '((aval (neg) ())))
+
+(test "radiw-plus-2"
+  (run* [q]
+    (analyzeo '(plus (int 0) (int 0)) q))
+  '((aval (zer) ())))
+
+(test "radiw-plus-3"
+  (run* [q]
+    (analyzeo '(plus (int 1) (int 0)) q))
+  '((aval (pos) ())))
+
+(test "radiw-plus-4"
+  (run* [q]
+    (analyzeo '(plus (int 0) (int -1)) q))
+  '((aval (neg) ())))
+
+(test "radiw-plus-5"
+  (run* [q]
+    (analyzeo '(plus (int -1) (int 1)) q))
+  '((aval (neg zer pos) ())))
+
 ;; broken
 (test "radiw-efact-0"
   (run 2 [q]
