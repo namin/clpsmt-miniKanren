@@ -12,7 +12,7 @@
 
 (define (not-ino x xs)
   (conde
-    [(== xs '())]
+    [(== '() xs)]
     [(fresh [y ys]
        (conso y ys xs)
        (=/= y x)
@@ -28,7 +28,7 @@
 
 (define (mapo r xs f)
   (conde
-    [(== xs '()) (== r '())]
+    [(== '() xs) (== '() r)]
     [(fresh [y ys z zs]
        (conso y ys xs)
        (conso z zs r)
@@ -37,7 +37,7 @@
 
 (define (foldlo f x xs r)
   (conde
-    [(== xs '()) (== x r)]
+    [(== '() xs) (== x r)]
     [(fresh [y ys z]
        (conso y ys xs)
        (f x y z)
@@ -47,7 +47,7 @@
   (conde
     ;; #f is never bound as a value in the store,
     ;; we don't have booleans.
-    [(== bs '()) (== out #f)]
+    [(== '() bs) (== #f out)]
     [(fresh [b br y v]
        (conso b br bs)
        (== `(,y ,v) b)
@@ -60,7 +60,7 @@
 
 (define (includo a b)
   (conde
-    [(== a '())]
+    [(== '() a)]
     [(fresh [a1 ar]
        (conso a1 ar a)
        (ino a1 b)
@@ -85,7 +85,7 @@
 
 (define (set-uniono a b c)
   (conde
-    [(== a '()) (== b c)]
+    [(== '() a) (== b c)]
     [(fresh [xa ra]
        (conso xa ra a)
        (conde
@@ -111,9 +111,9 @@
 
 (define (uo a b c)
   (fresh [ai bi ci aj bj cj]
-    (== a `(aval ,ai ,aj))
-    (== b `(aval ,bi ,bj))
-    (== c `(aval ,ci ,cj))
+    (== `(aval ,ai ,aj) a)
+    (== `(aval ,bi ,bj) b)
+    (== `(aval ,ci ,cj) c)
     (set-uniono ai bi ci)
     (set-uniono aj bj cj)))
 
@@ -128,7 +128,7 @@
 (define (replaceo x vo bs out)
   (fresh [b br y v]
     (conso b br bs)
-    (== b `(,y ,v))
+    (== `(,y ,v) b)
     (conde
       [(== y x) (conso `(,x ,vo) br out)]
       [(=/= y x)
@@ -140,8 +140,8 @@
   (fresh [l]
     (lookupo x s l)
     (conde
-      [(== l #f) (== out `((,x ,v) . ,s))]
-      [(=/= l #f)
+      [(== #f l) (== `((,x ,v) . ,s) out)]
+      [(=/= #f l)
        (fresh [vo]
          (uo v l vo)
          (replaceo x vo s out))])))
@@ -165,20 +165,20 @@
 
 (define (injo i a)
   (conde
-    [(== -1 i) (== a 'neg)]
-    [(== i 0) (== a 'zer)]
-    [(== 1 i) (== a 'pos)]))
+    [(== -1 i) (== 'neg a)]
+    [(== 0 i) (== 'zer a)]
+    [(== 1 i) (== 'pos a)]))
 
 (define (into i v)
   (fresh [a]
     (injo i a)
-    (== v `(aval (,a) ()))))
+    (== `(aval (,a) ()) v)))
 
 (define (combo f u os1 s1 s2 s3)
   (conde
     [(== '() s2)
      (== '() s3)]
-    [(== s1 '())
+    [(== '() s1)
      (fresh [a2 r2]
        (conso a2 r2 s2)
        (combo f u os1 os1 r2 s3))]
@@ -219,13 +219,13 @@
 (define (timesdo a b s)
   (fresh [c]
     (timeso a b c)
-    (== s `(,c))))
+    (== `(,c) s)))
 
 (define (timesso s1 s2 s3)
   (combino timesdo s1 s2 s3))
 
 (define (cloo x y body out)
-  (== out `(aval () ((,x ,y ,body)))))
+  (== `(aval () ((,x ,y ,body))) out))
 
 (define (unzip3o rs as bs cs)
   (conde
@@ -238,42 +238,42 @@
        (conso a1 ar as)
        (conso b1 br bs)
        (conso c1 cr cs)
-       (== r1 `(,a1 ,b1 ,c1))
+       (== `(,a1 ,b1 ,c1) r1)
        (unzip3o rr ar br cr))]))
 
 (define (adivalo e s oc ic v so co)
   (conde
     [(fresh [x l]
        (== `(var ,x) e)
-       (lookupo x s l)
        (== s so)
        (== ic co)
        (conde
          [(== l #f) (boto v)]
-         [(=/= l #f) (== l v)]))]
+         [(=/= l #f) (== l v)])
+       (lookupo x s l))]
     [(fresh [i a]
        (== `(int ,i) e)
-       (into i v)
        (== s so)
-       (== ic co))]
+       (== ic co)
+       (into i v))]
     [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n so1 co1 so2 co2]
        (== `(plus ,e1 ,e2) e)
-       (== v1 `(aval ,n1 ,s1))
-       (== v2 `(aval ,n2 ,s2))
+       (== `(aval ,n1 ,s1) v1)
+       (== `(aval ,n2 ,s2) v2)
+       (== `(aval ,n ()) v)
        (adivalpo e1 s oc ic v1 so1 co1)
        (adivalpo e2 s oc ic v2 so2 co2)
        (plusso n1 n2 n)
-       (== v `(aval ,n ()))
        (muo so1 so2 so)
        (muo co1 co2 co))]
     [(fresh [e1 e2 v1 v2 n1 n2 s1 s2 n so1 co1 so2 co2]
        (== `(times ,e1 ,e2) e)
        (== v1 `(aval ,n1 ,s1))
        (== v2 `(aval ,n2 ,s2))
+       (== v `(aval ,n ()))
        (adivalpo e1 s oc ic v1 so1 co1)
        (adivalpo e2 s oc ic v2 so2 co2)
        (timesso n1 n2 n)
-       (== v `(aval ,n ()))
        (muo so1 so2 so)
        (muo co1 co2 co))]
     [(fresh [x y body]
@@ -288,8 +288,8 @@
        (adivalpo e2 s oc ic v2 s2 c2)
        (mapo r fs (lambda (i z)
                     (fresh [x y body c sa1 sa vo so co]
-                      (== i `(,x ,y ,body))
-                      (== z `(,vo ,so ,co))
+                      (== `(,x ,y ,body) i)
+                      (== `(,vo ,so ,co) z)
                       (cloo x y body c)
                       (add-uo x c s sa1)
                       (add-uo y v2 sa1 sa)
@@ -300,8 +300,8 @@
        (mjoinso cs3 co))]
     [(fresh [e1 e2 e3 r2 r3p r3n r3 v1 n1 b1 s1 c1 v2 s2 c2 v3 s3 c3 s23 c23]
        (== `(if0 ,e1 ,e2 ,e3) e)
+       (== `(aval ,n1 ,b1) v1)
        (adivalpo e1 s oc ic v1 s1 c1)
-       (== v1 `(aval ,n1 ,b1))
        (is-ino 'zer n1 r2)
        (is-ino 'pos n1 r3p)
        (is-ino 'neg n1 r3n)
@@ -331,10 +331,10 @@
        (== ic co)]
       [(== r #f)
        (fresh [r0 v0 ic1 ic2]
-         (lookupo e oc r0)
          (conde
            [(== r0 #f) (boto v0)]
            [(=/= r0 #f) (== v0 r0)])
+         (lookupo e oc r0)
          (add-uo e v0 ic ic1)
          (adivalo e s oc ic1 v so ic2)
          (add-uo e v ic2 co))])))
