@@ -67,6 +67,34 @@
     (analyzeo '(int 1) q))
   '((aval (pos) ())))
 
+(test "radiw-num-2"
+  (run 2 [q]
+    (analyzeo '(int 0) q))
+  '((aval (zer) ())))
+
+(test "radiw-num-3"
+  (run 2 [q]
+    (analyzeo '(int -1) q))
+  '((aval (neg) ())))
+
+;; broken
+(test "radiw-efact-0"
+  (run 2 [q]
+    (analyzeo `(app ,fact (int 0)) q))
+  '((aval
+     ()
+     ((self
+       n
+       (lam self
+            n
+            (if0 (var n)
+                 (int 1)
+                 (times (var n)
+                        (app (var self)
+                             (plus (var n)
+                                   (int -1)))))))))))
+
+;; broken
 (test "radiw-efact"
   (run 2 [q]
     (analyzeo efact q))
