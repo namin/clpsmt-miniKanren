@@ -20,8 +20,8 @@
 
 (define (is-ino a s b)
   (conde
-    [(ino a s) (== b #t)]
-    [(not-ino a s) (== b #f)]))
+    [(== b #t) (ino a s)]
+    [(== b #f) (not-ino a s)]))
 
 (define (conso x xs r)
   (== (cons x xs) r))
@@ -342,19 +342,19 @@
 (define (lfppo e s c so co)
   (fresh [v sp cp]
     (adivalpo e s c '() v sp cp)
-    (cond
+    (conde
+      [(== so sp)
+       (== co cp)
+       (set-equivo sp s)
+       (set-equivo cp c)]
       [(set-equivo sp s)
-       (set-equivo cp c)
-       (== so sp)
-       (== co cp)]
-      [(set-equivo sp s)
-       (non-set-equivo cp c)
+       (not-set-equivo cp c)
        (lfppo e sp cp so co)]
-      [(non-set-equivo sp s)
+      [(not-set-equivo sp s)
        (set-equivo cp c)
        (lfppo e sp cp so co)]
-      [(non-set-equivo sp s)
-       (non-set-equivo cp c)
+      [(not-set-equivo sp s)
+       (not-set-equivo cp c)
        (lfppo e sp cp so co)])))
 
 (define (lfpo e so co)
