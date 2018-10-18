@@ -307,14 +307,14 @@
        (is-ino 'neg n1 r3n)
        (conde
          [(== r2 #t) (adivalpo e2 s oc ic v2 s2 c2)]
-         [(== r2 #f) (bot v2) (== s s2) (== ic c2)])
+         [(== r2 #f) (boto v2) (== s s2) (== ic c2)])
        (conde
          [(== r3p #t) (== r3 #t)]
          [(== r3p #f) (== r3n #t) (== r3 #t)]
          [(== r3p #f) (== r3n #f) (== r3 #f)])
        (conde
          [(== r3 #t) (adivalpo e3 s oc ic v3 s3 c3)]
-         [(== r3 #f) (bot v3) (== s s3) (== ic c3)])
+         [(== r3 #f) (boto v3) (== s s3) (== ic c3)])
        (uo v2 v3 v)
        (muo s2 s3 s23)
        (muo s1 s23 so)
