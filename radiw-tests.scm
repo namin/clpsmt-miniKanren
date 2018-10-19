@@ -145,47 +145,24 @@
 (test "radiw-lam-0"
   (run* [q]
     (analyzeo '(lam self n (int -1)) q))
-  '((aval () ((self n (lam self n (int -1)))))))
+  '((aval () ((self n (int -1))))))
 
 (test "radiw-app-0"
   (run* [q]
     (analyzeo '(app (lam self n (int -1)) (int 1)) q))
-  'broken)
+  '((aval (neg) ())))
 
 (test "radiw-app-1"
   (run* [q]
     (analyzeo '(app (lam self n (var n)) (int 1)) q))
-  'broken)
+  '((aval (pos) ())))
 
-;; broken
 (test "radiw-efact-0"
   (run 2 [q]
     (analyzeo `(app ,fact (int 0)) q))
-  '((aval
-     ()
-     ((self
-       n
-       (lam self
-            n
-            (if0 (var n)
-                 (int 1)
-                 (times (var n)
-                        (app (var self)
-                             (plus (var n)
-                                   (int -1)))))))))))
+  '((aval (pos) ())))
 
-;; broken
 (test "radiw-efact"
   (run 2 [q]
     (analyzeo efact q))
-  '((aval
-   ()
-   ((self
-      n
-      (lam self
-           n
-           (if0 (var n)
-                (int 1)
-                (times
-                  (var n)
-                  (app (var self) (plus (var n) (int -1)))))))))))
+  '((aval (neg zer pos) ())))

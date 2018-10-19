@@ -278,7 +278,7 @@
        (muo co1 co2 co))]
     [(fresh [x y body]
        (== `(lam ,x ,y ,body) e)
-       (cloo x y e v)
+       (cloo x y body v)
        (== s so)
        (== ic co))]
     [(fresh [e1 e2 is fs v1 s1 c1 v2 s2 c2 r vs ss3 cs3]
