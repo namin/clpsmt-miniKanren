@@ -2,6 +2,42 @@
 (load "test-check.scm")
 (load "radiw.scm")
 
+;; WEB -- need to try bit vector representation of sets, to see if we
+;; can get better divergence behavior.
+
+;;; WEB
+;;; set-equivo no longer generates non-sets, but can diverge on a run 2
+(test "set-equivo-0"
+  (run 1 (q)
+    (set-equivo '(a) q))
+  '((a)))
+
+;;; WEB run 3 diverges
+(test "set-equivo-1"
+  (run 2 (q)
+    (set-equivo '(a b) q))
+  '((a b) (b a)))
+
+(test "set-equivo-2"
+  (run 5 (q)
+    (set-equivo q q))
+  '(()
+    (_.0)
+    ((_.0 _.1)
+     (=/= ((_.0 _.1))))
+    ((_.0 _.1 _.2)
+     (=/= ((_.0 _.1))
+          ((_.0 _.2))
+          ((_.1 _.2))))
+    ((_.0 _.1 _.2 _.3)
+     (=/= ((_.0 _.1))
+          ((_.0 _.2))
+          ((_.0 _.3))
+          ((_.1 _.2))
+          ((_.1 _.3))
+          ((_.2 _.3))))))
+
+
 (test "muo-0"
   (run 2 (q)
     (muo '() '() q))
@@ -33,6 +69,32 @@
 
 (define efact
   `(app ,fact (int 1)))
+
+
+(define fib
+  `(lam self n
+        (if0 (var n)
+             (int 0)
+             (if0 (plus (var n) (int -1))
+                  (int 1)
+                  (plus (app (var self)
+                             (plus (var n) (int -1)))
+                        (app (var self)
+                             ;; WEB really should use -2 instead of -1,
+                             ;; but the current abstraction doesn't
+                             ;; support this!
+                             (plus (var n) (int -1))))))))
+
+(define efib
+  `(app ,fib (int 1)))
+
+
+(time
+  (test "radiw-efib-1"
+    (run* [q]
+      (analyzeo efib q))
+    '((aval (zer pos) ()))))
+
 
 (test "radiw-step-1"
   (run 2 [q]
