@@ -48,6 +48,7 @@
     (add-uo 'a '(aval (pos) ()) '() q))
   '(((a (aval (pos) ())))))
 
+;;; WEB pos comes before neg...
 (test "add-uo-2"
   (run 2 (q)
     (add-uo 'a '(aval (pos) ()) '((a (aval (neg) ()))) q))
@@ -104,7 +105,18 @@
       (1 (aval (zer pos) ())))))
 
 (time
- (test "radiw-efib-3"
+  (test "radiw-efib-3"
+    (run* [q]
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '(_.0)))
+
+(time
+ (test "radiw-efib-5"
    (run 10 [e out]
      (analyzeo `(app ,fib ,e) out))
    '(((var n) (aval () ()))
@@ -118,6 +130,8 @@
      (((plus (var _.0) (var _.0)) (aval () ()))
       (=/= ((_.0 n)) ((_.0 self))))
      ((plus (var self) (var n)) (aval () ())))))
+
+
 
 
 (test "radiw-step-1"
