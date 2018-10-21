@@ -95,6 +95,30 @@
       (analyzeo efib q))
     '((aval (zer pos) ()))))
 
+(time
+  (test "radiw-efib-2"
+    (run* [ie val]
+      (analyzeo `(app ,fib (int ,ie)) val))
+    '((0 (aval (zer) ()))
+      (-1 (aval () ()))
+      (1 (aval (zer pos) ())))))
+
+(time
+ (test "radiw-efib-3"
+   (run 10 [e out]
+     (analyzeo `(app ,fib ,e) out))
+   '(((var n) (aval () ()))
+     (((var _.0) (aval () ())) (=/= ((_.0 n)) ((_.0 self))))
+     ((var self) (aval () ()))
+     ((int 0) (aval (zer) ()))
+     ((lam _.0 _.1 _.2) (aval () ()))
+     ((plus (var self) (var self)) (aval () ()))
+     ((int -1) (aval () ()))
+     ((plus (var n) (var n)) (aval () ()))
+     (((plus (var _.0) (var _.0)) (aval () ()))
+      (=/= ((_.0 n)) ((_.0 self))))
+     ((plus (var self) (var n)) (aval () ())))))
+
 
 (test "radiw-step-1"
   (run 2 [q]
