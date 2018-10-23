@@ -349,6 +349,211 @@
                      (app (var self) (plus (var n) (int -1)))
                      (app (var self) (plus (var n) (int -1))))))))))
 
+(time
+ (test "radiw-efib-synthesis-6"
+   (run 20 [fib]
+     (fresh (r)
+       (== `(lam self n
+                 (if0 (var n)
+                      (int 0)
+                      (if0 (plus (var n) (int -1))
+                           (int 1)
+                           (plus (app (var self)
+                                      ,r)
+                                 (app (var self)
+                                      (plus (var n) (int -1)))))))
+           fib))
+     (analyzeo `(app ,fib (int -1))
+               '(aval () ()))
+     (analyzeo `(app ,fib (int 0))
+               '(aval (zer) ()))
+     (analyzeo `(app ,fib (int 1))
+               '(aval (zer pos) ())))
+   '((lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (int -1))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (var n))
+                     (app (var self) (plus (var n) (int -1)))))))
+     ((lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (var _.0))
+                      (app (var self) (plus (var n) (int -1)))))))
+      (=/= ((_.0 n)) ((_.0 self))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (var self))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (lam _.0 _.1 _.2))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (int -1) (int -1)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (int -1)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (int -1) (int 0)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (int 0)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (var n)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     ;; correct
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (int -1) (var n)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (int 1)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     ((lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (app (int -1) (var _.0)))
+                      (app (var self) (plus (var n) (int -1)))))))
+      (=/= ((_.0 n)) ((_.0 self))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (var self)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int 0) (int -1)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     ((lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (plus (int -1) (var _.0)))
+                      (app (var self) (plus (var n) (int -1)))))))
+      (=/= ((_.0 n)) ((_.0 self))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int -1) (lam _.0 _.1 _.2)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (int -1) (var self)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (app (int 0) (int 0)))
+                     (app (var self) (plus (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (int 0) (int -1)))
+                     (app (var self) (plus (var n) (int -1))))))))))
+
 
 (test "radiw-step-1"
   (run 2 [q]
