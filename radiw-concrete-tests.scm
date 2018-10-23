@@ -1,6 +1,14 @@
 (load "radiw-concrete.scm")
 (load "test-check.scm")
 
+;; WEB todo
+;;
+;; Port CLP(SMT) to faster mk
+;;
+;; Change radiw abstract interp to allow for any integer, rather than just -1, 0, 1
+;;
+;; Combine concrete and abstract interps for synthesis (perhaps with type inferencer).
+
 (define fact
   `(lam self n
         (if0 (var n)
