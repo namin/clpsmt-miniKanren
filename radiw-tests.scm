@@ -131,7 +131,223 @@
       (=/= ((_.0 n)) ((_.0 self))))
      ((plus (var self) (var n)) (aval () ())))))
 
+(time
+  (test "radiw-efib-synthesis-0"
+    (run* [fib]
+      (== `(lam self n
+                (if0 (var n)
+                     (int 0)
+                     (if0 (plus (var n) (int -1))
+                          (int 1)
+                          (plus (app (var self)
+                                     (plus (var n) (int -1)))
+                                (app (var self)
+                                     (plus (var n) (int -1)))))))
+          fib)
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '((lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self)
+                                (plus (var n) (int -1)))
+                           (app (var self)
+                                (plus (var n) (int -1))))))))))
 
+(time
+  (test "radiw-efib-synthesis-1"
+    (run 1 [fib]
+      (fresh (r)
+        (== `(lam self n
+                  (if0 (var n)
+                       (int 0)
+                       (if0 (plus (var n) (int -1))
+                            ,r
+                            (plus (app (var self)
+                                       (plus (var n) (int -1)))
+                                  (app (var self)
+                                       (plus (var n) (int -1)))))))
+            fib))
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '((lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self)
+                                (plus (var n) (int -1)))
+                           (app (var self)
+                                (plus (var n) (int -1))))))))))
+
+(time
+  (test "radiw-efib-synthesis-2"
+    (run 1 [fib]
+      (fresh (r)
+        (== `(lam self n
+                  (if0 (var n)
+                       (int 0)
+                       (if0 (plus (var n) (int -1))
+                            (int 1)
+                            (plus (app (var self)
+                                       (plus (var n) ,r))
+                                  (app (var self)
+                                       (plus (var n) (int -1)))))))
+            fib))
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '((lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self)
+                                (plus (var n) (int -1)))
+                           (app (var self)
+                                (plus (var n) (int -1))))))))))
+
+(time
+  (test "radiw-efib-synthesis-3"
+    (run 3 [fib]
+      (fresh (r)
+        (== `(lam self n
+                  (if0 (var n)
+                       (int 0)
+                       (if0 (plus (var n) (int -1))
+                            (int 1)
+                            (plus (app (var self)
+                                       (plus ,r (int -1)))
+                                  (app (var self)
+                                       (plus (var n) (int -1)))))))
+            fib))
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '((lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self) (plus (int -1) (int -1)))
+                           (app (var self) (plus (var n) (int -1)))))))
+      (lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self) (plus (int 0) (int -1)))
+                           (app (var self) (plus (var n) (int -1)))))))
+      (lam self n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus (app (var self) (plus (var n) (int -1)))
+                           (app (var self) (plus (var n) (int -1))))))))))
+
+(time
+  (test "radiw-efib-synthesis-4"
+    (run 3 [fib]
+      (fresh (r)
+        (== `(lam self n
+                  (if0 (var n)
+                       (int 0)
+                       (if0 (plus (var n) (int -1))
+                            (int 1)
+                            (plus (app (var self)
+                                       (plus (var n) (int -1)))
+                                  (app (var self)
+                                       (plus ,r (int -1)))))))
+            fib))
+      (analyzeo `(app ,fib (int -1))
+                '(aval () ()))
+      (analyzeo `(app ,fib (int 0))
+                '(aval (zer) ()))
+      (analyzeo `(app ,fib (int 1))
+                '(aval (zer pos) ())))
+    '((lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (plus (var n) (int -1)))
+                      (app (var self) (plus (int -1) (int -1)))))))
+      (lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (plus (var n) (int -1)))
+                      (app (var self) (plus (int 0) (int -1)))))))
+      (lam self
+           n
+           (if0 (var n)
+                (int 0)
+                (if0 (plus (var n) (int -1))
+                     (int 1)
+                     (plus
+                      (app (var self) (plus (var n) (int -1)))
+                      (app (var self) (plus (var n) (int -1))))))))))
+
+(time
+ (test "radiw-efib-synthesis-5"
+   (run 2 [fib]
+     (fresh (r)
+       (== `(lam self n
+                 (if0 (var n)
+                      (int 0)
+                      (if0 (plus (var n) (int -1))
+                           (int 1)
+                           (plus (app (var self)
+                                      (plus (var n) (int -1)))
+                                 (app (var self)
+                                      (,r (var n) (int -1)))))))
+           fib))
+     (analyzeo `(app ,fib (int -1))
+               '(aval () ()))
+     (analyzeo `(app ,fib (int 0))
+               '(aval (zer) ()))
+     (analyzeo `(app ,fib (int 1))
+               '(aval (zer pos) ())))
+   '((lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (var n) (int -1)))
+                     (app (var self) (app (var n) (int -1)))))))
+     (lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (var n) (int -1)))
+                     (app (var self) (plus (var n) (int -1))))))))))
 
 
 (test "radiw-step-1"
