@@ -46,3 +46,28 @@
     (run* (q)
       (evalo efib q))
     '((int 8))))
+
+(time
+ (test "fib-synthesis-1"
+   (run 1 (fib)
+     (fresh (r)
+       (== `(lam self n
+                 (if0 (var n)
+                      (int 0)
+                      (if0 (plus (var n) (int -1))
+                           ,r
+                           (plus (app (var self)
+                                      (plus (var n) (int -1)))
+                                 (app (var self)
+                                      (plus (var n) (int -2)))))))
+           fib))
+     (evalo `(app ,fib (int 6)) '(int 8)))
+   '((lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (var n) (int -1)))
+                     (app (var self) (plus (var n) (int -2))))))))))
