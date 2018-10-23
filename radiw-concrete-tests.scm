@@ -8,6 +8,8 @@
 ;; Change radiw abstract interp to allow for any integer, rather than just -1, 0, 1
 ;;
 ;; Combine concrete and abstract interps for synthesis (perhaps with type inferencer).
+;;
+;; Can I combine abstract and concrete interp for RSA synthesis?
 
 (define fact
   `(lam self n
