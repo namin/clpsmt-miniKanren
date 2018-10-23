@@ -120,7 +120,9 @@
    (run 10 [e out]
      (analyzeo `(app ,fib ,e) out))
    '(((var n) (aval () ()))
-     (((var _.0) (aval () ())) (=/= ((_.0 n)) ((_.0 self))))
+     (((var _.0) (aval () ()))
+      (=/= ((_.0 n)) ((_.0 self)))
+      (sym _.0))
      ((var self) (aval () ()))
      ((int 0) (aval (zer) ()))
      ((lam _.0 _.1 _.2) (aval () ()))
@@ -128,7 +130,8 @@
      ((int -1) (aval () ()))
      ((plus (var n) (var n)) (aval () ()))
      (((plus (var _.0) (var _.0)) (aval () ()))
-      (=/= ((_.0 n)) ((_.0 self))))
+      (=/= ((_.0 n)) ((_.0 self)))
+      (sym _.0))
      ((plus (var self) (var n)) (aval () ())))))
 
 (time
@@ -396,7 +399,8 @@
                      (plus
                       (app (var self) (var _.0))
                       (app (var self) (plus (var n) (int -1)))))))
-      (=/= ((_.0 n)) ((_.0 self))))
+      (=/= ((_.0 n)) ((_.0 self)))
+      (sym _.0))
      (lam self
           n
           (if0 (var n)
@@ -460,7 +464,6 @@
                     (plus
                      (app (var self) (app (int -1) (var n)))
                      (app (var self) (plus (var n) (int -1)))))))
-     ;; correct
      (lam self
           n
           (if0 (var n)
@@ -488,7 +491,8 @@
                      (plus
                       (app (var self) (app (int -1) (var _.0)))
                       (app (var self) (plus (var n) (int -1)))))))
-      (=/= ((_.0 n)) ((_.0 self))))
+      (=/= ((_.0 n)) ((_.0 self)))
+      (sym _.0))
      (lam self
           n
           (if0 (var n)
@@ -516,7 +520,8 @@
                      (plus
                       (app (var self) (plus (int -1) (var _.0)))
                       (app (var self) (plus (var n) (int -1)))))))
-      (=/= ((_.0 n)) ((_.0 self))))
+      (=/= ((_.0 n)) ((_.0 self)))
+      (sym _.0))
      (lam self
           n
           (if0 (var n)

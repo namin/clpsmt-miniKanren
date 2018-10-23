@@ -245,6 +245,7 @@
   (conde
     [(fresh [x l]
        (== `(var ,x) e)
+       (symbolo x)
        (== s so)
        (== ic co)
        (conde
