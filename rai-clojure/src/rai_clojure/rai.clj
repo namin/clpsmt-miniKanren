@@ -3,6 +3,8 @@
   (:use [clojure.core.logic])
   (:require [clojure.core.logic.fd :as fd]))
 
+
+;; concrete interp
 (defn lookupo [x env val]
   (fresh [y v rest]
     (conso [y v] rest env)

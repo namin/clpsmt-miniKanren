@@ -1,7 +1,30 @@
-RAI in Clojure
+Relational Abstract Interpretation in Clojure
 ====
 
 Meow!
+
+webyrd:~/github/rai-clojure/rai-clojure$ lein repl
+nREPL server started on port 56364 on host 127.0.0.1 - nrepl://127.0.0.1:56364
+REPL-y 0.3.7, nREPL 0.2.12
+Clojure 1.9.0
+Java HotSpot(TM) 64-Bit Server VM 9.0.1+11
+    Docs: (doc function-name-here)
+          (find-doc "part-of-name-here")
+  Source: (source function-name-here)
+ Javadoc: (javadoc java-object-or-class-here)
+    Exit: Control+D or (exit) or (quit)
+ Results: Stored in vars *1, *2, *3, an exception in *e
+
+user=> (require 'clojure.core.logic)
+nil
+user=> (load "rai_clojure/rai")
+nil
+user=> (in-ns 'rai-clojure.rai)
+#object[clojure.lang.Namespace 0x330a5dea "rai-clojure.rai"]
+rai-clojure.rai=> (run 100 [e v] (evalo e v))
+
+
+
 
 webyrd:~/github/rai-clojure/rai-clojure$ lein repl
 nREPL server started on port 56058 on host 127.0.0.1 - nrepl://127.0.0.1:56058
@@ -47,3 +70,5 @@ rai-clojure.rai=> (run 1 [q] (lookupo 'z [['w 2] ['v 4]] q))
 rai-clojure.rai=> (run 1 [q] (lookupo 'v [['w 2] ['v 4]] q))
 (4)
 rai-clojure.rai=>
+
+
