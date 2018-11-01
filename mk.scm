@@ -181,12 +181,6 @@
 
 (define numbero (make-tag-A 'num number?))
 
-(define booleano
-  (lambda (x)
-    (conde
-      ((== #f x))
-      ((== #t x)))))
-
 (define pr->tag (lambda (pr) (car (rhs pr))))
 
 (define pr->pred (lambda (pr) (cdr (rhs pr))))
@@ -645,7 +639,7 @@
              `(absent ,tag ,x)))
          T)))
 
-(define sorter (lambda (ls) (sort lex<=? ls)))
+(define sorter (lambda (ls) (list-sort lex<=? ls)))
 
 (define sort-part
   (lambda (pr)

@@ -10,19 +10,13 @@
 
 (define call-z3
   (lambda (xs)
-    (let ([p (open-output-file "out.smt" 'replace)])
+    (let ([p (open-output-file "out.smt" #:exists 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
-      ;; WEB -- I think this is equivalent to, but faster than, the commented three calls to sed, below
-      ;; see https://unix.stackexchange.com/questions/97428/sed-how-to-do-several-consecutive-substitutions-but-process-file-only-once#97437
       (system "sed -i '' 's/#t/true/g; s/#f/false/g; s/bitvec-/#b/g' out.smt")
-      ;; (system "sed -i '' 's/#t/true/g' out.smt")
-      ;; (system "sed -i '' 's/#f/false/g' out.smt")
-      ;; (system "sed -i '' 's/bitvec-/#b/g' out.smt")
-      
       (let ((r (system "z3 out.smt >out.txt")))
         (system "sed -i '' 's/#b/bitvec-/g' out.txt")
-        (when (not (= r 0))
+        (when (not r)
           (error 'call-z3 "error in z3 out.smt > out.txt"))))))
 
 (define check-sat
