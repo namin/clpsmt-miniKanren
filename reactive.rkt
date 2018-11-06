@@ -81,10 +81,15 @@
                            (== (list time^ ball^) q)
                            (conde
                              [(== #t start)
-                              (== `((0 7 2 3 "red")
-                                    (7 2 4 1 "green")
-                                    (100 100 -1 -2 "blue"))
-                                  balls)]
+                              (fresh (y)
+                                (== `((0 ,y 2 3 "red"))
+                                    balls)
+
+                                (z/assert `(and (>= ,y 0)
+                                                (<= ,y 50)
+                                                (= (mod ,y 10) 0)))
+                                
+                                )]
                              [(== #f start)
                               (== ball* balls)])
                            (membero ball balls)
