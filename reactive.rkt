@@ -58,16 +58,18 @@
                   [(== x-vel-in x-vel-out)
                    (z/assert `(and (>= ,possible-new-x ,left-wall-x)
                                    (<= ,possible-new-x ,right-wall-x)))]
-                  [(z/assert `(= (- ,x-vel-in) ,x-vel-out))
-                   (z/assert `(not (and (>= ,possible-new-x ,left-wall-x)
-                                        (<= ,possible-new-x ,right-wall-x))))])
+                  [(=/= x-vel-in x-vel-out)
+                   (z/assert `(and (not (and (>= ,possible-new-x ,left-wall-x)
+                                        (<= ,possible-new-x ,right-wall-x)))
+                                   (= (- ,x-vel-in) ,x-vel-out)))])
                 (conde
                   [(== y-vel-in y-vel-out)
                    (z/assert `(and (>= ,possible-new-y ,top-wall-y)
                                    (<= ,possible-new-y ,bottom-wall-y)))]
-                  [(z/assert `(= (- ,y-vel-in) ,y-vel-out))
-                   (z/assert `(not (and (>= ,possible-new-y ,top-wall-y)
-                                        (<= ,possible-new-y ,bottom-wall-y))))]))))
+                  [(=/= y-vel-in y-vel-out)
+                   (z/assert `(and (not (and (>= ,possible-new-y ,top-wall-y)
+                                        (<= ,possible-new-y ,bottom-wall-y)))
+                                   (= (- ,y-vel-in) ,y-vel-out)))]))))
 
           (let loop ((time start-time)
                      ;; x y x-velocity y-velocity color
@@ -95,7 +97,7 @@
                                 color)]))
                           new-ball*)
                     
-                (sleep 0.05)
+                ;;(sleep 0.05)
 
                 (loop new-time new-ball*)))))
         (begin
