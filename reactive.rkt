@@ -28,6 +28,52 @@
         (let ((ball-size 5.0)              
               (start-time (modulo (quotient (current-milliseconds) 50) 50)))
           (let loop ((old-time start-time)
+                     (old-ball* `((0 0 2 3) ; x y x-velocity y-velocity
+                                  )))
+            (let ((new-time (modulo (quotient (current-milliseconds) 50) 50)))
+              (if (= new-time old-time)
+                  (loop old-time old-ball*)
+                  (let ((ans (list new-time new-time)))
+                    (let ((factor-ls ans))
+                      (for-each (lambda (ball)
+                                  (match ball
+                                    [`(,x ,y ,x-vel ,y-vel)
+                                     ((clear-solid-ellipse w)
+                                      (make-posn x y)
+                                      ball-size
+                                      ball-size)]))
+                                old-ball*)
+                      
+                      (let ((new-ball* (map (lambda (ball)
+                                              (match ball
+                                                [`(,x ,y ,x-vel ,y-vel)
+                                                 (let ((possible-new-x (+ x x-vel)))
+                                                   (let ((x-vel (if (<= possible-new-x 50)
+                                                                    x-vel
+                                                                    (- x-vel))))
+                                                     (let ((new-x (+ x x-vel))
+                                                           (new-y (+ y y-vel)))
+                                                       ((draw-solid-ellipse w)
+                                                        (make-posn new-x new-y)
+                                                        ball-size
+                                                        ball-size)
+                                                       
+                                                       (let ((new-ball (list new-x new-y x-vel y-vel)))
+                                                         new-ball))))]))
+                                           old-ball*)))
+                        (loop new-time new-ball*))))))))
+        (begin
+          (close-viewport w)
+          (close-graphics)))))
+
+(define (old-draw-bouncing-ball-by-time)
+  (open-graphics)
+  (let ((w (open-viewport "old-draw-bouncing-ball-by-time" horiz vert)))
+    (dynamic-wind
+        void
+        (let ((ball-size 5.0)              
+              (start-time (modulo (quotient (current-milliseconds) 50) 50)))
+          (let loop ((old-time start-time)
                      (old-pos (make-posn 0 0))
                      (x-velocity 2)
                      (y-velocity 3))
