@@ -25,7 +25,11 @@
   (let ((w (open-viewport "draw-bouncing-ball-by-time" horiz vert)))
     (dynamic-wind
         void
-        (let ((ball-size 5.0)              
+        (let ((ball-size 5.0)
+              (left-wall-x 0)
+              (top-wall-y 0)
+              (right-wall-x 295)
+              (bottom-wall-y 295)
               (start-time (modulo (quotient (current-milliseconds) 50) 50)))
           (let loop ((old-time start-time)
                      (old-ball* `((0 0 2 3) ; x y x-velocity y-velocity
@@ -47,10 +51,18 @@
                       (let ((new-ball* (map (lambda (ball)
                                               (match ball
                                                 [`(,x ,y ,x-vel ,y-vel)
-                                                 (let ((possible-new-x (+ x x-vel)))
-                                                   (let ((x-vel (if (<= possible-new-x 50)
+                                                 (let ((possible-new-x (+ x x-vel))
+                                                       (possible-new-y (+ y y-vel)))
+                                                   (let ((x-vel (if (and
+                                                                     (>= possible-new-x left-wall-x)
+                                                                     (<= possible-new-x right-wall-x))
                                                                     x-vel
-                                                                    (- x-vel))))
+                                                                    (- x-vel)))
+                                                         (y-vel (if (and
+                                                                     (>= possible-new-y top-wall-y)
+                                                                     (<= possible-new-y bottom-wall-y))
+                                                                    y-vel
+                                                                    (- y-vel))))
                                                      (let ((new-x (+ x x-vel))
                                                            (new-y (+ y y-vel)))
                                                        ((draw-solid-ellipse w)
