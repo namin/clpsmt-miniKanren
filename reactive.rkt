@@ -1,5 +1,15 @@
 #lang racket
 
+#|
+(bouncing-ball)
+
+(clp-bouncing-ball)
+
+(clp-bouncing-ball-var)
+
+(clp-bouncing-ball-var-direction 'forward)
+|#
+
 (require "mk.rkt")
 (require graphics/graphics)
 
@@ -495,9 +505,9 @@
           (close-viewport w)
           (close-graphics)))))
 
-(define (clp-multiple-bouncing-balls)
+(define (bouncing-ball)
   (open-graphics)
-  (let ((w (open-viewport "clp-multiple-bouncing-balls" horiz vert)))
+  (let ((w (open-viewport "bouncing-ball" horiz vert)))
     (dynamic-wind
         void
         (let ((ball-size 5.0)
@@ -512,6 +522,8 @@
                                   (100 100 -1 -2))))
             (sleep 0.05)
             (let ((new-time (add1 old-time)))
+
+              #|
               (for-each (lambda (ball)
                           (match ball
                             [`(,x ,y ,x-vel ,y-vel)
@@ -520,6 +532,8 @@
                               ball-size
                               ball-size)]))
                         old-ball*)
+              |#
+              
               (let ((new-ball* (map (lambda (ball)
                                       (match ball
                                         [`(,x ,y ,x-vel ,y-vel)
@@ -569,6 +583,7 @@
               (if (= new-time old-time)
                   (loop old-time old-ball*)
                   (begin
+                    #|
                     (for-each (lambda (ball)
                                 (match ball
                                   [`(,x ,y ,x-vel ,y-vel)
@@ -577,7 +592,7 @@
                                     ball-size
                                     ball-size)]))
                               old-ball*)
-                      
+                    |#
                     (let ((new-ball* (map (lambda (ball)
                                             (match ball
                                               [`(,x ,y ,x-vel ,y-vel)
@@ -623,11 +638,14 @@
               (if (= new-time old-time)
                   (loop old-time old-pos x-velocity y-velocity)
                   (begin
+
+                    #|
                     ((clear-solid-ellipse w)
                      old-pos
                      ball-size
                      ball-size)
-                      
+                    |#
+                    
                     (let ((possible-new-x (+ (posn-x old-pos) x-velocity)))
                       (let ((x-velocity (if (<= possible-new-x 50)
                                             x-velocity
