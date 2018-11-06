@@ -29,7 +29,7 @@
               (start-time (modulo (quotient (current-milliseconds) 50) 50)))
           (let loop ((old-time start-time)
                      (old-ball* `((0 0 2 3) ; x y x-velocity y-velocity
-                                  )))
+                                  (7 2 4 1))))
             (let ((new-time (modulo (quotient (current-milliseconds) 50) 50)))
               (if (= new-time old-time)
                   (loop old-time old-ball*)
