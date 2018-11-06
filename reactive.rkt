@@ -37,43 +37,40 @@
                                   (100 100 -1 -2))))
             (sleep 0.05)
             (let ((new-time (add1 old-time)))
-              (let ((ans (list new-time new-time)))
-                (let ((factor-ls ans))
-                  (for-each (lambda (ball)
-                              (match ball
-                                [`(,x ,y ,x-vel ,y-vel)
-                                 ((clear-solid-ellipse w)
-                                  (make-posn x y)
-                                  ball-size
-                                  ball-size)]))
-                            old-ball*)
-                      
-                  (let ((new-ball* (map (lambda (ball)
-                                          (match ball
-                                            [`(,x ,y ,x-vel ,y-vel)
-                                             (let ((possible-new-x (+ x x-vel))
-                                                   (possible-new-y (+ y y-vel)))
-                                               (let ((x-vel (if (and
-                                                                 (>= possible-new-x left-wall-x)
-                                                                 (<= possible-new-x right-wall-x))
-                                                                x-vel
-                                                                (- x-vel)))
-                                                     (y-vel (if (and
-                                                                 (>= possible-new-y top-wall-y)
-                                                                 (<= possible-new-y bottom-wall-y))
-                                                                y-vel
-                                                                (- y-vel))))
-                                                 (let ((new-x (+ x x-vel))
-                                                       (new-y (+ y y-vel)))
-                                                   ((draw-solid-ellipse w)
-                                                    (make-posn new-x new-y)
-                                                    ball-size
-                                                    ball-size)
+              (for-each (lambda (ball)
+                          (match ball
+                            [`(,x ,y ,x-vel ,y-vel)
+                             ((clear-solid-ellipse w)
+                              (make-posn x y)
+                              ball-size
+                              ball-size)]))
+                        old-ball*)
+              (let ((new-ball* (map (lambda (ball)
+                                      (match ball
+                                        [`(,x ,y ,x-vel ,y-vel)
+                                         (let ((possible-new-x (+ x x-vel))
+                                               (possible-new-y (+ y y-vel)))
+                                           (let ((x-vel (if (and
+                                                             (>= possible-new-x left-wall-x)
+                                                             (<= possible-new-x right-wall-x))
+                                                            x-vel
+                                                            (- x-vel)))
+                                                 (y-vel (if (and
+                                                             (>= possible-new-y top-wall-y)
+                                                             (<= possible-new-y bottom-wall-y))
+                                                            y-vel
+                                                            (- y-vel))))
+                                             (let ((new-x (+ x x-vel))
+                                                   (new-y (+ y y-vel)))
+                                               ((draw-solid-ellipse w)
+                                                (make-posn new-x new-y)
+                                                ball-size
+                                                ball-size)
                                                        
-                                                   (let ((new-ball (list new-x new-y x-vel y-vel)))
-                                                     new-ball))))]))
-                                        old-ball*)))
-                    (loop new-time new-ball*)))))))
+                                               (let ((new-ball (list new-x new-y x-vel y-vel)))
+                                                 new-ball))))]))
+                                    old-ball*)))
+                (loop new-time new-ball*)))))
         (begin
           (close-viewport w)
           (close-graphics)))))
@@ -92,47 +89,46 @@
           (let loop ((old-time start-time)
                      (old-ball* `((0 0 2 3) ; x y x-velocity y-velocity
                                   (7 2 4 1)
-                                  (100 100 -1 -1))))
+                                  (100 100 -1 -2))))
             (let ((new-time (modulo (quotient (current-milliseconds) 50) 50)))
               (if (= new-time old-time)
                   (loop old-time old-ball*)
-                  (let ((ans (list new-time new-time)))
-                    (let ((factor-ls ans))
-                      (for-each (lambda (ball)
-                                  (match ball
-                                    [`(,x ,y ,x-vel ,y-vel)
-                                     ((clear-solid-ellipse w)
-                                      (make-posn x y)
-                                      ball-size
-                                      ball-size)]))
-                                old-ball*)
+                  (begin
+                    (for-each (lambda (ball)
+                                (match ball
+                                  [`(,x ,y ,x-vel ,y-vel)
+                                   ((clear-solid-ellipse w)
+                                    (make-posn x y)
+                                    ball-size
+                                    ball-size)]))
+                              old-ball*)
                       
-                      (let ((new-ball* (map (lambda (ball)
-                                              (match ball
-                                                [`(,x ,y ,x-vel ,y-vel)
-                                                 (let ((possible-new-x (+ x x-vel))
-                                                       (possible-new-y (+ y y-vel)))
-                                                   (let ((x-vel (if (and
-                                                                     (>= possible-new-x left-wall-x)
-                                                                     (<= possible-new-x right-wall-x))
-                                                                    x-vel
-                                                                    (- x-vel)))
-                                                         (y-vel (if (and
-                                                                     (>= possible-new-y top-wall-y)
-                                                                     (<= possible-new-y bottom-wall-y))
-                                                                    y-vel
-                                                                    (- y-vel))))
-                                                     (let ((new-x (+ x x-vel))
-                                                           (new-y (+ y y-vel)))
-                                                       ((draw-solid-ellipse w)
-                                                        (make-posn new-x new-y)
-                                                        ball-size
-                                                        ball-size)
+                    (let ((new-ball* (map (lambda (ball)
+                                            (match ball
+                                              [`(,x ,y ,x-vel ,y-vel)
+                                               (let ((possible-new-x (+ x x-vel))
+                                                     (possible-new-y (+ y y-vel)))
+                                                 (let ((x-vel (if (and
+                                                                   (>= possible-new-x left-wall-x)
+                                                                   (<= possible-new-x right-wall-x))
+                                                                  x-vel
+                                                                  (- x-vel)))
+                                                       (y-vel (if (and
+                                                                   (>= possible-new-y top-wall-y)
+                                                                   (<= possible-new-y bottom-wall-y))
+                                                                  y-vel
+                                                                  (- y-vel))))
+                                                   (let ((new-x (+ x x-vel))
+                                                         (new-y (+ y y-vel)))
+                                                     ((draw-solid-ellipse w)
+                                                      (make-posn new-x new-y)
+                                                      ball-size
+                                                      ball-size)
                                                        
-                                                       (let ((new-ball (list new-x new-y x-vel y-vel)))
-                                                         new-ball))))]))
-                                           old-ball*)))
-                        (loop new-time new-ball*))))))))
+                                                     (let ((new-ball (list new-x new-y x-vel y-vel)))
+                                                       new-ball))))]))
+                                          old-ball*)))
+                      (loop new-time new-ball*)))))))
         (begin
           (close-viewport w)
           (close-graphics)))))
@@ -151,26 +147,25 @@
             (let ((new-time (modulo (quotient (current-milliseconds) 50) 50)))
               (if (= new-time old-time)
                   (loop old-time old-pos x-velocity y-velocity)
-                  (let ((ans (list new-time new-time)))
-                    (let ((factor-ls ans))
-                      ((clear-solid-ellipse w)
-                       old-pos
-                       ball-size
-                       ball-size)
+                  (begin
+                    ((clear-solid-ellipse w)
+                     old-pos
+                     ball-size
+                     ball-size)
                       
-                      (let ((possible-new-x (+ (posn-x old-pos) x-velocity)))
-                        (let ((x-velocity (if (<= possible-new-x 50)
-                                              x-velocity
-                                              (- x-velocity))))
-                          (let ((new-x (+ (posn-x old-pos) x-velocity)))
-                            (let ((new-pos (make-posn new-x
-                                                      (+ (posn-y old-pos) y-velocity))))
-                              ((draw-solid-ellipse w)
-                               new-pos
-                               ball-size
-                               ball-size)
+                    (let ((possible-new-x (+ (posn-x old-pos) x-velocity)))
+                      (let ((x-velocity (if (<= possible-new-x 50)
+                                            x-velocity
+                                            (- x-velocity))))
+                        (let ((new-x (+ (posn-x old-pos) x-velocity)))
+                          (let ((new-pos (make-posn new-x
+                                                    (+ (posn-y old-pos) y-velocity))))
+                            ((draw-solid-ellipse w)
+                             new-pos
+                             ball-size
+                             ball-size)
                               
-                              (loop new-time new-pos x-velocity y-velocity)))))))))))
+                            (loop new-time new-pos x-velocity y-velocity))))))))))
         (begin
           (close-viewport w)
           (close-graphics)))))
