@@ -123,26 +123,29 @@
                                 
                                 )]
                              |#
-
+                             
                              [(== #t start)
                               (fresh (y)
                                 (== `((150 100 20 5 "red"))
-                                    balls)
-                                )
+                                    balls))]
+                             
+                             [(== #f start)
+                              (== new-ball* balls)])
+
+                           (conde
+                             [(== #t start)
                               (conde
                                 [(== 'forward direction)
                                  (== start-time time)]
                                 [(== 'backward direction)
                                  (== end-time time^)])]
-                             
                              [(== #f start)
-                              (== new-ball* balls)
                               (conde
                                 [(== 'forward direction)
                                  (== new-time time)]
                                 [(== 'backward direction)
                                  (== new-time time^)])])
-
+                           
                            (conde
                              [(== 'forward direction)
                               (membero ball balls)]
