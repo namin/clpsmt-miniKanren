@@ -29,9 +29,9 @@
         [(=/= x y)
          (membero x rest)]))))
 
-(define (clp-bouncing-ball)
+(define (clp-bouncing-ball-slow)
   (open-graphics)
-  (let ((w (open-viewport "clp-bouncing-ball" horiz vert)))
+  (let ((w (open-viewport "clp-bouncing-ball-slow" horiz vert)))
     (dynamic-wind
         void
         (let ((ball-size 5.0)
