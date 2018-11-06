@@ -29,6 +29,151 @@
         [(=/= x y)
          (membero x rest)]))))
 
+(define (clp-bouncing-ball-var-direction direction)
+  (open-graphics)
+  (let ((w (open-viewport "clp-bouncing-ball-var-direction" horiz vert)))
+    (dynamic-wind
+        void
+        (let ((ball-size 5.0)
+              (left-wall-x 0)
+              (top-wall-y 0)
+              (right-wall-x 295)
+              (bottom-wall-y 295)
+              (start-time 0)
+              (end-time 100))
+          
+          (define bounce-stepo
+            (lambda (time-in ball-in time-out ball-out)
+              (fresh (x-in y-in x-vel-in y-vel-in color-in
+                      x-out y-out x-vel-out y-vel-out color-out
+                      possible-new-x possible-new-y)                
+                (== `(,x-in ,y-in ,x-vel-in ,y-vel-in ,color-in) ball-in)
+                (== `(,x-out ,y-out ,x-vel-out ,y-vel-out ,color-out) ball-out)
+                (== color-in color-out)
+                (z/assert `(and (= (+ ,time-in 1) ,time-out)
+                                (= (+ ,x-in ,x-vel-in) ,possible-new-x)
+                                (= (+ ,y-in ,y-vel-in) ,possible-new-y)
+                                (= (+ ,x-in ,x-vel-out) ,x-out)
+                                (= (+ ,y-in ,y-vel-out) ,y-out)))
+                (conde
+                  [(== x-vel-in x-vel-out)
+                   (z/assert `(and (>= ,possible-new-x ,left-wall-x)
+                                   (<= ,possible-new-x ,right-wall-x)))]
+                  [(=/= x-vel-in x-vel-out)
+                   (z/assert `(and (not (and (>= ,possible-new-x ,left-wall-x)
+                                        (<= ,possible-new-x ,right-wall-x)))
+                                   (= (- ,x-vel-in) ,x-vel-out)))])
+                (conde
+                  [(== y-vel-in y-vel-out)
+                   (z/assert `(and (>= ,possible-new-y ,top-wall-y)
+                                   (<= ,possible-new-y ,bottom-wall-y)))]
+                  [(=/= y-vel-in y-vel-out)
+                   (z/assert `(and (not (and (>= ,possible-new-y ,top-wall-y)
+                                        (<= ,possible-new-y ,bottom-wall-y)))
+                                   (= (- ,y-vel-in) ,y-vel-out)))]))))
+
+          (let loop ((start #t)
+                     (new-time 'dummy)
+                     (new-ball* 'dummy))
+
+            (let ((ans (run* (q)
+                         (fresh (time ball balls time^ ball^)
+
+                           (conde
+                             [(== 'forward direction)
+                              (== (list time^ ball^) q)]
+                             [(== 'backward direction)
+                              (== (list time ball) q)])
+                           
+                           (conde
+
+                             #|
+                             [(== #t start)
+                              (fresh (x-vel y-vel color)
+                                ;; x y x-velocity y-velocity color
+                                (== `((100 43 ,x-vel ,y-vel ,color))
+                                    balls)
+
+                                (z/assert `(and (>= ,x-vel -3)
+                                                (<= ,x-vel 3)))
+
+                                (conde
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 0)
+                                                   (= ,x-vel ,y-vel)))
+                                   (== "red" color)]
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 1)
+                                                   (= (- ,x-vel) ,y-vel)))
+                                   (== "blue" color)]
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 2)
+                                                   (= (* ,x-vel 2) ,y-vel)))
+                                   (== "purple" color)])
+                                
+                                )]
+                             |#
+
+                             #|
+                             [(== #t start)
+                              (fresh (y)
+                                (== `((0 ,y 2 3 "red"))
+                                    balls)
+
+                                (z/assert `(and (>= ,y 0)
+                                                (<= ,y 50)
+                                                (= (mod ,y 10) 0)))
+                                
+                                )]
+                             |#
+
+                             [(== #t start)
+                              (fresh (y)
+                                (== `((150 100 20 5 "red"))
+                                    balls)
+                                )
+                              (conde
+                                [(== 'forward direction)
+                                 (== start-time time)]
+                                [(== 'backward direction)
+                                 (== end-time time^)])]
+                             
+                             [(== #f start)
+                              (== new-ball* balls)
+                              (conde
+                                [(== 'forward direction)
+                                 (== new-time time)]
+                                [(== 'backward direction)
+                                 (== new-time time^)])])
+
+                           (conde
+                             [(== 'forward direction)
+                              (membero ball balls)]
+                             [(== 'backward direction)
+                              (membero ball^ balls)])                           
+                           
+                           (bounce-stepo time ball time^ ball^)))))              
+              (let ((new-time (caar ans))
+                    (new-ball* (map (lambda (a)
+                                      (match a
+                                        [`(,t ,new-ball)
+                                         new-ball]))
+                                    ans)))
+                
+                (for-each (lambda (ball)
+                            (match ball
+                              [`(,x ,y ,x-vel ,y-vel ,color)
+                               ((draw-solid-ellipse w)
+                                (make-posn x y)
+                                ball-size
+                                ball-size
+                                color)]))
+                          new-ball*)
+                
+                ;;(sleep 0.05)
+
+                (loop #f new-time new-ball*)))))
+        (begin
+          (close-viewport w)
+          (close-graphics)))))
+
 (define (clp-bouncing-ball-var)
   (open-graphics)
   (let ((w (open-viewport "clp-bouncing-ball-var" horiz vert)))
@@ -73,7 +218,6 @@
 
           (let loop ((start #t)
                      (time start-time)
-                     ;; x y x-velocity y-velocity color
                      (ball* 'dummy))
 
             (let ((ans (run* (q)
@@ -83,6 +227,7 @@
 
                              [(== #t start)
                               (fresh (x-vel y-vel color)
+                                ;; x y x-velocity y-velocity color
                                 (== `((100 43 ,x-vel ,y-vel ,color))
                                     balls)
 
