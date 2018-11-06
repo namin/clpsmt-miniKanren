@@ -80,6 +80,29 @@
                          (fresh (ball balls time^ ball^)
                            (== (list time^ ball^) q)
                            (conde
+
+                             [(== #t start)
+                              (fresh (x-vel y-vel color)
+                                (== `((100 43 ,x-vel ,y-vel ,color))
+                                    balls)
+
+                                (z/assert `(and (>= ,x-vel -3)
+                                                (<= ,x-vel 3)))
+
+                                (conde
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 0)
+                                                   (= ,x-vel ,y-vel)))
+                                   (== "red" color)]
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 1)
+                                                   (= (- ,x-vel) ,y-vel)))
+                                   (== "blue" color)]
+                                  [(z/assert `(and (= (mod (abs ,x-vel) 3) 2)
+                                                   (= (* ,x-vel 2) ,y-vel)))
+                                   (== "purple" color)])
+                                
+                                )]
+
+                             #|
                              [(== #t start)
                               (fresh (y)
                                 (== `((0 ,y 2 3 "red"))
@@ -90,6 +113,8 @@
                                                 (= (mod ,y 10) 0)))
                                 
                                 )]
+                             |#
+                             
                              [(== #f start)
                               (== ball* balls)])
                            (membero ball balls)
