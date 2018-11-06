@@ -10,6 +10,8 @@
          conde
          symbolo numbero
          absento
+         succeed
+         fail
          project
          z/assert
          z/)
