@@ -87,7 +87,6 @@
                            
                            (conde
 
-                             #|
                              [(== #t start)
                               (fresh (x-vel y-vel color)
                                 ;; x y x-velocity y-velocity color
@@ -109,9 +108,8 @@
                                    (== "purple" color)])
                                 
                                 )]
-                             |#
 
-
+                             #|
                              [(== #t start)
                               (fresh (y)
                                 (== `((150 ,y 10 5 "red"))
@@ -122,6 +120,7 @@
                                                 (= (mod ,y 20) 0)))
                                 
                                 )]
+                             |#
 
                              #|
                              [(== #t start)
