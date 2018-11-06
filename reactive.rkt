@@ -111,23 +111,24 @@
                                 )]
                              |#
 
-                             #|
+
                              [(== #t start)
                               (fresh (y)
-                                (== `((0 ,y 2 3 "red"))
+                                (== `((150 ,y 10 5 "red"))
                                     balls)
 
-                                (z/assert `(and (>= ,y 0)
-                                                (<= ,y 50)
+                                (z/assert `(and (>= ,y 100)
+                                                (<= ,y 150)
                                                 (= (mod ,y 10) 0)))
                                 
                                 )]
-                             |#
-                             
+
+                             #|
                              [(== #t start)
                               (fresh (y)
                                 (== `((150 100 20 5 "red"))
                                     balls))]
+                             |#
                              
                              [(== #f start)
                               (== new-ball* balls)])
