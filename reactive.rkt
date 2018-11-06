@@ -74,7 +74,7 @@
           (let loop ((time start-time)
                      ;; x y x-velocity y-velocity color
                      (ball* `((0 7 2 3 "red")
-                              (7 2 4 1)
+                              (7 2 4 1 "green")
                               (100 100 -1 -2 "blue"))))
 
             (let ((ans (run* (q)
