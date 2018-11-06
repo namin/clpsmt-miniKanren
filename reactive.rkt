@@ -32,6 +32,60 @@
               (bottom-wall-y 295)
               (start-time 0))
           (let loop ((old-time start-time)
+                     (old-ball `(0 7 2 3 "red") ; x y x-velocity y-velocity color
+                               ))
+            (sleep 0.05)
+            (let ((new-time (add1 old-time)))
+
+              #|
+              (match old-ball
+                [`(,x ,y ,x-vel ,y-vel ,color)
+                 ((clear-solid-ellipse w)
+                  (make-posn x y)
+                  ball-size
+                  ball-size)])
+              |#
+
+              (match old-ball
+                [`(,x ,y ,x-vel ,y-vel ,color)
+                 (let ((possible-new-x (+ x x-vel))
+                       (possible-new-y (+ y y-vel)))
+                   (let ((x-vel (if (and
+                                     (>= possible-new-x left-wall-x)
+                                     (<= possible-new-x right-wall-x))
+                                    x-vel
+                                    (- x-vel)))
+                         (y-vel (if (and
+                                     (>= possible-new-y top-wall-y)
+                                     (<= possible-new-y bottom-wall-y))
+                                    y-vel
+                                    (- y-vel))))
+                     (let ((new-x (+ x x-vel))
+                           (new-y (+ y y-vel)))
+                       ((draw-solid-ellipse w)
+                        (make-posn new-x new-y)
+                        ball-size
+                        ball-size
+                        color)
+                       
+                       (let ((new-ball (list new-x new-y x-vel y-vel color)))
+                         (loop new-time new-ball)))))]))))
+        (begin
+          (close-viewport w)
+          (close-graphics)))))
+
+(define (clp-multiple-bouncing-balls)
+  (open-graphics)
+  (let ((w (open-viewport "clp-multiple-bouncing-balls" horiz vert)))
+    (dynamic-wind
+        void
+        (let ((ball-size 5.0)
+              (left-wall-x 0)
+              (top-wall-y 0)
+              (right-wall-x 295)
+              (bottom-wall-y 295)
+              (start-time 0))
+          (let loop ((old-time start-time)
                      (old-ball* `((0 0 2 3) ; x y x-velocity y-velocity
                                   (7 2 4 1)
                                   (100 100 -1 -2))))
