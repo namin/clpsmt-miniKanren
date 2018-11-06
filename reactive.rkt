@@ -253,7 +253,7 @@
                              #|
                              [(== #t start)
                               (fresh (y)
-                                (== `((0 ,y 2 3 "red"))
+                                (== `((0 ,y 2 3 "blue"))
                                     balls)
 
                                 (z/assert `(and (>= ,y 0)
