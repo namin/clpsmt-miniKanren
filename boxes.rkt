@@ -1,6 +1,10 @@
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "test-check.scm")
+#lang racket
+
+(require "mk.rkt")
+(require graphics/graphics)
+
+(provide (all-from-out "mk.rkt")
+         (all-defined-out))
 
 (define (is-boxo b x y w h)
   (fresh ()
@@ -51,22 +55,19 @@
     (not-withino ax aw bx bw)
     (not-withino ay ah by bh)))
 
-(test "impossible-boxes"
-  (run* (q)
-    (fresh (a b c)
-      (== q (list a b c))
-      (make-boxo 2 2 a)
-      (make-boxo 3 3 b)
-      (contains-boxo b a)))
-  '())
-
-(test "possible-boxes"
-  (run 1 (q)
+(define (ex1)
+  (define r
+    (run 1 (q)
     (fresh (a b c)
       (== q (list a b c))
       (make-boxo 2 2 a)
       (make-boxo 3 3 b)
       (make-boxo 4 4 c)
       (contains-boxo a b)
-      (overlaps-boxo b c)))
-  '(((box 1 0 2 2) (box 1 0 3 3) (box 0 1 4 4))))
+      (overlaps-boxo b c))))
+  (open-graphics)
+  (define v (open-viewport "practice" 200 200))
+  (define (s x) (* x 20))
+  (define (draw-box b)
+    ((draw-rectangle v) (make-posn (s (cadr b)) (s (caddr b))) (s (cadddr b)) (s (cadddr (cdr b)))))
+  (map draw-box (car r)))
