@@ -844,9 +844,11 @@
                (filter (undeclared? (map cadr ds)) (map cdr S)))
            M))))))
 
+(define defer-smt-checks #f)
+
 (define z/check
   (lambdag@ (c : S D A T M)
-    (if (check-sat (cdr ((z/reify-SM M) c)))
+    (if (or defer-smt-checks (check-sat (cdr ((z/reify-SM M) c))))
         c
         #f)))
 

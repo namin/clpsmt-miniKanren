@@ -2,6 +2,8 @@
 (load "z3-driver.scm")
 (load "test-check.scm")
 
+(set! defer-smt-checks #t)
+
 (define (is-boxo b x y w h)
   (fresh ()
     (z/assert `(<= 0 ,x))
