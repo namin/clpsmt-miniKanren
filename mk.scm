@@ -873,6 +873,8 @@
            ((== (cdr (assq (caar m) s)) (cdar m)) c)
            (add-model (cdr m) s))))))
 
+(define get-next-model? #t)
+
 (define z/purge
   (lambdag@ (c : S D A T M)
     (if (null? M)
@@ -887,4 +889,6 @@
                       (and m
                         (mplus
                          ((add-model m (car SM)) `(,S ,D ,A ,T ()))
-                         (lambda () (loop (cons m ms)))))))))))))
+                         (lambda () (if get-next-model?
+                                   (loop (cons m ms))
+                                   #f))))))))))))

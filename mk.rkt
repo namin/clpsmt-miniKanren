@@ -15,7 +15,9 @@
          project
          z/assert
          z/
-         do-defer-smt-checks!)
+         do-defer-smt-checks!
+         get-next-model?
+         toggle-get-next-model?!)
 
 ;; extra stuff for racket
 ;; due mostly to samth
@@ -34,3 +36,5 @@
 (include "mk.scm")
 (define (do-defer-smt-checks!)
   (set! defer-smt-checks #t))
+(define (toggle-get-next-model?!)
+  (set! get-next-model? (not get-next-model?)))

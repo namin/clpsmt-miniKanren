@@ -94,8 +94,14 @@
     ((z/assert `(= ,tq ,t)) (g))
     ((z/assert `(not (= ,tq ,t))) (runt (+ 1 t) tq g))))
 
+(define (with-toggled-get-next-model?! t)
+  (toggle-get-next-model?!)
+  (let ((r (t)))
+    (toggle-get-next-model?!)
+    r))
+
 (define (ex5)
-  (let ((r (run 10 (b) (fresh (t) (z/assert `(<= 0 ,t)) (runt 0 t (lambda () ((moveo3 t) b)))))))
+  (let ((r (with-toggled-get-next-model?! (lambda () (run 10 (b) (fresh (t) (z/assert `(<= 0 ,t)) (runt 0 t (lambda () ((moveo3 t) b)))))))))
     (big-bang r
               (on-tick cdr TICK-RATE)
               (stop-when null?)
