@@ -70,8 +70,11 @@
             (stop-when (lambda (t) (null? (move2 t))))
             (to-draw (lambda (t) (draw-scene (car (move2 t)))))))
 
+(define ((moveo3 t) b)
+  (fresh (y) ((moveo t) b) (boxo-y b y) (z/assert `(= ,y 100))))
+
 (define (move3 t)
-  (run 1 (b) ((moveo t) b) (fresh (y) (boxo-y b y) (z/assert `(= ,y 100)))))
+  (run 1 (b) ((moveo3 t) b)))
 
 (define (ex3)
   (big-bang 0
@@ -79,3 +82,9 @@
             (stop-when (lambda (t) (null? (move3 t))))
             (to-draw (lambda (t) (draw-scene (car (move3 t)))))))
   
+(define (ex4)
+  (let ((r (run 10 (b) (fresh (t) ((moveo3 t) b)))))
+    (big-bang r
+              (on-tick cdr TICK-RATE)
+              (stop-when null?)
+              (to-draw (lambda (x) (draw-scene (car x)))))))
