@@ -16,6 +16,9 @@
 (provide (all-from-out "mk.rkt")
          (all-defined-out))
 
+(do-defer-smt-checks!)
+(when get-next-model? (toggle-get-next-model?!))
+
 (define pi 3.14159)
 (define two-pi (* pi 2))
 
