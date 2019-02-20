@@ -88,3 +88,15 @@
               (on-tick cdr TICK-RATE)
               (stop-when null?)
               (to-draw (lambda (x) (draw-scene (car x)))))))
+
+(define (runt t tq g)
+  (conde
+    ((z/assert `(= ,tq ,t)) (g))
+    ((z/assert `(not (= ,tq ,t))) (runt (+ 1 t) tq g))))
+
+(define (ex5)
+  (let ((r (run 10 (b) (fresh (t) (z/assert `(<= 0 ,t)) (runt 0 t (lambda () ((moveo3 t) b)))))))
+    (big-bang r
+              (on-tick cdr TICK-RATE)
+              (stop-when null?)
+              (to-draw (lambda (x) (draw-scene (car x)))))))
