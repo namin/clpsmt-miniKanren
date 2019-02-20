@@ -14,7 +14,8 @@
          fail
          project
          z/assert
-         z/)
+         z/
+         do-defer-smt-checks!)
 
 ;; extra stuff for racket
 ;; due mostly to samth
@@ -31,3 +32,5 @@
 
 (include "z3-driver.rkt")
 (include "mk.scm")
+(define (do-defer-smt-checks!)
+  (set! defer-smt-checks #t))

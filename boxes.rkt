@@ -1,6 +1,7 @@
 #lang racket
 
 (require "mk.rkt")
+(do-defer-smt-checks!)
 (require graphics/graphics)
 
 (provide (all-from-out "mk.rkt")
