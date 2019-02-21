@@ -1,8 +1,6 @@
 #lang racket
 
 (require racket/system)
-(define (model-assoc m)
-  (map (lambda (x) (match x [(list _ lhs _ _ rhs) (cons lhs rhs)])) (cdr m)))
 
 (define rows
   (for/list ([i (in-range 1 10)])
@@ -20,16 +18,33 @@
 (define (name ij)
   (let ((i (car ij)) (j (cdr ij)))
     (string->symbol (string-append "x" (string-append (number->string i) (number->string j))))))
-(define (get ij m) (cdr (assoc (name ij) m)))
-(define (model->sudoku m)
+(define (model-assoc m)
+  (map (lambda (x) (match x [(list _ lhs _ _ rhs) (cons lhs rhs)])) (cdr m)))
+(define (model-get m ij) (cdr (assoc (name ij) m)))
+(define (model->puzzle m)
   (for/vector ([i (in-range 1 10)])
     (for/vector ([j (in-range 1 10)])
-      (get (cons i j) m))))
-(define (print-model m)
+      (model-get m (cons i j)))))
+(define (print-puzzle puzzle)
   (printf "~a\n" "'#(")
-  (for ([line m])
+  (for ([line puzzle])
     (printf "   ~a\n" line))
   (printf "  ~a\n" ")"))
+(define (puzzle-index puzzle i j)
+  (vector-ref (vector-ref puzzle (- i 1)) (- j 1)))
+
+(define puzzle
+  '#(
+     #(4 0 0 0 0 0 8 0 5)
+     #(0 3 0 0 0 0 0 0 0)
+     #(0 0 0 7 0 0 0 0 0)
+     #(0 2 0 0 0 0 0 6 0)
+     #(0 0 0 0 8 0 4 0 0)
+     #(0 0 0 0 1 0 0 0 0)
+     #(0 0 0 6 0 3 0 7 0)
+     #(5 0 0 2 0 0 0 0 0)
+     #(1 0 4 0 0 0 0 0 0)
+    ))
 
 (define (say msg)
   (printf "~a\n" msg))
@@ -45,24 +60,6 @@
     (for ([r c])
       (say `(assert (distinct . ,(map name r)))))))
 
-;(board-constraints say)
-
-(define puzzle
-  '#(
-     #(4 0 0 0 0 0 8 0 5)
-     #(0 3 0 0 0 0 0 0 0)
-     #(0 0 0 7 0 0 0 0 0)
-     #(0 2 0 0 0 0 0 6 0)
-     #(0 0 0 0 8 0 4 0 0)
-     #(0 0 0 0 1 0 0 0 0)
-     #(0 0 0 6 0 3 0 7 0)
-     #(5 0 0 2 0 0 0 0 0)
-     #(1 0 4 0 0 0 0 0 0)
-    ))
-
-(define (puzzle-index puzzle i j)
-  (vector-ref (vector-ref puzzle (- i 1)) (- j 1)))
-
 (define (puzzle-constraints puzzle say)
   (for ([i (in-range 1 10)])
     (for ([j (in-range 1 10)])
@@ -71,13 +68,13 @@
           (let ((x (name (cons i j))))
             (say `(assert (= ,x ,r)))))))))
 
-(define (uniqueness-constraints puzzle m say)
+(define (uniqueness-constraints puzzle solution say)
   (say
    `(assert (or .
                 ,(for*/list ([i (in-range 1 10)] [j (in-range 1 10)]
                              #:when (= 0 (puzzle-index puzzle i j)))
                    (let ((x (name (cons i j))))
-                     `(not (= ,x ,(puzzle-index m i j)))))))))
+                     `(not (= ,x ,(puzzle-index solution i j)))))))))
 
 (define (solve-sudoku puzzle)
   (match (process "z3 -in")
@@ -99,10 +96,10 @@
      (board-constraints say)
      (puzzle-constraints puzzle say)
      (if (check-sat)
-         (let ((m (model->sudoku (get-model))))
-           (print-model m)
+         (let ((solution (model->puzzle (get-model))))
+           (print-puzzle solution)
 
-           (uniqueness-constraints puzzle m say)
+           (uniqueness-constraints puzzle solution say)
 
            (if (check-sat)
                (printf "~a\n" ";; solution is not unique!")
