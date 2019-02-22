@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e -v
+
+bash $1 $2
