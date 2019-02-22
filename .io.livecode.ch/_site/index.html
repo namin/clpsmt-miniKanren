@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="live norun" id="ex">
+<div class="live norun" id="ex1">
 #lang racket
 
 (require racket/system)
@@ -122,6 +122,9 @@
 </div>
 
 <div class="live" id="run1" data-lib="ex1" data-mode="text/x-sh">
+#!/bin/bash
+set -e -v
+
 racket $1
 </div>
 
