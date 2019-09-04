@@ -5,6 +5,6 @@
  ((par (A B) ((pair (fst A) (snd B))))))
 
 (declare-datatypes
- ((Ty 0))
- (((arr (arr_param Ty) (arr_return Ty))
-   (rcd (rcd_set (Set (Pair Int Ty)))))))
+ ((Typ 0))
+ (((arr (arr_param Typ) (arr_return Typ))
+   (rcd (rcd_set (Set (Pair Int Typ)))))))

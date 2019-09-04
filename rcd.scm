@@ -1,5 +1,8 @@
-;(load "cvc4-set-tests.scm")
-(load "clpset.scm")
+(load "mk.scm")
+(load "cvc4-driver.scm")
+(load "test-check.scm")
+;;(load "cvc4-set-tests.scm")
+;;(load "clpset.scm")
 
 (define (declare-datatypes)
   (fresh ()
