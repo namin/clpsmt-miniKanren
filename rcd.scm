@@ -32,7 +32,7 @@
   (lambda (t1 t2)
     (conde
       ((z/== t1 t2))
-      ((z/=/= t1 t2)
+      ((z/assert `(not (= ,t1 ,t2)))
        (conde
          ((fresh (ta1 tb1 ta2 tb2)
             (typ ta1) (typ tb1) (typ ta2) (typ tb2)
@@ -52,9 +52,11 @@
     ))
 
 (test "1"
-  (run 1 (q) (declare-datatypes)
-      (fresh (t1 t2)
-        (typ t1) (typ t2)
-        (== q (list t1 t2))
-        (sub t1 t2)))
-  )
+  (run 1 (q)
+    (declare-datatypes)
+    (fresh (t1 t2)
+      (typ t1) (typ t2)
+      (== q (list t1 t2))
+      (sub t1 t2)))
+  '(((rcd (as emptyset (Set (Pair Label Ty))))
+     (rcd (as emptyset (Set (Pair Label Ty)))))))

@@ -790,7 +790,8 @@
 (define declare-datatypes?
   (lambda (s)
     (and (pair? s)
-         (eq? 'declare-datatypes (car s))
+         (or (eq? 'declare-datatypes (car s))
+             (eq? 'declare-sort (car s)))
          (cadr s))))
 
 (define declares?
