@@ -26,3 +26,11 @@
 (test "syn-double"
   (run* (q) (synthesize q '((1 . 2) (2 . 4))))
   '((lambda (x) (+ (* 2 x) 0))))
+
+(test "syn-const"
+  (run* (q) (synthesize q '((1 . 2) (2 . 2))))
+  '((lambda (x) (+ (* 0 x) 2))))
+
+(test "syn-no"
+  (run* (q) (synthesize q '((2 . 3) (3 . 2) (4 . 3))))
+  '())
