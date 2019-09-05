@@ -2,20 +2,27 @@
 (load "cvc4-driver.scm")
 (load "test-check.scm")
 
-(define (assert-exs f exs)
-  (conde
-    ((== '() exs))
-    ((fresh (a d i o)
-       (== (cons a d) exs)
-       (== (cons i o) a)
-       (z/assert `(= (,f ,i) ,o))
-       (assert-exs f d)))))
+;; following https://barghouthi.github.io/2017/04/24/synthesis-primer/
 
-(define (synthesize f exs)
-  (fresh ()
-    (z/ `(declare-fun ,f (Int) Int))
-    (assert-exs f exs)))
+(define (synthesize q exs)
+  (fresh (a b)
+    (let ((shape `(+ (* ,a x) ,b)))
+      (fresh ()
+        (z/ `(declare-const ,a Int))
+        (z/ `(declare-const ,b Int))
+        (z/ `(assert (forall ((x Int) (y Int))
+                             (=> (or ,@(map (lambda (ex)
+                                              `(and (= x ,(car ex))
+                                                    (= y ,(cdr ex))))
+                                            exs))
+                                 (= y ,shape)))))
+        (== q `(lambda (x) ,shape))))))
 
 
-(run 1 (q)
-  (synthesize q '((1 . 2) (3 . 4) (5 . 6) (6 . 7) (7 . 8))))
+(test "syn-inc"
+  (run* (q) (synthesize q '((1 . 2) (2 . 3))))
+  '((lambda (x) (+ (* 1 x) 1))))
+
+(test "syn-double"
+  (run* (q) (synthesize q '((1 . 2) (2 . 4))))
+  '((lambda (x) (+ (* 2 x) 0))))
