@@ -6,9 +6,9 @@
 ;; an embedded domain-specific language in Scheme, to create an environment for constraint logic programming.
 ;; We describe the simple implementation and illustrate the technology through interpreters, synthesis, and symbolic execution.
 
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "test-check.scm")
+;(load "mk.scm")
+;(load "z3-driver.scm")
+;(load "test-check.scm")
 
 ;; crash course on miniKanren
 (define appendo
@@ -37,7 +37,7 @@
     ((a b c d) (e))
     ((a b c d e) ())))
 
-(load "full-interp-quine.scm")
+(load "../clpsmt-miniKanren/full-interp-quine.scm")
 
 (test "evalo-append-forward"
   (run* (q)
@@ -187,7 +187,7 @@
     (facto q 720))
   '(6))
 
-(load "full-interp.scm")
+(load "../clpsmt-miniKanren/full-interp.scm")
 
 (test "evalo-1"
   (run* (q)
@@ -260,7 +260,7 @@
      (lambda (x) (* 2 x))
      (lambda (x) (* x 2))))
 
-(load "while-abort.scm")
+(load "../clpsmt-miniKanren/while-abort.scm")
 
 ;;; The following example is adapted from:
 ;;;
