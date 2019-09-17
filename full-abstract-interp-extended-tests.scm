@@ -1,8 +1,8 @@
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "sign-domain.scm")
-(load "test-check.scm")
-(load "full-abstract-interp-extended.scm")
+;(load "mk.scm")
+;(load "z3-driver.scm")
+(load "../clpsmt-miniKanren/sign-domain.scm")
+;(load "test-check.scm")
+(load "../clpsmt-miniKanren/full-abstract-interp-extended.scm")
 
 ;;; WEB stopping point:  21 April 02018
 ;;;
