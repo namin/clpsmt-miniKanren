@@ -1,7 +1,7 @@
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "test-check.scm")
-(load "full-interp-extended.scm")
+;(load "mk.scm")
+;(load "z3-driver.scm")
+;(load "test-check.scm")
+(load "../clpsmt-miniKanren/full-interp-extended.scm")
 
 
 (test "synthesize-triple-by-example-2c13"

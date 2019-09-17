@@ -1,7 +1,7 @@
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "test-check.scm")
-(load "full-interp.scm")
+;(load "mk.scm")
+;(load "z3-driver.scm")
+;(load "test-check.scm")
+(load "../clpsmt-miniKanren/full-interp.scm")
 
 (test "symbolic-execution-1a"
   (run 10 (q)
