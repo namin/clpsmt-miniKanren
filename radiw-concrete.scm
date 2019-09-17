@@ -1,5 +1,5 @@
-(load "mk.scm")
-(load "z3-driver.scm")
+;(load "mk.scm")
+;(load "z3-driver.scm")
 
 (define (lookupo x env val)
   (fresh (y v rest)

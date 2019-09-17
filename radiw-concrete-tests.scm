@@ -1,5 +1,5 @@
-(load "radiw-concrete.scm")
-(load "test-check.scm")
+(load "../clpsmt-miniKanren/radiw-concrete.scm")
+;(load "test-check.scm")
 
 ;; WEB todo
 ;;
@@ -57,6 +57,31 @@
                  (if0 (var n)
                       (int 0)
                       (if0 (plus (var n) (int -1))
+                           ,r
+                           (plus (app (var self)
+                                      (plus (var n) (int -1)))
+                                 (app (var self)
+                                      (plus (var n) (int -2)))))))
+           fib))
+     (evalo `(app ,fib (int 6)) '(int 8)))
+   '((lam self
+          n
+          (if0 (var n)
+               (int 0)
+               (if0 (plus (var n) (int -1))
+                    (int 1)
+                    (plus
+                     (app (var self) (plus (var n) (int -1)))
+                     (app (var self) (plus (var n) (int -2))))))))))
+
+(time
+ (test "fib-synthesis-2"
+   (run 1 (fib)
+     (fresh (r r1)
+       (== `(lam self n
+                 (if0 (var n)
+                      (int 0)
+                      (if0 (plus (var n) ,r1)
                            ,r
                            (plus (app (var self)
                                       (plus (var n) (int -1)))
