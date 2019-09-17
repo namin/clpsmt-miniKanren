@@ -1,7 +1,7 @@
-(load "mk.scm")
-(load "z3-driver.scm")
-(load "test-check.scm")
-(load "radi.scm")
+;;(load "mk.scm")
+;;(load "z3-driver.scm")
+;;(load "test-check.scm")
+(load "../clpsmt-miniKanren/radi.scm")
 
 (test "set-unionso-0"
   (run* [q]
@@ -554,7 +554,7 @@
         (n (aval (neg zer pos) ()))))))))
 
 
-(todo "radi-fact-app-2"
+(test "radi-fact-app-2"
   (run 3 [q]
     (fresh (e n out a d)
       (== (list e out) q)
