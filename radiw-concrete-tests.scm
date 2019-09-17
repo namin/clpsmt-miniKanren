@@ -77,18 +77,21 @@
 (time
  (test "fib-synthesis-2"
    (run 1 (fib)
-     (fresh (r r1)
+     (fresh (r r1 r2)
        (== `(lam self n
                  (if0 (var n)
                       (int 0)
-                      (if0 (plus (var n) ,r1)
+                      (if0 (plus (var n) (int -1))
                            ,r
                            (plus (app (var self)
-                                      (plus (var n) (int -1)))
+                                      (plus (var n) ,r1))
                                  (app (var self)
-                                      (plus (var n) (int -2)))))))
+                                      (plus (var n) ,r2))))))
            fib))
-     (evalo `(app ,fib (int 6)) '(int 8)))
+     (evalo `(app ,fib (int 0)) '(int 0))
+     (evalo `(app ,fib (int 2)) '(int 1))
+     (evalo `(app ,fib (int 3)) '(int 2))
+     (evalo `(app ,fib (int 4)) '(int 3)))
    '((lam self
           n
           (if0 (var n)
@@ -96,5 +99,6 @@
                (if0 (plus (var n) (int -1))
                     (int 1)
                     (plus
-                     (app (var self) (plus (var n) (int -1)))
-                     (app (var self) (plus (var n) (int -2))))))))))
+                     (app (var self) (plus (var n) (int -2)))
+                     (app (var self) (plus (var n) (int -1))))))))))
+
