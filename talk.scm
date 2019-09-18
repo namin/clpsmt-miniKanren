@@ -128,6 +128,8 @@
   (run 3 (q)
     (fresh (x y)
       (== q `(,x ,y))
+      (z/assert `(>= ,x 0))
+      (z/assert `(>= ,y 0))
       (z/assert `(= ,x (+ ,y 1)))))
   '((1 0) (2 1) (3 2)))
 
