@@ -37,20 +37,17 @@
 (define efib
   `(app ,fib (int 6)))
 
-(time
-  (test "fact-5"
+(time-test "fact-5"
     (run* (q)
       (evalo efact q))
-    '((int 120))))
+    '((int 120)))
 
-(time
-  (test "fib-6"
+(time-test "fib-6"
     (run* (q)
       (evalo efib q))
-    '((int 8))))
+    '((int 8)))
 
-(time
- (test "fib-synthesis-1"
+(time-test "fib-synthesis-1"
    (run 1 (fib)
      (fresh (r)
        (== `(lam self n
@@ -72,10 +69,9 @@
                     (int 1)
                     (plus
                      (app (var self) (plus (var n) (int -1)))
-                     (app (var self) (plus (var n) (int -2))))))))))
+                     (app (var self) (plus (var n) (int -2)))))))))
 
-(time
- (test "fib-synthesis-2"
+(time-test "fib-synthesis-2"
    (run 1 (fib)
      (fresh (r r1 r2)
        (== `(lam self n
@@ -100,5 +96,5 @@
                     (int 1)
                     (plus
                      (app (var self) (plus (var n) (int -2)))
-                     (app (var self) (plus (var n) (int -1))))))))))
+                     (app (var self) (plus (var n) (int -1)))))))))
 

@@ -377,8 +377,7 @@
   '(()))
 
 (printf "warning--this test takes a while!\n")
-(time
- (test "radi-loop-2"
+(time-test "radi-loop-2"
    (run 2 [q]
      (analyzeo `(app (lam self n
                           (if0 (var n)
@@ -393,7 +392,7 @@
                                    (int 1)
                                    (app (var self)
                                         (plus (var n) (int -1))))))))
-        (n (aval (neg zer pos) ()))))))))
+        (n (aval (neg zer pos) ())))))))
 
 (test "radi-not-a-loop-1"
   (run 2 [q]
@@ -416,8 +415,7 @@
        (n (aval (pos) ())))))))
 
 (printf "warning--this test takes a while!\n")
-(time
- (test "radi-loop-3"
+(time-test "radi-loop-3"
    (run 2 [q]
      (analyzeo `(app (lam self n
                           (if0 (var n)
@@ -438,11 +436,10 @@
                  (plus
                   (int 1)
                   (app (var self) (plus (var n) (int -1)))))))))
-        (n (aval (neg zer pos) ()))))))))
+        (n (aval (neg zer pos) ())))))))
 
 (printf "warning--this test takes a while!\n")
-(time
- (test "radi-loop-3b"
+(time-test "radi-loop-3b"
    (run 2 [q]
      (analyzeo `(app (lam self n
                           (if0 (var n)
@@ -463,7 +460,7 @@
                  (plus
                   (int 0)
                   (app (var self) (plus (var n) (int -1)))))))))
-        (n (aval (neg zer pos) ()))))))))
+        (n (aval (neg zer pos) ())))))))
 
 (test "radi-loop-3c"
   (run 2 [q]
@@ -524,8 +521,7 @@
   `(app ,fact (int 5)))
 
 (printf "warning--this test takes a while!\n")
-(time
- (test "radi-efact-1"
+(time-test "radi-efact-1"
    (run 1 [q]
      (analyzeo efact q))
    '((((aval (neg zer pos) ())
@@ -551,7 +547,7 @@
                  (times
                   (var n)
                   (app (var self) (plus (var n) (int -1)))))))))
-        (n (aval (neg zer pos) ()))))))))
+        (n (aval (neg zer pos) ())))))))
 
 
 (test "radi-fact-app-2"

@@ -14,73 +14,65 @@
     (evalo `(list (,f 1) (,f 2)) '(3 6)))
   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c14"
+(time-test "synthesize-triple-by-example-2c14"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op)
        (numbero e1))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c15"
+(time-test "synthesize-triple-by-example-2c15"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1)) '(3)))
-   '(((lambda (x) (let ((_.0 _.1)) 3)) (num _.1) (sym _.0)))))
+   '(((lambda (x) (let ((_.0 _.1)) 3)) (num _.1) (sym _.0))))
 
-(time
- (test "synthesize-triple-by-example-2c16"
+(time-test "synthesize-triple-by-example-2c16"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 1)) '(3 3)))
-   '(((lambda (x) (let ((_.0 _.1)) 3)) (num _.1) (sym _.0)))))
+   '(((lambda (x) (let ((_.0 _.1)) 3)) (num _.1) (sym _.0))))
 
-(time
- (test "synthesize-triple-by-example-2c17"
+(time-test "synthesize-triple-by-example-2c17"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 2)) '(1 2)))
-   '(((lambda (x) (let ((_.0 _.1)) x)) (=/= ((_.0 x))) (num _.1) (sym _.0)))))
+   '(((lambda (x) (let ((_.0 _.1)) x)) (=/= ((_.0 x))) (num _.1) (sym _.0))))
 
-(time
- (test "synthesize-triple-by-example-2c18"
+(time-test "synthesize-triple-by-example-2c18"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 2)) '(2 3)))
-   '((lambda (x) (+ 1 x)))))
+   '((lambda (x) (+ 1 x))))
 
-(time
- (test "synthesize-triple-by-example-2c19"
+(time-test "synthesize-triple-by-example-2c19"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 2)) '(18 19)))
-   '((lambda (x) (+ 17 x)))))
+   '((lambda (x) (+ 17 x))))
 
-(time
- (test "synthesize-triple-by-example-2c20a"
+(time-test "synthesize-triple-by-example-2c20a"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op)
        (== '* op))
      (evalo `(list (,f 1) (,f 2)) '(2 4)))
-   '((lambda (x) (* 2 x)))))
+   '((lambda (x) (* 2 x))))
 
-(time
- (test "synthesize-triple-by-example-2c20b"
+(time-test "synthesize-triple-by-example-2c20b"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
@@ -88,19 +80,17 @@
        (=/= 'let op)
        (=/= 'letrec op))
      (evalo `(list (,f 1) (,f 2)) '(2 4)))
-   '((lambda (x) (+ x x)))))
+   '((lambda (x) (+ x x))))
 
-(time
- (test "synthesize-triple-by-example-2c20c"
+(time-test "synthesize-triple-by-example-2c20c"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 2)) '(2 4)))
-   '((lambda (x) (+ x x)))))
+   '((lambda (x) (+ x x))))
 
-(time
- (test "synthesize-triple-by-example-2c21a"
+(time-test "synthesize-triple-by-example-2c21a"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
@@ -108,20 +98,18 @@
        (=/= 'let op)
        (=/= 'letrec op))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c21b"
+(time-test "synthesize-triple-by-example-2c21b"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op)
        (=/= 'let op))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c21c"
+(time-test "synthesize-triple-by-example-2c21c"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
@@ -130,26 +118,24 @@
          [(== 'let op)]
          [(== '* op)]))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c21d"
+(time-test "synthesize-triple-by-example-2c21d"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op)
        (=/= 'letrec op))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
-(time
- (test "synthesize-triple-by-example-2c21e"
+(time-test "synthesize-triple-by-example-2c21e"
    (run 1 (f)
      (fresh (op e1 e2)
        (== `(lambda (x) (,op ,e1 ,e2)) f)
        (symbolo op))
      (evalo `(list (,f 1) (,f 2)) '(3 6)))
-   '((lambda (x) (* 3 x)))))
+   '((lambda (x) (* 3 x))))
 
 
 
@@ -852,113 +838,101 @@
 
 
 
-(time
-  (test "a"
+(time-test "a"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f))
       (evalo `(list (,f 1)) '(3)))
-    '((lambda (x) 3))))
+    '((lambda (x) 3)))
 
-(time
-  (test "b"
+(time-test "b"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
-    '((lambda (x) (match x (1 3) (2 6) (3 9) . _.0)))))
+    '((lambda (x) (match x (1 3) (2 6) (3 9) . _.0))))
 
-(time
-  (test "c"
+(time-test "c"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(1 2 3)))
-    '((lambda (x) x))))
+    '((lambda (x) x)))
 
-(time
-  (test "d"
+(time-test "d"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(2 3 4)))
-    '((lambda (x) (+ 1 x)))))
+    '((lambda (x) (+ 1 x))))
 
-(time
-  (test "e"
+(time-test "e"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 4 5)))
-    '((lambda (x) (+ 2 x)))))
+    '((lambda (x) (+ 2 x))))
 
-(time
-  (test "f"
+(time-test "f"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(173 174 175)))
-    '((lambda (x) (+ 172 x)))))
+    '((lambda (x) (+ 172 x))))
 
-(time
-  (test "lool"
+(time-test "lool"
     (run 4 (f)
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(1 2 3)))
-    '(quote and or ((lambda (_.0) _.0) (sym _.0)))))
+    '(quote and or ((lambda (_.0) _.0) (sym _.0))))
 
 (printf "this test takes a minute\n")
-(time
-  (test "g"
+(time-test "g"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 2 4)))
-    '((lambda (x) (+ x x)))))
+    '((lambda (x) (+ x x))))
 
 (printf "this test takes several minutes\n")
-(time
-  (test "h-a"
+(time-test "h-a"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(3 6 9)))
-    '((lambda (x) (* 3 x)))))
+    '((lambda (x) (* 3 x))))
 
 (printf "this test takes several minutes\n")
-(time
-  (test "h-b"
+(time-test "h-b"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 1) (,f 2) (,f 3)) '(137 274 411)))
-    '((lambda (x) (* 137 x)))))
+    '((lambda (x) (* 137 x))))
 
 (printf "this test takes several minutes\n")
-(time
-  (test "h-c"
+(time-test "h-c"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 2) (,f 3) (,f 4)) '(274 411 548)))
-    '((lambda (x) (* 137 x)))))
+    '((lambda (x) (* 137 x))))
 
 (printf "this test takes several minutes\n")
-(time
-  (test "i"
+(time-test "i"
     (run 1 (f)
       (fresh (e)
         (== `(lambda (x) ,e) f)
         (absento 'match e))
       (evalo `(list (,f 0) (,f 1) (,f 2)) '(0 3 6)))
-    '((lambda (x) (* 3 x)))))
+    '((lambda (x) (* 3 x))))
 
 
 #!eof
