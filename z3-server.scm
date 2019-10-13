@@ -29,7 +29,7 @@
               (if (eq? r 'unknown)
                   (begin
                     (printf "read-sat: unknown\n")
-                    (call-z3 '((pop)))
+                    ;;(call-z3 '((pop)))
                     #f)
                   (error 'read-sat (format "~a" r))))))))
 
