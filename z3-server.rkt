@@ -1,15 +1,24 @@
+#lang racket
+
+(require racket/system)
+
+(provide (all-defined-out))
+
 (define z3-counter-check-sat 0)
 (define z3-counter-get-model 0)
 
-(define-values (z3-out z3-in z3-err z3-p)
-  (open-process-ports "z3 -in" 'block (native-transcoder)))
+(define z3-out #f)
+(define z3-in #f)
+(define z3-err #f)
+(define z3-p #f)
 (define (z3-reset!)
-  (let-values (((out in err p)
-                (open-process-ports "z3 -in" 'block (native-transcoder))))
-    (set! z3-out out)
-    (set! z3-in in)
-    (set! z3-err err)
-    (set! z3-p p)))
+  (let ((r
+         (process "z3 -in")))
+    (set! z3-in (car r))
+    (set! z3-out (cadr r))
+    (set! z3-p (caddr r))
+    (set! z3-err (cadddr r))))
+(z3-reset!)
 (define (z3-check-in!)
   (if (eof-object? z3-in)
       (error 'z3-check-in "z3 input port")
@@ -38,7 +47,7 @@
     (for-each (lambda (x)
                 ;;(printf "~a\n" x)
                 (fprintf z3-out "~a\n" x)) xs)
-    (flush-output-port z3-out)))
+    (flush-output z3-out)))
 
 (define check-sat
   (lambda (xs)
@@ -49,6 +58,7 @@
 (define read-model
   (lambda ()
     (let ([m (read z3-in)])
+      ;;(display m)
       (map (lambda (x)
              (cons (cadr x)
                    (if (null? (caddr x))
