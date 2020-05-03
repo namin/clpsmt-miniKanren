@@ -40,8 +40,8 @@
    ((fresh (a b r idfa idfb cola colb)
       (== edges `((,a ,b) . ,r))
       (=/= cola colb) (z/assert `(not (= ,cola ,colb)))
-      (ntho idfa nodes a) (nth idfa vars cola)
-      (ntho idfb nodes b) (nth idfb vars colb)
+      (ntho idfa nodes a) (ntho idfa vars cola)
+      (ntho idfb nodes b) (ntho idfb vars colb)
       (constraintso r nodes vars)))))
 
 (define (ntho i xs x)
@@ -65,9 +65,11 @@
   
 
 (define (lengtho xs n)
+  (fresh ()
+  (z/assert `(>= ,n 0))
   (conde
    ((== xs '()) (== n 0) (z/assert `(= ,n 0)))
    ((fresh (x rest n-1)
       (== `(,x . ,rest) xs)
       (z/assert `(= ,n (+ ,n-1 1)))
-      (lengtho rest n-1)))))
+      (lengtho rest n-1))))))
