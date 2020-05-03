@@ -73,3 +73,9 @@
       (== `(,x . ,rest) xs)
       (z/assert `(= ,n (+ ,n-1 1)))
       (lengtho rest n-1))))))
+
+;; non-deterministic result :(
+#;
+(test "3coloring"
+  (run* (q) (coloringo 3 q))
+  '((3 2 1) (3 1 2) (2 3 1) (1 3 2) (1 2 3) (2 1 3)))    
