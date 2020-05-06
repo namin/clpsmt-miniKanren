@@ -32,7 +32,7 @@
               (if (eq? r 'unknown)
                   (begin
                     (printf "read-sat: unknown\n")
-                    ;;(call-z3 '((pop)))
+                    (call-z3 '((pop)))
                     #f)
                   (error 'read-sat (format "~a" r))))))))
 
@@ -40,6 +40,11 @@
   (lambda (xs)
     (for-each (lambda (x)
                 (when log-all-calls (printf "~a\n" x))
+		(when (and (pair? x)
+			   (eq? 'assert (car x))
+			   (pair? (cadr x))
+			   (eq? '=> (caadr x)))
+		  (fprintf z3-out "(push) "))
                 (fprintf z3-out "~a\n" x)) xs)
     (flush-output-port z3-out)))
 
