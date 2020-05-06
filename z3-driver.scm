@@ -8,6 +8,8 @@
     (let ([p (open-input-file fn)])
       (let ([r (read p)])
         (close-input-port p)
+	(when (eq? r 'unknown)
+	  (printf "unknown\n"))
         (eq? r 'sat)))))
 
 (define call-z3
