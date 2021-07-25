@@ -98,6 +98,7 @@
                       (filter (lambda (x) ; ignoring functions
                                 (or (number? (cdr x))
                                     (symbol? (cdr x)) ; for bitvectors
+                                    (boolean? (cdr x)) ; for booleans
                                     )) m))
                     ms)])
       (if (member '() ms) #f  ; if we're skipping a model, let us stop
