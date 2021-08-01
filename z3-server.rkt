@@ -4,6 +4,8 @@
 
 (provide (all-defined-out))
 
+(define ns (make-base-namespace))
+
 (define z3-counter-check-sat 0)
 (define z3-counter-get-model 0)
 
@@ -67,7 +69,7 @@
                            ((eq? r 'false) #f)
                            ((eq? r 'true) #t)
                            ((and (pair? (cadddr x)) (eq? (cadr (cadddr x)) 'BitVec)) r)
-                           (else (eval r))))
+                           (else (eval r ns))))
                        `(lambda ,(map car (caddr x)) ,(cadddr (cdr x))))))
            (cdr m)))))
 
