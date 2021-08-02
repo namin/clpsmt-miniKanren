@@ -17,7 +17,10 @@
          z/
          do-defer-smt-checks!
          get-next-model?
-         toggle-get-next-model?!)
+         toggle-get-next-model?!
+         z3-counter-check-sat
+         z3-counter-get-model
+         )
 
 ;; extra stuff for racket
 ;; due mostly to samth
