@@ -14,9 +14,9 @@
     (let ([p (open-output-file "out.smt" #:exists 'replace)])
       (for-each (lambda (x) (fprintf p "~a\n" x)) xs)
       (close-output-port p)
-      (system "sed -i '' 's/#t/true/g; s/#f/false/g; s/bitvec-/#b/g' out.smt")
+      (system "perl -i -pe 's/#t/true/g; s/#f/false/g; s/bitvec-/#b/g' out.smt")
       (let ((r (system "z3 out.smt >out.txt")))
-        (system "sed -i '' 's/#b/bitvec-/g' out.txt")
+        (system "perl -i -pe 's/#b/bitvec-/g' out.txt")
         (when (not r)
           (error 'call-z3 "error in z3 out.smt > out.txt"))))))
 

@@ -19,16 +19,16 @@
       (close-output-port p)
       ;; WEB -- I think this is equivalent to, but faster than, the commented three calls to sed, below
       ;; see https://unix.stackexchange.com/questions/97428/sed-how-to-do-several-consecutive-substitutions-but-process-file-only-once#97437
-      (system "sed -i '' 's/#t/true/g; s/#f/false/g; s/bitvec-/#b/g' out.smt")
-      ;; (system "sed -i '' 's/#t/true/g' out.smt")
-      ;; (system "sed -i '' 's/#f/false/g' out.smt")
-      ;; (system "sed -i '' 's/bitvec-/#b/g' out.smt")
+      (system "perl -i -pe 's/#t/true/g; s/#f/false/g; s/bitvec-/#b/g' out.smt")
+      ;; (system "perl -i -pe 's/#t/true/g' out.smt")
+      ;; (system "perl -i -pe 's/#f/false/g' out.smt")
+      ;; (system "perl -i -pe 's/bitvec-/#b/g' out.smt")
       
       (let ((r (system "z3 out.smt >out.txt")))
         (when log-all-calls
           (system (format "cp out.smt out~d.smt" (+ z3-counter-check-sat z3-counter-get-model)))
           (system (format "cp out.txt out~d.txt" (+ z3-counter-check-sat z3-counter-get-model))))
-        (system "sed -i '' 's/#b/bitvec-/g' out.txt")
+        (system "perl -i -pe 's/#b/bitvec-/g' out.txt")
         (when (not (= r 0))
           (error 'call-z3 "error in z3 out.smt > out.txt"))))))
 
