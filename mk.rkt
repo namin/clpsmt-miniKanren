@@ -2,7 +2,10 @@
 
 (require racket/list
          racket/system
-         racket/include)
+	 racket/include
+         (rename-in racket/base (eval eval1))
+         (rename-in racket/base (open-output-file open-output-file1))
+         (rename-in racket/system (system system1)))
 
 (provide run run*
          == =/=
@@ -19,8 +22,21 @@
          get-next-model?
          toggle-get-next-model?!
          z3-counter-check-sat
-         z3-counter-get-model
-         )
+         z3-counter-get-model)
+
+;; extra stuff for racket
+(define ns (make-base-namespace))
+
+(define (eval e)
+  (eval1 e ns))
+
+(define (open-output-file path options)
+  (open-output-file1 path #:exists options))
+
+(define (system command)
+  (if (system1 command) 0 -1))
+
+(include "z3-driver.scm")
 
 ;; extra stuff for racket
 ;; due mostly to samth
@@ -35,7 +51,6 @@
 
 (define (exists f l) (ormap f l))
 
-(include "z3-driver.rkt")
 (include "mk.scm")
 (define (do-defer-smt-checks!)
   (set! defer-smt-checks #t))
