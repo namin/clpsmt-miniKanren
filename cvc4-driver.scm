@@ -19,7 +19,7 @@
       (system "perl -i -pe 's/bitvec-/#b/g' out.smt")
       (let ((r (system "cvc4 -m --lang smt out.smt >out.txt")))
         (system "perl -i -pe 's/#b/bitvec-/g' out.txt")
-        (if (not (= r 0))
+        (when (not (= r 0))
             (error 'call-cvc4 "error in cvc4 out.smt > out.txt"))))))
 
 (define check-sat
