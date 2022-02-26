@@ -3,10 +3,10 @@ CLP(SMT)-miniKanren
 
 Canonical miniKanren implementation, augmented with CLP(SMT).
 
-Added SMT hooks: `z/assert` takes a boolean arithmetic expression with variables (integer by default), `z/` takes an SMT statement, `z/purge` manually purges the SMT constraints into an enumeration of models, `z/check` only fails if the constraints are unsatisfiable.
+This repository adds SMT hooks: `z/assert` takes a boolean arithmetic expression with variables (integer by default), `z/` takes an SMT statement, `z/purge` manually purges the SMT constraints into an enumeration of models, `z/check` only fails if the constraints are unsatisfiable.
 
 See also:
-- https://github.com/chansey97/faster-minikanren/tree/smt-assumptions-full-integration
+- (recommended version) https://github.com/chansey97/faster-minikanren/tree/smt-assumptions-full-integration
 - https://github.com/namin/faster-miniKanren/tree/smt-assumptions
 - https://github.com/webyrd/Barliman/blob/will-clpsmt/cocoa/Barliman/mk-and-rel-interp/test-interp.scm
 
